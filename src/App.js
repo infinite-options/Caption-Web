@@ -1,8 +1,10 @@
 import React, { useState } from "react";
-import logo from "./images/logo.svg";
+import logo from "./Assets/logo.svg";
 import "./App.css";
-import Pic from "./images/sd.jpg";
-import Page1 from "./Components/Page";
+import Pic from "./Assets/sd.jpg";
+import Page1 from "./Pages/Page";
+
+import Scoreboard from "./Pages/Scoreboard";
 
 function App() {
   const [gameStart, setGameStart] = useState(false);
@@ -13,14 +15,18 @@ function App() {
 
   return (
     <div className="App">
-      {gameStart ? (
+      {/* {gameStart ? (
         <Page1 />
       ) : (
         <div>
           <button onClick={startGame}>Begin the Game</button>
           <h4>Click the button to begin</h4>
         </div>
-      )}
+      )} */}
+      <Scoreboard
+        title="Dreamworks"
+        bestCaption="Just two dudes looking at something funny"
+      />
     </div>
   );
 }

@@ -1,0 +1,22 @@
+.col {
+  margin: 20px;
+  text-align: center;
+}
+
+.row {
+  text-align: center;
+}
+
+.card {
+  padding: 20px;
+  border-radius: 25px;
+  max-width: 500px;
+  align-self: center;
+}
+
+.container {
+  max-width: 500px;
+}
+.img {
+  max-width: 500px;
+}

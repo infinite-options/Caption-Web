@@ -3,6 +3,7 @@ import logo from "./Assets/logo.svg";
 import "./App.css";
 import Pic from "./Assets/sd.jpg";
 import Page1 from "./Pages/Page";
+import Landing from "./Pages/Landing";
 
 import Scoreboard from "./Pages/Scoreboard";
 
@@ -23,10 +24,11 @@ function App() {
           <h4>Click the button to begin</h4>
         </div>
       )} */}
-      <Scoreboard
+      {/* <Scoreboard
         title="Dreamworks"
         bestCaption="Just two dudes looking at something funny"
-      />
+      /> */}
+      <Landing />
     </div>
   );
 }

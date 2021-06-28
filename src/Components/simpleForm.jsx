@@ -1,4 +1,5 @@
 import React, { Component } from "react";
+import "./SimpleForm.css";
 
 class Form extends Component {
   constructor(props) {
@@ -17,13 +18,11 @@ class Form extends Component {
       <form onSubmit={this.handleSubmit}>
         <div aria-label={"Enter your " + this.props.field + "here"}>
           <input
+            className="input"
             name="variable"
             placeholder={this.props.field}
             value={info}
             onChange={this.handleChange}
-            style={{
-              width: "300px",
-            }}
           />
         </div>
       </form>

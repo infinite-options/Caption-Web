@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Pic from "../Assets/sd.jpg";
 import Countdown from "react-countdown";
-import SimpleForm from "../Components/simpleForm";
+import SimpleForm from "../Components/SimpleForm";
 
 export default function Page() {
   const [caption, setCaption] = useState("");

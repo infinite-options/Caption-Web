@@ -1,0 +1,17 @@
+.col {
+  margin: 20px;
+  text-align: center;
+}
+
+.row {
+  text-align: center;
+}
+
+.card {
+  padding: 20px;
+  border-radius: 25px;
+}
+
+.container {
+  max-width: 500px;
+}

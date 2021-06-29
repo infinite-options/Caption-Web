@@ -34,7 +34,7 @@ export default function Page() {
             <br></br>
             10s Timer:{" "}
             <Countdown
-              date={Date.now() + 5 * 1000}
+              date={Date.now() + 10 * 1000}
               onComplete={countdownComplete}
             />
           </div>

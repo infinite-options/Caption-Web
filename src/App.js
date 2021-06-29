@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import logo from "./Assets/logo.svg";
 import "./App.css";
-import Pic from "./Assets/sd.jpg";
-import Page1 from "./Pages/Page";
-import Landing from "./Pages/Landing";
-
-import Scoreboard from "./Pages/Scoreboard";
+// import Pic from "./Assets/sd.jpg";
+// import Page1 from "./Pages/Page";
+// import Landing from "./Pages/Landing";
+// import Collections from "./Pages/Collections";
+// import Scoreboard from "./Pages/Scoreboard";
+import Nav from "./Nav";
 
 function App() {
   const [gameStart, setGameStart] = useState(false);
@@ -28,7 +29,9 @@ function App() {
         title="Dreamworks"
         bestCaption="Just two dudes looking at something funny"
       /> */}
-      <Landing />
+      {/* <Landing /> */}
+      {/* <Collections /> */}
+      <Nav />
     </div>
   );
 }

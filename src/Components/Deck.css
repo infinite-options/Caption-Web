@@ -1,0 +1,20 @@
+/* How do I get the css of an image to work correctly?  */
+.img {
+  max-width: 150px;
+  max-height: 150px;
+  border-radius: 100px;
+}
+.imageBackground {
+  background-color: yellow;
+}
+.p {
+  width: 150px;
+  height: 50px;
+}
+.outer {
+  width: 160px;
+  /* height: 20px;
+  border-style: solid;
+  border-color: red;
+  border-width: 2px; */
+}

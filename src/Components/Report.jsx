@@ -1,6 +1,6 @@
 import React from "react";
 import { Row, Col, Card } from "reactstrap";
-import "./Report.css";
+import "../Styles/Report.css";
 
 export default function Report(props) {
   const alias = props.alias;

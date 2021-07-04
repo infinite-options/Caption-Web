@@ -11,14 +11,14 @@ function Scoreboard(props) {
   return (
     <div>
       <h1>{title}</h1>
-      <h3> Scoreboard</h3>
+      <h3>Selection</h3>
       <img className="img2" src={Pic} />
 
-      <h4 classname="row">Winning Caption:</h4>
-      <h4>{bestCaption}</h4>
-      <br></br>
+      <h4 classname="row">Select the Best Caption</h4>
+      {/* <h4>{bestCaption}</h4>
+      <br></br> */}
 
-      <Report
+      {/* <Report
         // alias="Mickey"
         caption="Shrek and Donkey"
         // points="10"
@@ -38,9 +38,18 @@ function Scoreboard(props) {
         points="10"
         totalPts="42"
         votes="2"
+      /> */}
+      <Button buttonStyle="btn--outline" children="Shrek and Donkey" />
+      <br></br>
+      <Button
+        buttonStyle="btn--outline"
+        children="Two really nice halloween costumes"
       />
       <br></br>
-      <Button destination="/" children="back to the landing page" />
+      <Button buttonStyle="btn--outline" children="Shrek Dead Redemption" />
+      <br></br>
+      <br></br>
+      <Button destination="/scoreboard" children="Continue to Scoreboard" />
     </div>
   );
 }

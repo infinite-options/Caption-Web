@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import Pic from "../Assets/sd.jpg";
 import Countdown from "react-countdown";
 import SimpleForm from "../Components/SimpleForm";
+import { Button } from "../Components/Button";
+import "../Styles/Scoreboard.css";
 
 export default function Page() {
   const [caption, setCaption] = useState("");
@@ -18,11 +20,14 @@ export default function Page() {
   return (
     <div>
       <div style={{ padding: "20px" }}>
-        <img src={Pic} />
+        <img className="img2" src={Pic} />
         <br></br>
         <br></br>
         {timeUp ? (
-          <h1>You have captioned the above image as: "{caption}"</h1>
+          <div>
+            <h1>You have captioned the above image as: "{caption}"</h1>
+            <Button destination="/selection" children="navigate to selection" />
+          </div>
         ) : (
           <div>
             <SimpleForm

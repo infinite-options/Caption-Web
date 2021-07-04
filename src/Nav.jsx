@@ -5,6 +5,7 @@ import Page1 from "./Pages/Page";
 import Collections from "./Pages/Collections";
 import Scoreboard from "./Pages/Scoreboard";
 import Landing from "./Pages/Landing";
+import Selection from "./Pages/Selection";
 
 export default function Nav() {
   return (
@@ -14,6 +15,7 @@ export default function Nav() {
         <Route exact path="/collections" component={Collections} />
         <Route exact path="/scoreboard" component={Scoreboard} />
         <Route exact path="/page" component={Page1} />
+        <Route exact path="/selection" component={Selection} />
       </Switch>
     </Router>
   );

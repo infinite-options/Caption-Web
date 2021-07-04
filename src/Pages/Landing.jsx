@@ -1,6 +1,7 @@
 import React, { useState } from "react";
-import SimpleForm from "../Components/SimpleForm";
+import SimpleForm from "../Components/SimpleForm.jsx";
 import Background from "../Assets/sd.jpg";
+import { Button } from "../Components/Button.jsx";
 // import "./Landing.css";
 
 function Landing() {
@@ -35,6 +36,8 @@ function Landing() {
       <SimpleForm field="Enter Game Code" onHandleChange={existingCode} />
       <br></br>
       <SimpleForm field="Create New Game" onHandleChange={newCode} />
+      <br></br>
+      <Button destination="/collections">navigate to collections</Button>
     </div>
   );
 }

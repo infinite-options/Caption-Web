@@ -1,25 +1,17 @@
 import React from "react";
-import "./Deck.css";
+import "../Styles/Deck.css";
+import { Link } from "react-router-dom";
 
-function DeckCard(props) {
+export default function DeckCard(props) {
   return (
-    <div className="outer">
-      <div className="imageBackground">
-        <img
-          src={props.src}
-          alt={props.alt}
-          className="img"
-          // style={{
-          //   maxHeight: "150px",
-          //   maxWidth: "150px",
-          // }}
-        />
+    <Link to="/page" className="btn-mobile">
+      <div className="outer">
+        <div className="imageBackground">
+          <img src={props.src} alt={props.alt} className="img" />
+        </div>
+        <p>{props.title}</p>
+        <p> Price: ${props.price}</p>
       </div>
-
-      <p>{props.title}</p>
-      <p> Price: ${props.price}</p>
-    </div>
+    </Link>
   );
 }
-
-export default DeckCard;

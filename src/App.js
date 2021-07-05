@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import logo from "./Assets/logo.svg";
+// import logo from "./Assets/logo.svg";
 import "./App.css";
 // import Pic from "./Assets/sd.jpg";
 // import Page1 from "./Pages/Page";

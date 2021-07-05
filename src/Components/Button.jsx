@@ -23,7 +23,8 @@ const Button = ({
   return (
     <Link to={destination} className="btn-mobile">
       <button
-        className={`btn ${checkButtonStyle} ${checkButtonSize}`}
+        // className={`btn ${checkButtonStyle} ${checkButtonSize}`}
+        className = "btrn"
         onClick={onClick}
         type={type}
       >

@@ -39,7 +39,7 @@ function Scoreboard(props) {
         totalPts="42"
         votes="2"
       /> */}
-      <Button buttonStyle="btn--outline" children="Shrek and Donkey" />
+      <Button  buttonStyle="btn--outline" children="Shrek and Donkey" />
       <br></br>
       <Button
         buttonStyle="btn--outline"

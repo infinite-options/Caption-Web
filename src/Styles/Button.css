@@ -1,4 +1,4 @@
-:root {
+/* :root {
   --primary: #fff;
 }
 
@@ -40,4 +40,25 @@
   background: #fff;
   color: #242424;
   transition: 250ms;
+} */
+
+.btrn {
+  /* height: 50px;
+  width: 500px; */
+  width: 300px;
+  border-radius: 15px;
+  border-color: black;
+  border-width: 3px;
+  /* background-color: white; */
+  color: black;
+  font-family: Josefin Sans;
+  font-weight: bold;
+  background-color: yellow;
+
+}
+
+::placeholder {
+  /* color: black;
+  font-family: Josefin Sans;
+  font-weight: bold; */
 }

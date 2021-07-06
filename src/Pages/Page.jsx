@@ -4,7 +4,8 @@ import Countdown from "react-countdown";
 import SimpleForm from "../Components/SimpleForm";
 import { Button } from "../Components/Button";
 import "../Styles/Scoreboard.css";
-import background from "../Assets/landing.png";
+import background from "../Assets/temp.png";
+import { CountdownCircleTimer } from 'react-countdown-circle-timer'
 
 export default function Page() {
   const [caption, setCaption] = useState("");
@@ -30,6 +31,9 @@ export default function Page() {
     }}
   >
       <div style={{ padding: "20px" }}>
+        <h1>Name of Deck</h1>
+        <br></br>
+        <h4>Enter the Caption</h4>
         <img className="img2" src={Pic} />
         <br></br>
         <br></br>
@@ -45,13 +49,27 @@ export default function Page() {
               onHandleChange={handleCaptionChange}
             />
             <br></br>
-            <button onClick={countdownComplete}> Submit</button>
+            <Button onClick={countdownComplete} children="Submit"/>
+            {/* <button onClick={countdownComplete}> Submit</button> */}
             <br></br>
-            10s Timer:{" "}
-            <Countdown
+            {/* 10s Timer:{" "} */}
+            {/* <Countdown
               date={Date.now() + 100 * 1000}
-              onComplete={countdownComplete}
-            />
+              // onComplete={countdownComplete}
+            /> */}
+
+            
+            <CountdownCircleTimer
+    isPlaying
+    duration={10}
+    colors={[
+      ['#004777', 0.33],
+      ['#F7B801', 0.33],
+      ['#A30000', 0.33],
+    ]}
+  >
+    {({ remainingTime }) => remainingTime}
+  </CountdownCircleTimer>
           </div>
         )}
       </div>

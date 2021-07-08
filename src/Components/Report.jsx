@@ -12,25 +12,42 @@ export default function Report(props) {
   return (
     <div className="container">
       <Row
-        style={{
-          backgroundColor: "grey",
-        }}
+      // style={{
+      //   backgroundColor: "#4D4D4D",
+      // }}
       >
         <Col>
-          <Row>
-            {alias} {"  "} {pts} pts
-          </Row>
-          <Card
+          <Row
             style={{
-              textAlign: "center",
+              display: "block",
             }}
           >
-            {caption}
-          </Card>
+            <span className="yes">{alias}</span>
+            <span className="no">{pts} pts</span>
+
+            {/* {alias} {"  "} {pts} pts */}
+          </Row>
+          <br></br>
+          <Row>
+            <Card>{caption}</Card>
+          </Row>
         </Col>
         <Col>
-          <Row>{votes} votes</Row>
-          <Row>{totalPts} total points</Row>
+          <Row
+            style={{
+              font: "Josefin Sans",
+              alignItems: "right",
+              color: "white",
+            }}
+          >
+            {votes} votes
+          </Row>
+          <br></br>
+          <Row
+            style={{ font: "Josefin Sans", fontSize: "42px", color: "white" }}
+          >
+            {totalPts} pts
+          </Row>
         </Col>
       </Row>
     </div>

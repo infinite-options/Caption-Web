@@ -42,21 +42,42 @@
   transition: 250ms;
 } */
 
-.btrn {
-  /* height: 50px;
-  width: 500px; */
-  width: 300px;
+/* narrow */
+.landing1 {
+  width: 100px;
   border-radius: 15px;
   border-color: black;
   border-width: 1px;
-  /* background-color: white; */
   color: black;
   font-family: Josefin Sans;
   font-weight: bold;
   background-color: yellow;
-
+}
+/* 
+wide */
+.landing2 {
+  width: 300px;
+  border-radius: 15px;
+  border-color: black;
+  border-width: 1px;
+  color: black;
+  font-family: Josefin Sans;
+  font-weight: bold;
+  background-color: yellow;
 }
 
+/* fat */
+.landing3 {
+  width: 100px;
+  height: 60px;
+  border-radius: 15px;
+  border-color: black;
+  border-width: 1px;
+  color: black;
+  font-family: Josefin Sans;
+  font-weight: bold;
+  background-color: yellow;
+}
 ::placeholder {
   /* color: black;
   font-family: Josefin Sans;

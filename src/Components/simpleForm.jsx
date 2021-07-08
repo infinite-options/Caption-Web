@@ -18,7 +18,7 @@ class Form extends Component {
       <form onSubmit={this.handleSubmit}>
         <div aria-label={"Enter your " + this.props.field + "here"}>
           <input
-            className="input"
+            className={this.props.className}
             name="variable"
             placeholder={this.props.field}
             value={info}

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import "../Styles/Button.css";
 import { Link } from "react-router-dom";
 
@@ -7,6 +7,7 @@ const STYLES = ["btn--primary", "btn--outline", "btn--test"];
 const SIZES = ["btn--medium", "btn--large"];
 
 const Button = ({
+  className,
   children,
   type,
   onClick,
@@ -24,12 +25,13 @@ const Button = ({
     <Link to={destination} className="btn-mobile">
       <button
         // className={`btn ${checkButtonStyle} ${checkButtonSize}`}
-        className = "btrn"
+        className={className}
         onClick={onClick}
         type={type}
       >
         {children}
       </button>
+      <br></br>
     </Link>
   );
 };

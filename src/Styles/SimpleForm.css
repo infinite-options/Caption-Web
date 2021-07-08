@@ -1,5 +1,13 @@
-.input {
+.input1 {
   width: 300px;
+  border-radius: 15px;
+  border-color: black;
+  border-width: 1px;
+  background-color: white;
+}
+.input2 {
+  width: 350px;
+  height: 140px;
   border-radius: 15px;
   border-color: black;
   border-width: 1px;
@@ -11,4 +19,5 @@
   font-family: Josefin Sans;
   font-weight: bold;
   font-size: 14px;
+  text-align: center;
 }

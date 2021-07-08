@@ -11,15 +11,15 @@ function Scoreboard(props) {
   const bestCaption = "Two dudes watching the Sharknado trailer";
   return (
     <div
-    style={{
-      maxWidth: "375px",
-      height: "812px",
-      //As long as I import the image from my package strcuture, I can use them like so
-      backgroundImage: `url(${background})` 
-      // backgroundImage:
-      //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
-    }}
-  >
+      style={{
+        maxWidth: "375px",
+        height: "812px",
+        //As long as I import the image from my package strcuture, I can use them like so
+        backgroundImage: `url(${background})`,
+        // backgroundImage:
+        //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
+      }}
+    >
       {/* <h1>{title}</h1> */}
       <h1>Name of Deck</h1>
       <br></br>
@@ -32,38 +32,30 @@ function Scoreboard(props) {
       {/* <h4>{bestCaption}</h4>
       <br></br> */}
 
-      {/* <Report
-        // alias="Mickey"
-        caption="Shrek and Donkey"
-        // points="10"
-        // totalPts="42"
-        // votes="2"
+      <Button
+        className="landing2"
+        buttonStyle="btn--outline"
+        children="Shrek and Donkey"
       />
-      <Report
-        alias="Mickey"
-        caption="Shrek and Donkey"
-        points="10"
-        totalPts="42"
-        votes="2"
-      />
-      <Report
-        alias="Mickey"
-        caption="Shrek and Donkey"
-        points="10"
-        totalPts="42"
-        votes="2"
-      /> */}
-      <Button  buttonStyle="btn--outline" children="Shrek and Donkey" />
       <br></br>
       <Button
+        className="landing2"
         buttonStyle="btn--outline"
         children="Two really nice halloween costumes"
       />
       <br></br>
-      <Button buttonStyle="btn--outline" children="Shrek Dead Redemption" />
+      <Button
+        className="landing2"
+        buttonStyle="btn--outline"
+        children="Shrek Dead Redemption"
+      />
       <br></br>
       <br></br>
-      <Button destination="/scoreboard" children="Continue to Scoreboard" />
+      <Button
+        className="landing2"
+        destination="/scoreboard"
+        children="Continue to Scoreboard"
+      />
     </div>
   );
 }

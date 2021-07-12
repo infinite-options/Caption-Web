@@ -45,9 +45,21 @@ function Collections() {
         //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
       }}
     >
-      <img className="innerImage1" src={circle} />
+      {/* <img className="innerImage1" src={circle} /> */}
+
       <br></br>
       <br></br>
+      <i
+        style={{
+          height: "30px",
+          width: "30px",
+          position: "absolute",
+          top: "55px",
+          left: "30px",
+          color: "blue",
+        }}
+        class="fas fa-info-circle"
+      />
       <h4>Select a deck</h4>
       <br></br>
       <br></br>
@@ -65,7 +77,7 @@ function Collections() {
           </li>
         ))}
       </ul>
-      <img className="innerImage2" src={thing} />
+      {/* <img className="innerImage2" src={thing} /> */}
     </div>
   );
 }

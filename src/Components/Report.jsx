@@ -8,28 +8,29 @@ export default function Report(props) {
   const pts = props.points;
   const totalPts = props.totalPts;
   const votes = props.votes;
+  const isWinner = props.isWinner;
 
   return (
     <div className="container">
-      <Row
-      // style={{
-      //   backgroundColor: "#4D4D4D",
-      // }}
-      >
+      <Row>
         <Col>
           <Row
             style={{
               display: "block",
             }}
           >
-            <span className="yes">{alias}</span>
-            <span className="no">{pts} pts</span>
-
-            {/* {alias} {"  "} {pts} pts */}
+            <span className="nameTag">{alias}</span>
+            <span className="pointTag">{pts} pts</span>
           </Row>
           <br></br>
           <Row>
-            <Card>{caption}</Card>
+            {isWinner ? (
+              <Card className="card1" style={{ backgroundColor: "yellow" }}>
+                {caption}
+              </Card>
+            ) : (
+              <Card className="card1">{caption}</Card>
+            )}
           </Row>
         </Col>
         <Col>
@@ -40,11 +41,18 @@ export default function Report(props) {
               color: "white",
             }}
           >
+            <i class="fa fa-thumbs-up fa-2x"></i>
+            <span style={{ marginLeft: "40px" }} />
             {votes} votes
           </Row>
-          <br></br>
+
           <Row
-            style={{ font: "Josefin Sans", fontSize: "42px", color: "white" }}
+            style={{
+              alignText: "center",
+              font: "Josefin Sans",
+              fontSize: "32px",
+              color: "white",
+            }}
           >
             {totalPts} pts
           </Row>

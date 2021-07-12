@@ -4,7 +4,8 @@ import Countdown from "react-countdown";
 import { Row, Col, Card } from "reactstrap";
 import SimpleForm from "../Components/SimpleForm";
 import { Button } from "../Components/Button";
-import "../Styles/Scoreboard.css";
+// import "../Styles/Scoreboard.css";
+import "../Styles/Page.css";
 import background from "../Assets/temp.png";
 
 //Documentation for the CountdownCircleTimer component
@@ -35,10 +36,12 @@ export default function Page() {
       }}
     >
       <div style={{ padding: "20px" }}>
+        <br></br>
+
         <h1>Name of Deck</h1>
         <br></br>
-        <h4>Enter the Caption</h4>
-        <img className="img2" src={Pic} />
+
+        <img className="centerPic" src={Pic} />
         <br></br>
         <br></br>
         {timeUp ? (
@@ -54,39 +57,39 @@ export default function Page() {
           <div>
             <SimpleForm
               className="input2"
-              field="Caption The Image Before the Timer runs out"
+              field="Enter your caption here"
               onHandleChange={handleCaptionChange}
             />
             <br></br>
             <Row>
-              <Col>
-                <br></br>{" "}
-                <Button
-                  className="landing3"
-                  onClick={countdownComplete}
-                  children="Submit"
-                />
-              </Col>
-              <Col>
-                <div
-                  style={{
-                    background: "yellow",
-                    borderRadius: "60px",
-                    width: "120px",
-                  }}
+              <span style={{ marginLeft: "50px" }}></span>
+              <div
+                style={{
+                  background: "yellow",
+                  borderRadius: "30px",
+                  width: "60px",
+                }}
+              >
+                <CountdownCircleTimer
+                  background="red"
+                  size={60}
+                  strokeWidth={5}
+                  isPlaying
+                  duration={100}
+                  colors="#000000"
                 >
-                  <CountdownCircleTimer
-                    background="red"
-                    size={120}
-                    strokeWidth={5}
-                    isPlaying
-                    duration={100}
-                    colors="#000000"
-                  >
-                    {({ remainingTime }) => remainingTime}
-                  </CountdownCircleTimer>
-                </div>
-              </Col>
+                  {({ remainingTime }) => (
+                    <div className="countdownText">{remainingTime}</div>
+                  )}
+                </CountdownCircleTimer>
+              </div>
+              <span style={{ marginLeft: "60px" }}></span>
+              <br></br>{" "}
+              <Button
+                className="fat"
+                onClick={countdownComplete}
+                children="Submit"
+              />
             </Row>
           </div>
         )}

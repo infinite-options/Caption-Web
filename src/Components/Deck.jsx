@@ -9,8 +9,10 @@ export default function DeckCard(props) {
         <div className="imageBackground">
           <img src={props.src} alt={props.alt} className="img" />
         </div>
-        {props.title}
-        <p> Price: ${props.price}</p>
+        <div className="deckText">
+          {props.title} ({props.price})
+        </div>
+        <Link className="linkText">Learn More</Link>
       </div>
     </Link>
   );

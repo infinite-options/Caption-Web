@@ -1,0 +1,15 @@
+.centerPic {
+  display: block;
+
+  max-width: 325px;
+  max-height: 325px;
+  width: auto;
+  height: auto;
+  border-radius: 50px;
+}
+
+.countdownText {
+  font-family: Josefin Sans, sans-serif;
+  font-weight: bold;
+  font-size: 18px;
+}

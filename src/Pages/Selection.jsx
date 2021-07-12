@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import Pic from "../Assets/sd.jpg";
 import { Row, Col, Card } from "reactstrap";
 import "../Styles/Scoreboard.css";
@@ -9,6 +9,13 @@ import background from "../Assets/temp.png";
 function Scoreboard(props) {
   const title = props.title;
   const bestCaption = "Two dudes watching the Sharknado trailer";
+
+  const [toggle, setToggle] = useState(false);
+
+  function changeToggle() {
+    setToggle(!toggle);
+  }
+
   return (
     <div
       style={{
@@ -33,29 +40,27 @@ function Scoreboard(props) {
       <br></br> */}
 
       <Button
-        className="landing2"
+        isSelected={toggle}
+        className="input1"
         buttonStyle="btn--outline"
         children="Shrek and Donkey"
+        onClick={changeToggle}
       />
       <br></br>
       <Button
-        className="landing2"
+        className="input1"
         buttonStyle="btn--outline"
         children="Two really nice halloween costumes"
       />
       <br></br>
       <Button
-        className="landing2"
+        className="input1"
         buttonStyle="btn--outline"
         children="Shrek Dead Redemption"
       />
       <br></br>
       <br></br>
-      <Button
-        className="landing2"
-        destination="/scoreboard"
-        children="Continue to Scoreboard"
-      />
+      <Button className="fat" destination="/scoreboard" children="Vote" />
     </div>
   );
 }

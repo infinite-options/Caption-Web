@@ -1,8 +1,9 @@
 .input1 {
-  width: 300px;
-  border-radius: 15px;
+  width: 350px;
+  height: 50px;
+  border-radius: 25px;
   border-color: black;
-  border-width: 1px;
+  border-width: 3px;
   background-color: white;
 }
 .input2 {
@@ -14,10 +15,30 @@
   background-color: white;
 }
 
-::placeholder {
+.input1::placeholder {
   color: black;
-  font-family: Josefin Sans;
+  font-family: Josefin Sans, sans-serif;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 20px;
+  padding: 10px;
+  text-align: left;
+
+  /* font-family: Verdana, Geneva, Tahoma, sans-serif; */
+
+  border-radius: 15px;
+  border-color: black;
+}
+
+.input2::placeholder {
+  color: black;
+  font-family: Josefin Sans, sans-serif;
+
+  font-size: 18px;
+  padding: 10px;
+  vertical-align: top;
   text-align: center;
+
+  /* font-family: Verdana, Geneva, Tahoma, sans-serif; */
+
+  border-radius: 15px;
 }

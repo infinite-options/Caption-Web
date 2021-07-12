@@ -14,6 +14,7 @@ const Button = ({
   buttonStyle,
   buttonSize,
   destination,
+  isSelected,
 }) => {
   const checkButtonStyle = STYLES.includes(buttonStyle)
     ? buttonStyle
@@ -23,14 +24,35 @@ const Button = ({
 
   return (
     <Link to={destination} className="btn-mobile">
-      <button
+      {isSelected ? (
+        <button
+          style={{ backgroundColor: "red" }}
+          // className={`btn ${checkButtonStyle} ${checkButtonSize}`}
+          className={className}
+          onClick={onClick}
+          type={type}
+        >
+          {children}
+        </button>
+      ) : (
+        <button
+          // className={`btn ${checkButtonStyle} ${checkButtonSize}`}
+          className={className}
+          onClick={onClick}
+          type={type}
+        >
+          {children}
+        </button>
+      )}
+      {/* <button
+
         // className={`btn ${checkButtonStyle} ${checkButtonSize}`}
         className={className}
         onClick={onClick}
         type={type}
       >
         {children}
-      </button>
+      </button> */}
       <br></br>
     </Link>
   );

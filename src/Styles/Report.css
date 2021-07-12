@@ -1,5 +1,5 @@
 .col {
-  margin: 20px;
+  margin: 10px;
   text-align: center;
 }
 
@@ -7,21 +7,26 @@
   text-align: center;
 }
 
-.card {
-  padding: 20px;
+.card1 {
+  height: 60px;
+  width: 200px;
+  /* padding: 20px; */
   border-radius: 25px;
+  font-size: 14px;
+  vertical-align: 100%;
 }
 
 .container {
   max-width: 500px;
 }
 
-.yes {
+.nameTag {
   color: white;
   float: left;
+  font-size: 14px;
 }
 
-.no {
+.pointTag {
   color: white;
   float: right;
 }

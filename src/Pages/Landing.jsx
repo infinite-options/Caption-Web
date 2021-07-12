@@ -1,13 +1,16 @@
 import React, { useState } from "react";
+import axios from "axios";
 import SimpleForm from "../Components/SimpleForm";
 import Background from "../Assets/sd.jpg";
 import { Button } from "../Components/Button.jsx";
 import background from "../Assets/landing.png";
-// import "./Landing.css";
+import "../Styles/Landing.css";
 
 function Landing() {
   const [code, setCode] = useState("");
   const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [zipCode, setZipCode] = useState("");
 
   var sectionStyle = {
     width: "100%",
@@ -19,53 +22,97 @@ function Landing() {
     setCode(codeInput);
   };
 
-  const handleNameChange = (codeInput) => {
-    setCode(codeInput);
+  const handleNameChange = (nameInput) => {
+    setName(nameInput);
   };
+
+  const handleEmailChange = (emailInput) => {
+    setEmail(emailInput);
+  };
+
+  const handleZipCodeChange = (zipCodeInput) => {
+    setZipCode(zipCodeInput);
+  };
+
+  function createGame() {
+    const postURL =
+      "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createGame";
+    const payload = {
+      rounds: "6",
+      round_time: "0000-00-00 00:00:10",
+    };
+
+    axios.post(postURL, payload).then((res) => console.log(res));
+  }
+
+  function joinGame() {
+    const getURL =
+      "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame";
+
+    axios.get(getURL + "/" + code).then((res) => {
+      console.log(res);
+    });
+  }
 
   return (
     <div
       style={{
         maxWidth: "375px",
         height: "812px",
-        //As long as I import the image from my package strcuture, I can use them like so
-        backgroundImage: `url(${background})`,
-        // backgroundImage:
-        //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
+        // backgroundImage: `url(${background})`,
       }}
     >
-      <br></br>
-      <br></br>
-      <br></br>
-      <br></br>
-      {/* <h1
+      <div
+        className="testBlur"
         style={{
-          color: "Black",
+          backgroundImage: `url(${background})`,
         }}
-      >
-        Captionary
-      </h1> */}
-      <br></br>
-      <SimpleForm
-        className="input1"
-        field="Enter Game Code"
-        onHandleChange={handleCodeChange}
-      />
-      <br></br>
-      <SimpleForm
-        className="input1"
-        field="Your Name"
-        onHandleChange={handleNameChange}
-      />
-      <br></br>
-      <Button className="landing1" destination="/collections">
-        Enter
-      </Button>
-      <br></br>
-      <br></br>
-      <Button className="landing2" destination="/collections">
-        Create New Game
-      </Button>
+      ></div>
+      <div className="testBlur2">
+        <div className="spacer" />
+        <SimpleForm
+          className="input1"
+          field="Your Name"
+          onHandleChange={handleNameChange}
+        />
+        <br></br>
+        <SimpleForm
+          className="input1"
+          field="Email Address"
+          onHandleChange={handleNameChange}
+        />
+        <br></br>
+        <SimpleForm
+          className="input1"
+          field="Zip Code"
+          onHandleChange={handleNameChange}
+        />
+        <br></br>
+        <br></br>
+        <br></br>
+
+        <Button
+          onClick={createGame}
+          className="landing"
+          destination="/collections"
+        >
+          Create New Game
+        </Button>
+        <div className="middleText">OR</div>
+        <SimpleForm
+          className="input1"
+          field="Enter Game Code"
+          onHandleChange={handleCodeChange}
+        />
+        <br></br>
+        <Button
+          onClick={joinGame}
+          className="landing"
+          destination="/collections"
+        >
+          Join Game
+        </Button>
+      </div>
     </div>
   );
 }

@@ -56,14 +56,15 @@
 /* 
 wide */
 .landing2 {
-  width: 300px;
+  width: 277px;
   border-radius: 15px;
   border-color: black;
-  border-width: 1px;
+  border-width: 3px;
   color: black;
   font-family: Josefin Sans;
   font-weight: bold;
-  background-color: yellow;
+  font-size: 20px;
+  background-color: #f9dd25;
 }
 
 /* fat */

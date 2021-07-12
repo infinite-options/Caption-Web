@@ -1,0 +1,28 @@
+.backgroundimg {
+  background-image: url(landing.png);
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+}
+
+.rectangle {
+  position: absolute;
+  max-width: 300px;
+  top: 296px;
+  left: 45px;
+}
+
+.message {
+  position: absolute;
+  max-width: 250px;
+  top: 328px;
+  left: 62px;
+  font-family: Josefin Sans;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.landing2 {
+  position: absolute;
+  top: 554px;
+  left: 47px;
+}

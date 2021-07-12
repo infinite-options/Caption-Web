@@ -1,8 +1,8 @@
-.backgroundimg {
-  background-image: url(landing.png);
+/* .backgroundimg {
+  background-image: url("landing.png");
   filter: blur(5px);
   -webkit-filter: blur(5px);
-}
+} */
 
 .rectangle {
   position: absolute;

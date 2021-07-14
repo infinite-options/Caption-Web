@@ -1,0 +1,7 @@
+.card{
+    margin: 0 auto; /* Added */
+
+  
+    background-color: yellow;
+    border-color: black;
+}

@@ -60,6 +60,24 @@
 
   background-color: #f9dd25;
 }
+
+.circle {
+  height: 50px;
+  width: 50px;
+
+  border-width: 3px;
+  border-radius: 25px;
+  border-color: black;
+
+  /* font-family: Verdana, Geneva, Tahoma, sans-serif; */
+  font-family: Josefin Sans, sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+
+  color: black;
+
+  background-color: #f9dd25;
+}
 /* 
 wide */
 .landing2 {
@@ -87,6 +105,24 @@ wide */
   font-size: 18px;
 
   background-color: white;
+}
+
+.cardStyle {
+  width: 275px;
+  height: 150px;
+
+  border-width: 3px;
+  border-radius: 25px;
+  border-color: black;
+
+  /* font-family: Verdana, Geneva, Tahoma, sans-serif; */
+  font-family: Josefin Sans, sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+
+  color: black;
+
+  background-color: #f9dd25;
 }
 
 ::placeholder {

@@ -79,20 +79,20 @@ function Landing() {
         <SimpleForm
           className="input1"
           field="Email Address"
-          onHandleChange={handleNameChange}
+          onHandleChange={handleEmailChange}
         />
         <br></br>
         <SimpleForm
           className="input1"
           field="Zip Code"
-          onHandleChange={handleNameChange}
+          onHandleChange={handleZipCodeChange}
         />
         <br></br>
         <br></br>
         <br></br>
 
         <Button
-          onClick={createGame}
+          // onClick={createGame}
           className="landing"
           destination="/collections"
         >
@@ -106,7 +106,7 @@ function Landing() {
         />
         <br></br>
         <Button
-          onClick={joinGame}
+          // onClick={joinGame}
           className="landing"
           destination="/collections"
         >

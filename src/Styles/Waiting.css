@@ -5,3 +5,39 @@
     background-color: yellow;
     border-color: black;
 }
+/*.col{*/
+/*    margin: 0px;*/
+/*    padding: 0px;*/
+/*    width: 20px;*/
+/*    text-align: center;*/
+/*    vertical-align: center;*/
+/*}*/
+
+/*.row{*/
+/*    margin: 0px;*/
+/*    padding: 0px;*/
+/*    width: 100px;*/
+/*}*/
+
+.flex-container {
+    max-width: "375px";
+    height: "812px";
+
+    /* We first create a flex layout context */
+    display: flex;
+
+    /* Then we define the flow direction
+       and if we allow the items to wrap
+     * Remember this is the same as:
+     * flex-direction: row;
+     * flex-wrap: wrap;
+     */
+    flex-flow: row wrap;
+
+    /* Then we define how is distributed the remaining space */
+    justify-content: space-around;
+
+    padding: 0;
+    margin: 0;
+    list-style: none;
+}

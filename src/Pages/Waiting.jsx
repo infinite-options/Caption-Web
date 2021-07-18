@@ -1,9 +1,11 @@
 import React from 'react'
-import { Card } from 'reactstrap';
+
 import circle from "../Assets/circle.png";
 import thing from "../Assets/idk.png";
 import { Button } from '../Components/Button';
 import "../Styles/Waiting.css";
+import { Row, Col, Card } from "reactstrap";
+import Deck from "../Components/Deck";
 
 export default function Waiting() {
 
@@ -30,25 +32,30 @@ export default function Waiting() {
 
         <img className="innerImage1" src={circle} />
         <img className="innerImage2" src={thing} />
-  
+
         <br></br>
         <br></br>
         <br></br>
         <br></br>
         <br></br>
         <br></br>
+
+            {/* <div className = "spacer"/> */}
         
         <h4>Waiting for all players to join</h4>
-    
-        {/* <div className = "spacer"/> */}
 
+
+            <ul className="flex-container">
         {names.map((item) => (
-          <div>
-            <Button className = "circle"/>
-            {item}
-         </div>
+            <li className="flex-item">
+                <Row>
+                <Col>  <Button className="circle"/></Col>
+                <Col>{item}</Col>
+                </Row>
+            </li>
         ))}
-        
+            </ul>
+
         <Button
           className="cardStyle"
           children = "Game Code: CYTHLI "

@@ -27,7 +27,6 @@ const Button = ({
       {isSelected ? (
         <button
           style={{ backgroundColor: "red" }}
-          // className={`btn ${checkButtonStyle} ${checkButtonSize}`}
           className={className}
           onClick={onClick}
           type={type}
@@ -36,7 +35,6 @@ const Button = ({
         </button>
       ) : (
         <button
-          // className={`btn ${checkButtonStyle} ${checkButtonSize}`}
           className={className}
           onClick={onClick}
           type={type}

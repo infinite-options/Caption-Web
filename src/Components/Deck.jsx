@@ -9,10 +9,17 @@ export default function DeckCard(props) {
         <div className="imageBackground">
           <img src={props.src} alt={props.alt} className="img" />
         </div>
-        <div className="deckText">
-          {props.title} ({props.price})
-        </div>
-        <Link className="linkText">Learn More</Link>
+
+        {props.title === "" ? <></> :
+            <div>
+            <div className="deckText">
+              {props.title} ({props.price})
+            </div>
+          <Link to="/rules" className="linkText">
+          Learn More
+          </Link>
+            </div>
+        }
       </div>
     </Link>
   );

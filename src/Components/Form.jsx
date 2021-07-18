@@ -1,5 +1,5 @@
 import React, { Component } from "react";
-import "../Styles/SimpleForm.css";
+import "../Styles/Form.css";
 
 class Form extends Component {
   constructor(props) {
@@ -17,6 +17,7 @@ class Form extends Component {
     return (
       <form onSubmit={this.handleSubmit}>
         <div aria-label={"Enter your " + this.props.field + "here"}>
+          {/*<textarea*/}
           <input
             className={this.props.className}
             name="variable"

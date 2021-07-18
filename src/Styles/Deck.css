@@ -1,18 +1,17 @@
 /* How do I get the css of an image to work correctly?  */
 .img {
-  /* Limit the height of an image while preserving aspect ratio */
-  display: block;
-  max-width: 160px;
-  max-height: 155px;
-  width: auto;
-  height: auto;
+  /* Limit the height of an image while keeping a 1:1 apsect ratio*/
+  object-fit: cover;
+  height: 146px;
+  width: 146px;
+
+  /* vertically center anything with these three lines*/
+  position: relative;
+  top: 50%;
+  transform: translateY(-50%);
 
   border-radius: 40px;
-  align-content: center;
 
-  /* How to horizontally center an element */
-  margin: 0 auto;
-  border-top: 15px;
 }
 .imageBackground {
   height: 160px;
@@ -24,17 +23,9 @@
   height: 50px;
 }
 .outer {
-  /* height: 20px; */
-  /* border-style: solid;
-  border-color: grey;
-  border-width: 2px; */
-
-  /* font-family: Josefin Sans; */
   font-weight: bold;
-  /* font-size: 20pt; */
   color: black;
-  /* character-spacing: 0;
-  line-spacing: 24; */
+  margin: 10px;
 }
 
 .deckText {

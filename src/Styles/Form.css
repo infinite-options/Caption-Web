@@ -7,12 +7,13 @@
   background-color: white;
 }
 .input2 {
-  width: 350px;
-  height: 140px;
+  width: 335px;
+  height: 136px;
   border-radius: 15px;
   border-color: black;
   border-width: 1px;
   background-color: white;
+  margin: 0 auto;
 }
 
 .input1::placeholder {

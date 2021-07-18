@@ -5,21 +5,24 @@ import "../Styles/Collections.css";
 import background from "../Assets/landing.png";
 import circle from "../Assets/circle.png";
 import thing from "../Assets/idk.png";
+import { Button } from "../Components/Button";
 
 function Collections() {
   const deckArray = [
     {
       src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
       alt: "student",
-      title: "Student Gallery",
-      price: "free",
+      title : "",
+      // title: "Student Gallery",
+      // price: "free",
     },
-    {
-      src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
-      alt: "student",
-      title: "Student Gallery",
-      price: "free",
-    },
+      {
+          src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
+          alt: "student",
+          title : "",
+          // title: "Student Gallery",
+          // price: "free",
+      },
     {
       src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
       alt: "student",
@@ -49,7 +52,8 @@ function Collections() {
 
       <br></br>
       <br></br>
-      <i
+      <Button
+        destination="/info"
         style={{
           height: "30px",
           width: "30px",
@@ -58,8 +62,20 @@ function Collections() {
           left: "30px",
           color: "blue",
         }}
-        class="fas fa-info-circle"
-      />
+        className="circle"
+      >
+        <i
+          style={{
+            height: "30px",
+            width: "30px",
+            position: "absolute",
+            top: "55px",
+            left: "30px",
+            color: "blue",
+          }}
+          class="fas fa-info-circle"
+        />
+      </Button>
       <h4>Select a deck</h4>
       <br></br>
       <br></br>

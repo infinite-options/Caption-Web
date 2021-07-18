@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
-import SimpleForm from "../Components/SimpleForm";
+import Form from "../Components/Form";
 import Background from "../Assets/sd.jpg";
 import { Button } from "../Components/Button.jsx";
 import background from "../Assets/landing.png";
@@ -70,19 +70,19 @@ function Landing() {
       ></div>
       <div className="testBlur2">
         <div className="spacer" />
-        <SimpleForm
+        <Form
           className="input1"
           field="Your Name"
           onHandleChange={handleNameChange}
         />
         <br></br>
-        <SimpleForm
+        <Form
           className="input1"
           field="Email Address"
           onHandleChange={handleEmailChange}
         />
         <br></br>
-        <SimpleForm
+        <Form
           className="input1"
           field="Zip Code"
           onHandleChange={handleZipCodeChange}
@@ -92,21 +92,21 @@ function Landing() {
         <br></br>
 
         <Button
-          // onClick={createGame}
+          onClick={createGame}
           className="landing"
           destination="/collections"
         >
           Create New Game
         </Button>
         <div className="middleText">OR</div>
-        <SimpleForm
+        <Form
           className="input1"
           field="Enter Game Code"
           onHandleChange={handleCodeChange}
         />
         <br></br>
         <Button
-          // onClick={joinGame}
+          onClick={joinGame}
           className="landing"
           destination="/collections"
         >

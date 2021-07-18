@@ -7,6 +7,8 @@ import Scoreboard from "./Pages/Scoreboard";
 import Landing from "./Pages/Landing";
 import Selection from "./Pages/Selection";
 import Waiting from "./Pages/Waiting";
+import Info from "./Pages/Info";
+import Rules from "./Pages/Rules";
 
 export default function Nav() {
   return (
@@ -18,6 +20,8 @@ export default function Nav() {
         <Route exact path="/page" component={Page1} />
         <Route exact path="/selection" component={Selection} />
         <Route exact path="/waiting" component={Waiting} />
+        <Route exact path="/info" component={Info} />
+        <Route exact path="/rules" component={Rules} />
       </Switch>
     </Router>
   );

@@ -9,6 +9,7 @@ import Selection from "./Pages/Selection";
 import Waiting from "./Pages/Waiting";
 import Info from "./Pages/Info";
 import Rules from "./Pages/Rules";
+import Error from "./Pages/Error";
 
 export default function Nav() {
   return (
@@ -22,6 +23,7 @@ export default function Nav() {
         <Route exact path="/waiting" component={Waiting} />
         <Route exact path="/info" component={Info} />
         <Route exact path="/rules" component={Rules} />
+        <Route exact path="/error" component={Error} />
       </Switch>
     </Router>
   );

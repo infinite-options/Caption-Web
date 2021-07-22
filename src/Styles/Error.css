@@ -27,6 +27,21 @@
   line-height: 24px;
 }
 
+.testBlur {
+  /* Add the blur effect */
+  filter: blur(4px);
+
+  /* Full height */
+  height: 100%;
+}
+
+.testBlur2 {
+  position: absolute;
+  top: 0px;
+  left: 0px;
+}
+
+
 .landing2 {
   position: absolute;
   top: 554px;

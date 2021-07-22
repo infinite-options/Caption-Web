@@ -14,8 +14,14 @@ function Error() {
           height: "812px",
           backgroundImage: `url(${background})`,
         }}
-      > 
-        <div> 
+      >
+            <div
+              className="testBlur"
+              style={{
+                backgroundImage: `url(${background})`,
+              }}
+            ></div>
+        <div>
             <img src={rectangle} alt="" class="rectangle"/>
             <div class="message">
                 <b>
@@ -27,10 +33,10 @@ function Error() {
             </div>
         </div>
 
-      <Button className="landing2" destination="/landing">
-        Back
-      </Button>
-        </div>
+        <Button className="landing2" destination="/">
+            Back
+        </Button>
+      </div>
     )
 }
 

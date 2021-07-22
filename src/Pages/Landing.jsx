@@ -1,120 +1,126 @@
-import React, { useState } from "react";
+import React, {useContext} from "react";
 import axios from "axios";
 import Form from "../Components/Form";
-import Background from "../Assets/sd.jpg";
-import { Button } from "../Components/Button.jsx";
+import {Button} from "../Components/Button.jsx";
 import background from "../Assets/landing.png";
 import "../Styles/Landing.css";
+import {LandingContext} from "../App";
 
-function Landing() {
-  const [code, setCode] = useState("");
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [zipCode, setZipCode] = useState("");
+export default function Landing({setCode, setName, setEmail, setZipCode}) {
 
-  var sectionStyle = {
-    width: "100%",
-    height: "400px",
-    backgroundImage: "url(" + { Background } + ")",
-  };
+    const {code, name, email, zipCode} = useContext(LandingContext);
 
-  const handleCodeChange = (codeInput) => {
-    setCode(codeInput);
-  };
+    const handleCodeChange = (codeInput) => {
+        setCode(codeInput);
 
-  const handleNameChange = (nameInput) => {
-    setName(nameInput);
-  };
-
-  const handleEmailChange = (emailInput) => {
-    setEmail(emailInput);
-  };
-
-  const handleZipCodeChange = (zipCodeInput) => {
-    setZipCode(zipCodeInput);
-  };
-
-  function createGame() {
-    const postURL =
-      "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createGame";
-    const payload = {
-      rounds: "6",
-      round_time: "0000-00-00 00:00:10",
     };
 
-    axios.post(postURL, payload).then((res) => console.log(res));
-  }
+    const handleNameChange = (nameInput) => {
+        setName(nameInput);
+    };
 
-  function joinGame() {
-    const getURL =
-      "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame";
+    const handleEmailChange = (emailInput) => {
+        setEmail(emailInput);
+    };
 
-    axios.get(getURL + "/" + code).then((res) => {
-      console.log(res);
-    });
-  }
+    const handleZipCodeChange = (zipCodeInput) => {
+        setZipCode(zipCodeInput);
+    };
 
-  return (
-    <div
-      style={{
-        maxWidth: "375px",
-        height: "812px",
-        // backgroundImage: `url(${background})`,
-      }}
-    >
-      <div
-        className="testBlur"
-        style={{
-          backgroundImage: `url(${background})`,
-        }}
-      ></div>
-      <div className="testBlur2">
-        <div className="spacer" />
-        <Form
-          className="input1"
-          field="Your Name"
-          onHandleChange={handleNameChange}
-        />
-        <br></br>
-        <Form
-          className="input1"
-          field="Email Address"
-          onHandleChange={handleEmailChange}
-        />
-        <br></br>
-        <Form
-          className="input1"
-          field="Zip Code"
-          onHandleChange={handleZipCodeChange}
-        />
-        <br></br>
-        <br></br>
-        <br></br>
+    function createGame() {
+        if (name !== "" && email !== "" && zipCode !== "") {
 
-        <Button
-          onClick={createGame}
-          className="landing"
-          destination="/collections"
+
+            const postURL =
+                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
+            const payload = {
+                user_name: name,
+                user_alias: "mickey",
+                user_email: email,
+                user_zip: zipCode,
+            };
+
+            axios.post(postURL, payload).then((res) => {
+                console.log(res);
+                setCode(res.data.game_code);
+
+            })
+
+
+            // window.location.href = "/waiting";
+        } else {
+            window.alert("In order to create a new game please provide your name, email, and zip code.");
+        }
+    }
+
+    function joinGame() {
+
+        if (name !== "" && email !== "" && zipCode !== "") {
+            const getURL =
+                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame";
+
+            axios.get(getURL + "/" + code).then((res) => {
+                console.log(res);
+            });
+        } else {
+            window.alert("In order to create a new game please provide your name, email, and zip code.");
+        }
+    }
+
+    return (
+        <div
+            style={{
+                maxWidth: "375px",
+                height: "812px",
+                backgroundImage: `url(${background})`,
+            }}
         >
-          Create New Game
-        </Button>
-        <div className="middleText">OR</div>
-        <Form
-          className="input1"
-          field="Enter Game Code"
-          onHandleChange={handleCodeChange}
-        />
-        <br></br>
-        <Button
-          onClick={joinGame}
-          className="landing"
-          destination="/collections"
-        >
-          Join Game
-        </Button>
-      </div>
-    </div>
-  );
+            <div className="spacer"/>
+            <Form
+                className="input1"
+                field="Your Name"
+                onHandleChange={handleNameChange}
+            />
+            <br></br>
+            <Form
+                className="input1"
+                field="Email Address"
+                onHandleChange={handleEmailChange}
+            />
+            <br></br>
+            <Form
+                className="input1"
+                field="Zip Code"
+                onHandleChange={handleZipCodeChange}
+            />
+            <br></br>
+            <br></br>
+            <br></br>
+
+            <Button
+                onClick={createGame}
+                className="landing"
+                destination="/waiting"
+            >
+                Create New Game
+            </Button>
+            <div className="middleText">OR</div>
+            <Form
+                className="input1"
+                field="Enter Game Code"
+                onHandleChange={handleCodeChange}
+            />
+            <br></br>
+            <Button
+                onClick={joinGame}
+                className="landing"
+                // destination="/collections"
+            >
+                Join Game
+            </Button>
+
+        </div>
+    );
 }
 
-export default Landing;
+

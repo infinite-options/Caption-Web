@@ -20,7 +20,7 @@ export default function Report(props) {
                         }}
                     >
                         <span className="nameTag">{alias}</span>
-                        <span className="pointTag">{pts} pts</span>
+                        <span className="pointTag">{totalPts} pts</span>
                     </Row>
                     <br></br>
                     <Row>
@@ -29,7 +29,7 @@ export default function Report(props) {
                                 {caption}
                             </Card>
                         ) : (
-                            <Card className="card1">{caption}</Card>
+                            <Card className="card1" style={{backgroundColor: "white"}}>{caption}</Card>
                         )}
                     </Row>
                 </Col>
@@ -41,7 +41,7 @@ export default function Report(props) {
                             color: "white",
                         }}
                     >
-                        <i class="fa fa-thumbs-up fa-2x"></i>
+                        {/*<i class="fa fa-thumbs-up fa-2x"></i>*/}
                         <span style={{marginLeft: "40px"}}/>
                         {votes} votes
                     </Row>
@@ -54,7 +54,7 @@ export default function Report(props) {
                             color: "white",
                         }}
                     >
-                        {totalPts} pts
+                        {pts} pts
                     </Row>
                 </Col>
             </Row>

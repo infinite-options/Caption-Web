@@ -52,18 +52,7 @@ function Collections() {
 
       <br></br>
       <br></br>
-      <Button
-        destination="/info"
-        style={{
-          height: "30px",
-          width: "30px",
-          position: "absolute",
-          top: "55px",
-          left: "30px",
-          color: "blue",
-        }}
-        className="circle"
-      >
+
         <i
           style={{
             height: "30px",
@@ -75,7 +64,19 @@ function Collections() {
           }}
           class="fas fa-info-circle"
         />
-      </Button>
+
+        <Button
+            destination="/info"
+            style={{
+                height: "30px",
+                width: "30px",
+                position: "absolute",
+                top: "155px",
+                left: "130px",
+                color: "blue",
+            }}
+            className="circle"
+        />
       <h4>Select a deck</h4>
       <br></br>
       <br></br>

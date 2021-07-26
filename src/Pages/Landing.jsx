@@ -6,9 +6,9 @@ import background from "../Assets/landing.png";
 import "../Styles/Landing.css";
 import {LandingContext} from "../App";
 
-export default function Landing({setCode, setName, setEmail, setZipCode}) {
+export default function Landing({setCode, setName, setAlias, setEmail, setZipCode}) {
 
-    const {code, name, email, zipCode} = useContext(LandingContext);
+    const {code, name, alias, email, zipCode} = useContext(LandingContext);
 
     const handleCodeChange = (codeInput) => {
         setCode(codeInput);
@@ -27,6 +27,10 @@ export default function Landing({setCode, setName, setEmail, setZipCode}) {
         setZipCode(zipCodeInput);
     };
 
+    const handleAliasChange = (aliasInput) => {
+        setAlias(aliasInput);
+    };
+
     function createGame() {
         if (name !== "" && email !== "" && zipCode !== "") {
 
@@ -35,9 +39,13 @@ export default function Landing({setCode, setName, setEmail, setZipCode}) {
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
             const payload = {
                 user_name: name,
-                user_alias: "mickey",
+                user_alias: alias,
                 user_email: email,
                 user_zip: zipCode,
+                // user_name: "Sam",
+                // user_alias: "Sampat",
+                // user_email: "sam@sjsu.edu",
+                // user_zip: "95121",
             };
 
             axios.post(postURL, payload).then((res) => {
@@ -46,8 +54,9 @@ export default function Landing({setCode, setName, setEmail, setZipCode}) {
 
             })
 
+            window.location.href = "/waiting";
 
-            // window.location.href = "/waiting";
+
         } else {
             window.alert("In order to create a new game please provide your name, email, and zip code.");
         }
@@ -61,7 +70,10 @@ export default function Landing({setCode, setName, setEmail, setZipCode}) {
 
             axios.get(getURL + "/" + code).then((res) => {
                 console.log(res);
-            });
+            })
+
+            window.location.href = "/waiting";
+
         } else {
             window.alert("In order to create a new game please provide your name, email, and zip code.");
         }
@@ -94,13 +106,18 @@ export default function Landing({setCode, setName, setEmail, setZipCode}) {
                 onHandleChange={handleZipCodeChange}
             />
             <br></br>
+            <Form
+                className="input1"
+                field="Alias (screen name)"
+                onHandleChange={handleAliasChange}
+            />
             <br></br>
             <br></br>
 
             <Button
                 onClick={createGame}
                 className="landing"
-                destination="/waiting"
+                // destination="/waiting"
             >
                 Create New Game
             </Button>

@@ -30,7 +30,7 @@
 .artist {
   font-family: "Josefin Sans", sans-serif;
   font-size: 14px;
-  font-weight: normal;
+  font-weight: 400;
   position: absolute;
   top: 184px;
   left: 184px;
@@ -69,6 +69,8 @@
   width: 175px;
   height: 40px;
   text-align: left;
+  line-height: 14px;
+  font-weight: 400;
 }
 
 .blueText {
@@ -79,6 +81,7 @@
   color: #3a91fb;
   font-size: 14px;
   text-decoration: underline;
+  font-weight: 400;
 }
 
 .description {
@@ -89,4 +92,6 @@
   text-align: left;
   width: 343px;
   height: 117px;
+  line-height: 18px;
+  font-weight: 400;
 }

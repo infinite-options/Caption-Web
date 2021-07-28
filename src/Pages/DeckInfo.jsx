@@ -16,10 +16,8 @@ function DeckInfo() {
             <img src={art} alt="" class="art"/>
 
             <div class="header">
-                <b>
-                <h4>Student Gallery</h4>
-                <h4> (Free) </h4>
-                </b>
+                <h4> <b>Student Gallery </b> </h4>
+                <h4> <b>(Free) </b> </h4>
             </div>
             
             <div class="square"> </div>
@@ -37,7 +35,8 @@ function DeckInfo() {
             </div>
 
             <div class="description">
-                <p> This is a collection by artist, John Doe, who is </p>
+                <p> This is a collection by artist, John Doe, who is </p> 
+                <br></br>
                 <p> Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos</p>
             </div>
         </div>

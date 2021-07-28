@@ -1,11 +1,6 @@
 /* .backgroundimg {
-  background-image: url("landing.png");
-  filter: blur(5px);
-  -webkit-filter: blur(5px);
-} */
-/* 
-.div {
-  font-family: "Josefin Sans", sans-serif;
+  filter: blur(4px);
+  height: 100%;
 } */
 
 .rectangle {
@@ -13,6 +8,7 @@
   max-width: 300px;
   top: 296px;
   left: 45px;
+  /* z-index: 2; */
 }
 
 .message {
@@ -25,6 +21,7 @@
   font-size: 20px;
   font-weight: bold;
   line-height: 24px;
+  /* z-index: 1; */
 }
 
 .landing2 {

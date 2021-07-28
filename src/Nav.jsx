@@ -7,6 +7,7 @@ import Scoreboard from "./Pages/Scoreboard";
 import Landing from "./Pages/Landing";
 import Selection from "./Pages/Selection";
 import Error from "./Pages/Error";
+import GameRules from "./Pages/GameRules"
 
 export default function Nav() {
   return (
@@ -18,6 +19,7 @@ export default function Nav() {
         <Route exact path="/page" component={Page1} />
         <Route exact path="/selection" component={Selection} />
         <Route exact path="/error" component={Error} />
+        <Route exact path="/gamerules" component={GameRules} />
       </Switch>
     </Router>
   );

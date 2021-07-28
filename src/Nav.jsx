@@ -8,6 +8,7 @@ import Landing from "./Pages/Landing";
 import Selection from "./Pages/Selection";
 import Error from "./Pages/Error";
 import GameRules from "./Pages/GameRules"
+import DeckInfo from "./Pages/DeckInfo"
 
 export default function Nav() {
   return (
@@ -20,6 +21,7 @@ export default function Nav() {
         <Route exact path="/selection" component={Selection} />
         <Route exact path="/error" component={Error} />
         <Route exact path="/gamerules" component={GameRules} />
+        <Route exact path="/deckinfo" component={DeckInfo} />
       </Switch>
     </Router>
   );

@@ -79,6 +79,7 @@
   color: black;
 
   background-color: #f9dd25;
+
 }
 /* 
 wide */
@@ -107,7 +108,7 @@ wide */
   font-family: Josefin Sans, sans-serif;
   font-size: 18px;
 
-  background-color: white;
+  /*background-color: white;*/
 }
 
 .cardStyle {
@@ -132,4 +133,46 @@ wide */
   /* color: black;
   font-family: Josefin Sans;
   font-weight: bold; */
+}
+
+
+.selectionBtn1 {
+  width: 342px;
+  height: 60px;
+  border-radius: 25px;
+  border-color: black;
+  border-width: 1px;
+  background-color: white;
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 3;
+
+}
+
+ /*When the button's state is in focus, just render no outline*/
+button:focus{
+  outline:none;
+}
+
+selectionBtn1:hover {
+  outline:none;
+  border: none;
+}
+
+
+.selectionBtn2 {
+  width: 342px;
+  height: 60px;
+  border-radius: 25px;
+  border-color: black;
+  border-width: 1px;
+  background-color: white;
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 3;
+  color: #6C6C6C;
+}
+
+.selected {
+  background-color: #f9dd25;
 }

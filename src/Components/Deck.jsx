@@ -7,7 +7,7 @@ export default function DeckCard(props) {
     <Link to="/page" className="btn-mobile">
       <div className="outer">
         <div className="imageBackground">
-          <img src={props.src} alt={props.alt} className="img" />
+          <img src={props.src} alt={props.alt} className="img1" />
         </div>
 
         {props.title === "" ? <></> :

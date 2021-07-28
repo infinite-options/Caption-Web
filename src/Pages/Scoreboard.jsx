@@ -23,11 +23,39 @@ function Scoreboard(props) {
             <h1>Name of Deck</h1>
             <br></br>
             <h3> Scoreboard</h3>
-            <img className="centerPic" style={{
-                height: "255px",
-                width: "255px",
-            }}
-                 src={Pic}/>
+
+
+            {/*<img className="centerPic flip-card" style={{*/}
+            {/*    height: "255px",*/}
+            {/*    width: "255px",*/}
+            {/*}}*/}
+            {/*     src={Pic}/>*/}
+            {/*<i*/}
+            {/*    style={{*/}
+            {/*        position: "absolute",*/}
+            {/*        top: "140px",*/}
+            {/*        left: "270px",*/}
+            {/*        color: "white",*/}
+            {/*    }}*/}
+            {/*    className="fas fa-info-circle"*/}
+            {/*/>*/}
+
+            <div className="flip-card">
+                <div className="flip-card-inner">
+                    <div className="flip-card-front">
+                        <img className="centerPic" style={{
+                            height: "255px",
+                            width: "255px",
+                        }}
+                             src={Pic}/>
+                    </div>
+                    <div className="flip-card-back">
+                        <h1>John Doe</h1>
+                        <p>Architect & Engineer</p>
+                        <p>We love that guy</p>
+                    </div>
+                </div>
+            </div>
 
 
             {/* <Card>{bestCaption}</Card>

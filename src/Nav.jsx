@@ -16,7 +16,7 @@ import {LandingContext} from "./App";
 
 export default function Nav() {
 
-    const {setCode, setName, setEmail, setZipCode, setAlias} = useContext(LandingContext);
+    const {setCode, setName, setEmail, setZipCode, setAlias, setGameUID} = useContext(LandingContext);
 
     return (
         <Router>
@@ -24,13 +24,13 @@ export default function Nav() {
 
                 <Route exact path='/'>
                     {/*<LandingContext.Provider value = {{code, name, email, zipCode}}>*/}
-                    <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode} setAlias={setAlias}/>
+                    <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode} setAlias={setAlias} setGameUID={setGameUID}/>
                     {/*</LandingContext.Provider>*/}
                 </Route>
 
                 {/*This way of rendering the component forces re-renders in a way that I don't want atm*/}
-                <Route exact path='/' component={() => <Landing setCode={setCode} setName={setName} setEmail={setEmail}
-                                                                setZipCode={setZipCode} setAlias={setAlias}/>}/>
+                {/*<Route exact path='/' component={() => <Landing setCode={setCode} setName={setName} setEmail={setEmail}*/}
+                {/*                                                setZipCode={setZipCode} setAlias={setAlias}/>}/>*/}
 
 
                 <Route exact path="/collections" component={Collections}/>

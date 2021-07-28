@@ -15,6 +15,7 @@ const Button = ({
                     buttonSize,
                     destination,
                     isSelected,
+                    conditionalLink,
                 }) => {
     const checkButtonStyle = STYLES.includes(buttonStyle)
         ? buttonStyle
@@ -23,35 +24,20 @@ const Button = ({
     const checkButtonSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0];
 
     return (
-        <Link to={destination} className="btn-mobile">
-            {isSelected ? (
-                <button
-                    style={{backgroundColor: "red"}}
-                    className={className}
-                    onClick={onClick}
-                    type={type}
-                >
-                    {children}
-                </button>
-            ) : (
-                <button
-                    className={className}
-                    onClick={onClick}
-                    type={type}
-                >
-                    {children}
-                </button>
-            )}
-            {/* <button
+        <Link to={conditionalLink ? destination : ""} className="btn-mobile">
+            <button
+                className={isSelected ? className + " selected" : className}
+                onClick={onClick}
+                type={type}
+                children={children}
+            />
 
-        // className={`btn ${checkButtonStyle} ${checkButtonSize}`}
-        className={className}
-        onClick={onClick}
-        type={type}
-      >
-        {children}
-      </button> */}
-            <br></br>
+            {/*className={`btn ${checkButtonStyle} ${checkButtonSize}`}*/}
+            {/*className={className}*/}
+            {/*onClick={onClick}*/}
+            {/*type={type}*/}
+
+            <br/>
         </Link>
     );
 };

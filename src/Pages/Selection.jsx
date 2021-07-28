@@ -6,14 +6,32 @@ import Report from "../Components/Report";
 import { Button } from "../Components/Button";
 import background from "../Assets/temp.png";
 
+
+
 function Scoreboard(props) {
   const title = props.title;
-  const bestCaption = "Two dudes watching the Sharknado trailer";
+  // const bestCaption = "Two dudes watching the Sharknado trailer";
 
-  const [toggle, setToggle] = useState(false);
+  const [toggle1, setToggle1] = useState(false);
+  const [toggle2, setToggle2] = useState(false);
+  const [toggle3, setToggle3] = useState(false);
 
-  function changeToggle() {
-    setToggle(!toggle);
+  function changeToggle1(){
+    setToggle1(true);
+    setToggle2(false);
+    setToggle3(false);
+  }
+
+  function changeToggle2(){
+    setToggle1(false);
+    setToggle2(true);
+    setToggle3(false);
+  }
+
+  function changeToggle3(){
+    setToggle1(false);
+    setToggle2(false);
+    setToggle3(true);
   }
 
   return (
@@ -33,34 +51,48 @@ function Scoreboard(props) {
 
       <h4 classname="row">Pick Your Favorite Caption</h4>
       <br></br>
-      <img className="img2" src={Pic} />
+      {/*<img className="img2" src={Pic} />*/}
+      <img  style = {{
+        objectFit: "cover",
+        height: "325px",
+        width: "325px",
+        borderRadius: "50px",
+      }} src={Pic}/>
+
       <br></br>
       <br></br>
-      {/* <h4>{bestCaption}</h4>
-      <br></br> */}
 
       <Button
-        isSelected={toggle}
-        className="input1"
-        buttonStyle="btn--outline"
+        isSelected={toggle1}
+        className="selectionBtn1"
+
         children="Shrek and Donkey"
-        onClick={changeToggle}
+        destination="/selection"
+        onClick={changeToggle1}
+        conditionalLink={true}
       />
       <br></br>
       <Button
-        className="input1"
-        buttonStyle="btn--outline"
-        children="Two really nice halloween costumes"
+          // isSelected={toggle2}
+          className="selectionBtn2"
+
+          children="Shrek and Donkey"
+          destination="/selection"
+          // onClick={changeToggle2}
+          conditionalLink={true}
       />
       <br></br>
       <Button
-        className="input1"
-        buttonStyle="btn--outline"
-        children="Shrek Dead Redemption"
+          isSelected={toggle3}
+          className="selectionBtn1"
+
+          children="Shrek and Donkey"
+          destination="/selection"
+          onClick={changeToggle3}
+          conditionalLink={true}
       />
       <br></br>
-      <br></br>
-      <Button className="fat" destination="/scoreboard" children="Vote" />
+      <Button className="fat" destination="/scoreboard" children="Vote" conditionalLink={true} />
     </div>
   );
 }

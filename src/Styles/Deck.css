@@ -1,5 +1,5 @@
 /* How do I get the css of an image to work correctly?  */
-.img {
+.img1 {
   /* Limit the height of an image while keeping a 1:1 apsect ratio*/
   object-fit: cover;
   height: 146px;
@@ -34,12 +34,12 @@
   font-size: 12px;
 }
 
-.linkText {
-  font-family: Josefin Sans, sans-serif;
-  font-weight: semi-bold;
-  font-size: 14px;
-  color: #3991fb;
-  word-spacing: 0px;
-  border-spacing: 18;
-  text-decoration: underline;
-}
+/*.linkText {*/
+/*  font-family: Josefin Sans, sans-serif;*/
+/*  font-weight: semi-bold;*/
+/*  font-size: 14px;*/
+/*  color: #3991fb;*/
+/*  word-spacing: 0px;*/
+/*  border-spacing: 18;*/
+/*  text-decoration: underline;*/
+/*}*/

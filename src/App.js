@@ -11,12 +11,12 @@ export default function App() {
     const [email, setEmail] = useState("");
     const [zipCode, setZipCode] = useState("");
     const [alias, setAlias] = useState("");
-
+    const [gameUID, setGameUID] = useState("");
 
 
     return (
     <div className="App">
-        <LandingContext.Provider value = {{code, name, email, zipCode, alias, setCode, setName, setEmail, setZipCode, setAlias}}>
+        <LandingContext.Provider value = {{code, name, email, zipCode, alias, gameUID, setCode, setName, setEmail, setZipCode, setAlias, setGameUID}}>
             <Nav />
         </LandingContext.Provider>
       {/*  <ShareExample/>*/}

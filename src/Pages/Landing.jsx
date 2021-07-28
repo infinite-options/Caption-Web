@@ -5,8 +5,9 @@ import {Button} from "../Components/Button.jsx";
 import background from "../Assets/landing.png";
 import "../Styles/Landing.css";
 import {LandingContext} from "../App";
+import {Card} from "reactstrap";
 
-export default function Landing({setCode, setName, setAlias, setEmail, setZipCode}) {
+export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID}) {
 
     const {code, name, alias, email, zipCode} = useContext(LandingContext);
 
@@ -31,8 +32,16 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         setAlias(aliasInput);
     };
 
+    function validateInputToCreateGame() {
+        return (name !== "" && email !== "" && zipCode !== "" && alias !== "");
+    }
+
+    function validateInputToJoinGame() {
+        return (code !== "" && validateInputToCreateGame());
+    }
+
     function createGame() {
-        if (name !== "" && email !== "" && zipCode !== "") {
+        if (validateInputToCreateGame()) {
 
 
             const postURL =
@@ -54,28 +63,36 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
             })
 
-            window.location.href = "/waiting";
-
-
         } else {
-            window.alert("In order to create a new game please provide your name, email, and zip code.");
+            window.alert("To create a game, fill out the necessary information");
         }
     }
 
     function joinGame() {
-
-        if (name !== "" && email !== "" && zipCode !== "") {
+        if (validateInputToJoinGame()) {
             const getURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame";
 
             axios.get(getURL + "/" + code).then((res) => {
                 console.log(res);
+
+                try {
+                    if (res.data.warning === "Invalid game code") {
+                        console.log("Looks like an invalid game code. Time to send you to the error screen");
+
+                        window.location.href = "/error";
+                    } else {
+                        console.log("Else within try clause: No error message. Game on!");
+                        setGameUID(res.data.game_uid);
+                    }
+                } catch {
+                    console.log("Catch Clause: No error message. Game on!");
+
+                }
             })
 
-            window.location.href = "/waiting";
-
         } else {
-            window.alert("In order to create a new game please provide your name, email, and zip code.");
+            window.alert("To join a game, fill out the necessary information and the correct gamecode.");
         }
     }
 
@@ -88,6 +105,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             }}
         >
             <div className="spacer"/>
+
             <Form
                 className="input1"
                 field="Your Name"
@@ -115,12 +133,13 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             <br></br>
 
             <Button
+                isSelected={true}
                 onClick={createGame}
                 className="landing"
-                // destination="/waiting"
-            >
-                Create New Game
-            </Button>
+                destination="/waiting"
+                children="Create New Game"
+                conditionalLink={validateInputToCreateGame()}
+            />
             <div className="middleText">OR</div>
             <Form
                 className="input1"
@@ -129,12 +148,13 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             />
             <br></br>
             <Button
+                isSelected={true}
                 onClick={joinGame}
                 className="landing"
-                // destination="/collections"
-            >
-                Join Game
-            </Button>
+                destination="/waiting"
+                children="Join Game"
+                conditionalLink={validateInputToJoinGame()}
+            />
 
         </div>
     );

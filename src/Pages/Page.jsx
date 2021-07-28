@@ -26,6 +26,7 @@ export default function Page() {
 
   function transition(){
     window.location.href = "/selection";
+    //this is not good because all internal state gets wiped whenever the page reloads
   }
 
   return (

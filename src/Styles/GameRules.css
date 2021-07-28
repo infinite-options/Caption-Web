@@ -9,7 +9,7 @@
 
 .list {
   font-family: "Josefin Sans", sans-serif;
-  font-weight: lighter;
+  font-weight: 600;
   font-size: 20px;
   width: 375px;
   height: 812px;
@@ -20,8 +20,4 @@
   position: absolute;
   text-align: left;
   line-height: 24px;
-}
-
-.blueText {
-  color: #3a91fb;
 }

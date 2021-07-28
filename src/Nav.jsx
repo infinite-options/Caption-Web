@@ -7,8 +7,8 @@ import Scoreboard from "./Pages/Scoreboard";
 import Landing from "./Pages/Landing";
 import Selection from "./Pages/Selection";
 import Waiting from "./Pages/Waiting";
-import Info from "./Pages/Info";
-import Rules from "./Pages/Rules";
+import GameRules from "./Pages/GameRules"
+import DeckInfo from "./Pages/DeckInfo"
 import Error from "./Pages/Error";
 import {LandingContext} from "./App";
 
@@ -45,8 +45,8 @@ export default function Nav() {
                     {/*</LandingContext.Provider>*/}
                 </Route>
 
-                <Route exact path="/info" component={Info}/>
-                <Route exact path="/rules" component={Rules}/>
+              <Route exact path="/gamerules" component={GameRules} />
+              <Route exact path="/deckinfo" component={DeckInfo} />
                 <Route exact path="/error" component={Error}/>
             </Switch>
         </Router>

@@ -1,0 +1,27 @@
+.header {
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 20px;
+  font-weight: bold;
+  position: absolute;
+  top: 81px;
+  left: 110px;
+  line-height: 24px;
+}
+
+.square {
+  width: 160px;
+  height: 160px;
+  background-color: #f9dd25;
+  position: relative;
+  top: 172px;
+  left: 16px;
+}
+
+.artist {
+  font-family: "Josefin Sans", sans-serif;
+  font-size: 14px;
+  font-weight: 400;
+  position: relative;
+  top: 184px;
+  left: 184px;
+}

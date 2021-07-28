@@ -8,6 +8,16 @@
   line-height: 24px;
 }
 
+.art {
+  position: absolute;
+  top: 179px;
+  left: 23px;
+  right: 206px;
+  z-index: 1;
+  width: 146px;
+  height: 146px;
+}
+
 .square {
   width: 160px;
   height: 160px;
@@ -20,8 +30,63 @@
 .artist {
   font-family: "Josefin Sans", sans-serif;
   font-size: 14px;
-  font-weight: 400;
-  position: relative;
+  font-weight: normal;
+  position: absolute;
   top: 184px;
   left: 184px;
+}
+
+.globe {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 219px;
+  left: 184px;
+}
+
+.instagram {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 219px;
+  left: 218px;
+}
+
+.dribbble {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  top: 219px;
+  left: 253px;
+}
+
+.buyDeck {
+  font-family: "Josefin Sans", sans-serif;
+  position: absolute;
+  font-size: 12px;
+  top: 280px;
+  left: 184px;
+  width: 175px;
+  height: 40px;
+  text-align: left;
+}
+
+.blueText {
+  position: absolute;
+  font-family: "Josefin Sans", sans-serif;
+  top: 258px;
+  left: 184px;
+  color: #3a91fb;
+  font-size: 14px;
+  text-decoration: underline;
+}
+
+.description {
+  position: absolute;
+  font-family: "Josefin Sans", sans-serif;
+  top: 383px;
+  left: 16px;
+  text-align: left;
+  width: 343px;
+  height: 117px;
 }

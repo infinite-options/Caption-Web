@@ -87,7 +87,7 @@ export default function Page() {
                   size={60}
                   strokeWidth={5}
                   isPlaying
-                  duration={100}
+                  duration={1}
                   colors="#000000"
                   onComplete={transition}
                 >

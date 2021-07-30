@@ -10,22 +10,22 @@ import Waiting from "./Pages/Waiting";
 import GameRules from "./Pages/GameRules"
 import DeckInfo from "./Pages/DeckInfo"
 import Error from "./Pages/Error";
+import Rounds from "./Pages/Rounds";
 import {LandingContext} from "./App";
 
 // export const LandingContext = React.createContext();
 
 export default function Nav() {
 
-    const {setCode, setName, setEmail, setZipCode, setAlias, setGameUID} = useContext(LandingContext);
+    const {setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost} = useContext(LandingContext);
 
     return (
         <Router>
             <Switch>
 
                 <Route exact path='/'>
-                    {/*<LandingContext.Provider value = {{code, name, email, zipCode}}>*/}
-                    <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode} setAlias={setAlias} setGameUID={setGameUID}/>
-                    {/*</LandingContext.Provider>*/}
+                    <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
+                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost}/>
                 </Route>
 
                 {/*This way of rendering the component forces re-renders in a way that I don't want atm*/}
@@ -40,14 +40,18 @@ export default function Nav() {
                 {/*<Route exact path="/waiting" component={Waiting} />*/}
 
                 <Route exact path='/waiting'>
-                    {/*<LandingContext.Provider value = {{code, name, email, zipCode}}>*/}
                     <Waiting/>
-                    {/*</LandingContext.Provider>*/}
                 </Route>
 
-              <Route exact path="/gamerules" component={GameRules} />
-              <Route exact path="/deckinfo" component={DeckInfo} />
+                <Route exact path="/gamerules" component={GameRules}/>
+                <Route exact path="/deckinfo" component={DeckInfo}/>
                 <Route exact path="/error" component={Error}/>
+
+
+
+                <Route exact path='/rounds'>
+                    <Rounds setRounds = {setRounds} setRoundDuration = {setRoundDuration}/>
+                </Route>
             </Switch>
         </Router>
     );

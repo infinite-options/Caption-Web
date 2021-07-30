@@ -12,14 +12,36 @@ export default function App() {
     const [zipCode, setZipCode] = useState("");
     const [alias, setAlias] = useState("");
     const [gameUID, setGameUID] = useState("");
+    const [rounds, setRounds] = useState("");
+    const [roundDuration, setRoundDuration] = useState("");
+    const [host, setHost] = useState("");
 
 
     return (
-    <div className="App">
-        <LandingContext.Provider value = {{code, name, email, zipCode, alias, gameUID, setCode, setName, setEmail, setZipCode, setAlias, setGameUID}}>
-            <Nav />
-        </LandingContext.Provider>
-      {/*  <ShareExample/>*/}
-    </div>
-  );
+        <div className="App">
+            <LandingContext.Provider value={{
+                code,
+                name,
+                email,
+                zipCode,
+                alias,
+                gameUID,
+                rounds,
+                roundDuration,
+                host,
+                setCode,
+                setName,
+                setEmail,
+                setZipCode,
+                setAlias,
+                setGameUID,
+                setRounds,
+                setRoundDuration,
+                setHost
+            }}>
+                <Nav/>
+            </LandingContext.Provider>
+            {/*  <ShareExample/>*/}
+        </div>
+    );
 }

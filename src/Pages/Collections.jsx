@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useEffect, useState} from "react";
 import {Row, Col, Card} from "reactstrap";
 import Deck from "../Components/Deck";
 import "../Styles/Collections.css";
@@ -7,36 +7,50 @@ import circle from "../Assets/circle.png";
 import thing from "../Assets/idk.png";
 import {Button} from "../Components/Button";
 import {Link} from "react-router-dom";
+import axios from "axios";
 
 function Collections() {
-    const deckArray = [
-        {
-            src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
-            alt: "student",
-            title: "",
-            // title: "Student Gallery",
-            // price: "free",
-        },
-        {
-            src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
-            alt: "student",
-            title: "",
-            // title: "Student Gallery",
-            // price: "free",
-        },
-        {
-            src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
-            alt: "student",
-            title: "Student Gallery",
-            price: "free",
-        },
-        {
-            src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
-            alt: "student",
-            title: "Student Gallery",
-            price: "free",
-        },
-    ];
+    // const deckArray = [
+    //     {
+    //         src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
+    //         alt: "student",
+    //         title: "",
+    //         // title: "Student Gallery",
+    //         // price: "free",
+    //     },
+    //     {
+    //         src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
+    //         alt: "student",
+    //         title: "",
+    //         // title: "Student Gallery",
+    //         // price: "free",
+    //     },
+    //     {
+    //         src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
+    //         alt: "student",
+    //         title: "Student Gallery",
+    //         price: "free",
+    //     },
+    //     {
+    //         src: "https://images.unsplash.com/photo-1617503752587-97d2103a96ea?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1619&q=80",
+    //         alt: "student",
+    //         title: "Student Gallery",
+    //         price: "free",
+    //     },
+    // ];
+
+    const [deckArray, setDeckArray] = useState([]);
+
+
+
+    useEffect(() => {
+        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks";
+        axios.get(getURL).then((res) => {
+            console.log(res);
+            setDeckArray(res.data.decks_info);
+
+        })
+    }, []);
 
     return (
         <div
@@ -55,7 +69,7 @@ function Collections() {
             <br></br>
 
 
-            <Link to="/rules">
+            <Link to="/gamerules">
                 <i
                     style={{
                         position: "absolute",
@@ -80,7 +94,7 @@ function Collections() {
                         <Deck
                             src={deck.src}
                             alt={deck.alt}
-                            title={deck.title}
+                            title={deck.deck_title}
                             price={deck.price}
                         />
                     </li>

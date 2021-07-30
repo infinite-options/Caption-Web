@@ -12,7 +12,7 @@ import {LandingContext} from "../App";
 
 export default function Waiting() {
 
-    const {code, gameUID} = useContext(LandingContext);
+    const {code, gameUID, host} = useContext(LandingContext);
     // const [names, setNames] = useEffect([]);
 
     let gameCodeText = "Game Code: " + code;
@@ -90,10 +90,14 @@ export default function Waiting() {
 
             <br></br>
 
-            <Button
+            {host ?  <Button
                 className="landing"
                 children="Start Game"
-            />
+                destination="/collections"
+                conditionalLink={true}
+            /> : <></>}
+
+
 
         </div>
     )

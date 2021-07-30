@@ -7,13 +7,12 @@ import "../Styles/Landing.css";
 import {LandingContext} from "../App";
 import {Card} from "reactstrap";
 
-export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID}) {
+export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost}) {
 
-    const {code, name, alias, email, zipCode} = useContext(LandingContext);
+    const {code, name, alias, email, zipCode, host} = useContext(LandingContext);
 
     const handleCodeChange = (codeInput) => {
         setCode(codeInput);
-
     };
 
     const handleNameChange = (nameInput) => {
@@ -62,6 +61,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 setCode(res.data.game_code);
 
             })
+
+            setHost(true);
 
         } else {
             window.alert("To create a game, fill out the necessary information");

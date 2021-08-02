@@ -92,6 +92,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 }
             })
 
+            setHost(false);
+
         } else {
             window.alert("To join a game, fill out the necessary information and the correct gamecode.");
         }

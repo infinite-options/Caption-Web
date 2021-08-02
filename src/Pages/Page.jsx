@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import Pic from "../Assets/sd.jpg";
 import Countdown from "react-countdown";
 import { Row, Col, Card } from "reactstrap";
@@ -11,10 +11,14 @@ import background from "../Assets/temp.png";
 //Documentation for the CountdownCircleTimer component
 //https://github.com/vydimitrov/react-countdown-circle-timer#props-for-both-reactreact-native
 import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import axios from "axios";
 
 export default function Page() {
   const [caption, setCaption] = useState("");
   const [timeUp, setTimeUp] = useState(false);
+
+  const [time, setTime] = useState();
+  const [duration, setDuration] = useState();
 
   const handleCaptionChange = (newCaption) => {
     setCaption(newCaption);
@@ -28,6 +32,22 @@ export default function Page() {
     window.location.href = "/selection";
     //this is not good because all internal state gets wiped whenever the page reloads
   }
+
+  useEffect(() => {
+    const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/59779668";
+    axios.get(getURL).then((res) => {
+      console.log(res);
+      setTime(res.data.round_started_at);
+      setDuration(res.data.round_duration);
+
+      console.log("Time before addition : " + time);
+
+      // console.log(time.getSeconds());
+      // console.log(duration.getSeconds());
+      console.log("Time after addition : "+ time);
+
+    })
+  }, []);
 
   return (
     <div
@@ -89,7 +109,7 @@ export default function Page() {
                   isPlaying
                   duration={1}
                   colors="#000000"
-                  onComplete={transition}
+                  // onComplete={transition}
                 >
                   {({ remainingTime }) => (
                     <div className="countdownText">{remainingTime}</div>

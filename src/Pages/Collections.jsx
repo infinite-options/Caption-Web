@@ -92,8 +92,9 @@ function Collections() {
                 {deckArray.map((deck) => (
                     <li class="flex-item">
                         <Deck
-                            src={deck.src}
-                            alt={deck.alt}
+                            id = {deck.deck_uid}
+                            src={deck.deck_thumbnail_url}
+                            // alt={deck.deck_title}
                             title={deck.deck_title}
                             price={deck.price}
                         />

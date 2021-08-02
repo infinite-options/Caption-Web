@@ -50,7 +50,7 @@ export default function Nav() {
 
 
                 <Route exact path='/rounds'>
-                    <Rounds setRounds = {setRounds} setRoundDuration = {setRoundDuration}/>
+                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration}/>
                 </Route>
             </Switch>
         </Router>

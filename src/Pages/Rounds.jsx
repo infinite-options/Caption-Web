@@ -11,9 +11,9 @@ import Form from "../Components/Form";
 
 
 
-export default function Rounds() {
+export default function Rounds({setRounds, setRoundDuration}) {
 
-    const {setRounds, setRoundDuration} = useContext(LandingContext);
+    const {code, rounds, roundDuration} = useContext(LandingContext);
 
 
     {/*Need some way to check that the input is an integer*/}
@@ -25,6 +25,21 @@ export default function Rounds() {
     const handleRoundsDurationChange = (durationInput) => {
         setRoundDuration(durationInput);
     };
+
+    function postRoundInfo() {
+
+        const payload = {
+             number_of_rounds: rounds,
+             game_code: code,
+            round_duration: roundDuration,
+        };
+
+        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/changeRoundsAndDuration";
+        axios.post(postURL, payload).then((res) => {
+            console.log(res);
+        })
+    }
+
 
 
     return (
@@ -65,26 +80,8 @@ export default function Rounds() {
 
             <br></br>
 
-            <Button className="landing" children = "Start Playing" conditionalLink={true}/>
+            <Button className="landing"  conditionalLink={true} destination= "/page"onClick={postRoundInfo} children = "Start Playing"/>
 
         </div>
     )
 }
-
-// export function joinGame() {
-//
-//     const {code, name, alias, email, zipCode} = useContext(LandingContext);
-//
-//
-//     if (name !== "" && email !== "" && zipCode !== "") {
-//         const getURL =
-//             "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame";
-//
-//         axios.get(getURL + "/" + code).then((res) => {
-//             console.log(res);
-//         })
-//
-//     } else {
-//         window.alert("To join a game, fill out the necessary information and the correct gamecode.");
-//     }
-// }

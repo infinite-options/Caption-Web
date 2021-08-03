@@ -16,6 +16,8 @@ function Scoreboard(props) {
   const [toggle2, setToggle2] = useState(false);
   const [toggle3, setToggle3] = useState(false);
 
+  // let ter = {false, false, false, false};
+
   function changeToggle1(){
     setToggle1(true);
     setToggle2(false);
@@ -38,7 +40,7 @@ function Scoreboard(props) {
     <div
       style={{
         maxWidth: "375px",
-        height: "812px",
+        height: "100%",
         //As long as I import the image from my package strcuture, I can use them like so
         backgroundImage: `url(${background})`,
         // backgroundImage:
@@ -82,6 +84,37 @@ function Scoreboard(props) {
           conditionalLink={true}
       />
       <br></br>
+      <Button
+          isSelected={toggle3}
+          className="selectionBtn1"
+
+          children="Shrek and Donkey"
+          destination="/selection"
+          onClick={changeToggle3}
+          conditionalLink={true}
+      />
+      <br></br>
+      <Button
+          isSelected={toggle3}
+          className="selectionBtn1"
+
+          children="Shrek and Donkey"
+          destination="/selection"
+          onClick={changeToggle3}
+          conditionalLink={true}
+      />
+      <br></br>
+      <Button
+          isSelected={toggle3}
+          className="selectionBtn1"
+
+          children="Shrek and Donkey"
+          destination="/selection"
+          onClick={changeToggle3}
+          conditionalLink={true}
+      />
+      <br></br>
+
       <Button
           isSelected={toggle3}
           className="selectionBtn1"

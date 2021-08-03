@@ -96,7 +96,7 @@ function Collections() {
                             src={deck.deck_thumbnail_url}
                             // alt={deck.deck_title}
                             title={deck.deck_title}
-                            price={deck.price}
+                            price= "free"
                         />
                     </li>
                 ))}

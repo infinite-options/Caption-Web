@@ -26,6 +26,7 @@ export default function DeckCard(props) {
             <div className="outer">
                 <div className="imageBackground">
                     <img src={props.src} alt={props.alt} className="img1"/>
+                    {/*<img src="https://iocaptions.s3.us-west-1.amazonaws.com/Amrita-Marino-NewYorkTimes-Worldnet-001-t.gif" alt={props.alt} className="img1"/>*/}
                 </div>
 
                 {props.title === "" ? <></> :

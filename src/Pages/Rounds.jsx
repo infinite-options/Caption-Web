@@ -62,7 +62,7 @@ export default function Rounds({setRounds, setRoundDuration}) {
 
             <h4>Number of Rounds</h4>
             <Form
-                className="input1"
+                className="input1 grey"
                 field="10"
                 onHandleChange={handleRoundsChange}
             />
@@ -72,7 +72,7 @@ export default function Rounds({setRounds, setRoundDuration}) {
 
             <h4>Time for each round (seconds)</h4>
             <Form
-                className="input1"
+                className="input1 grey"
                 field="30"
                 onHandleChange={handleRoundsDurationChange}
             />

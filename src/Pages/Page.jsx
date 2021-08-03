@@ -17,8 +17,9 @@ export default function Page() {
   const [caption, setCaption] = useState("");
   const [timeUp, setTimeUp] = useState(false);
 
-  const [time, setTime] = useState();
-  const [duration, setDuration] = useState();
+  const [timerDurationDetermined, setTimerDurationDetermined] = useState(false);
+
+  const[timerDuration, setTimerDuration] = useState(-1);
 
   const handleCaptionChange = (newCaption) => {
     setCaption(newCaption);
@@ -33,21 +34,69 @@ export default function Page() {
     //this is not good because all internal state gets wiped whenever the page reloads
   }
 
+  /**
+   * This useEffect() hook will be used to determine the amount of time left on the countdown timer.
+   *
+   * s = the second at which the round has started
+   * c = the second at which the clock is currently on
+   * d = the seconds for the duration of the round
+   */
   useEffect(() => {
     const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/59779668";
     axios.get(getURL).then((res) => {
       console.log(res);
-      setTime(res.data.round_started_at);
-      setDuration(res.data.round_duration);
 
-      console.log("Time before addition : " + time);
+      /**
+       * This c variable records the value of the seconds within the 'server clock'
+       * @type {number}
+       */
+      let serverClock = parseInt(res.data.current_time.substring(17));
+
+      /**
+       * This c variable records the value of the seconds within the 'client clock'
+       * @type {number}
+       */
+      let clientClock = new Date().getSeconds();
+      let c = serverClock;
+
+
+      // console.log("Server Clock: " + serverClock);
+      // console.log("Client Clock: " + serverClock);
+
+
+      let s = parseInt(res.data.round_started_at.substring(17));
+
+      let d = parseInt(res.data.round_duration.substring(17));
+
+      console.log("Current Second: " + c);
+      console.log("Start Second: " + s);
+      console.log("Calculated Lag: " + determineLag(c,s));
+      console.log("Round Duration: " + d);
+
+
+
+      setTimerDuration(d-determineLag(c,s));
+      console.log("Determined duration: " + (d-1));
+      console.log("Determined duration: " + timerDuration);
+
+      // console.log("Time before addition : " + time);
 
       // console.log(time.getSeconds());
       // console.log(duration.getSeconds());
-      console.log("Time after addition : "+ time);
+      // console.log("Time after addition : "+ time);
 
     })
+    setTimerDurationDetermined(true);
   }, []);
+
+  function determineLag(current, start){
+    if(current-start >= 0){
+      return current-start;
+    }
+    else{
+      return current + (60-start);
+    }
+  }
 
   return (
     <div
@@ -102,19 +151,20 @@ export default function Page() {
                   width: "60px",
                 }}
               >
-                <CountdownCircleTimer
-                  background="red"
-                  size={60}
-                  strokeWidth={5}
-                  isPlaying
-                  duration={1}
-                  colors="#000000"
-                  // onComplete={transition}
+                {timerDuration != -1 ?  <CountdownCircleTimer
+                    background="red"
+                    size={60}
+                    strokeWidth={5}
+                    isPlaying
+                    duration={timerDuration}
+                    colors="#000000"
+                    // onComplete={transition}
                 >
                   {({ remainingTime }) => (
-                    <div className="countdownText">{remainingTime}</div>
+                      <div className="countdownText">{remainingTime}</div>
                   )}
-                </CountdownCircleTimer>
+                </CountdownCircleTimer> : <></> }
+
               </div>
               <span style={{ marginLeft: "60px" }}></span>
               <br></br>{" "}

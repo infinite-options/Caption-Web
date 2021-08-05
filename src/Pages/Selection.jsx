@@ -1,133 +1,117 @@
-import React, { useState } from "react";
+import React, {useEffect, useState} from "react";
 import Pic from "../Assets/sd.jpg";
-import { Row, Col, Card } from "reactstrap";
+import {Row, Col, Card} from "reactstrap";
 import "../Styles/Scoreboard.css";
 import Report from "../Components/Report";
-import { Button } from "../Components/Button";
+import {Button} from "../Components/Button";
 import background from "../Assets/temp.png";
-
+import axios from "axios";
+import Deck from "../Components/Deck";
 
 
 function Scoreboard(props) {
-  const title = props.title;
-  // const bestCaption = "Two dudes watching the Sharknado trailer";
+    // const title = props.title;
+    // const bestCaption = "Two dudes watching the Sharknado trailer";
 
-  const [toggle1, setToggle1] = useState(false);
-  const [toggle2, setToggle2] = useState(false);
-  const [toggle3, setToggle3] = useState(false);
 
-  // let ter = {false, false, false, false};
+    const [toggleArr, setToggleArr] = useState([]);
+    const [playersArr, setPlayersArr] = useState([]);
 
-  function changeToggle1(){
-    setToggle1(true);
-    setToggle2(false);
-    setToggle3(false);
-  }
 
-  function changeToggle2(){
-    setToggle1(false);
-    setToggle2(true);
-    setToggle3(false);
-  }
+    useEffect(() => {
 
-  function changeToggle3(){
-    setToggle1(false);
-    setToggle2(false);
-    setToggle3(true);
-  }
+        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/39827741,1";
+        axios.get(getURL).then((res) => {
+            console.log(res);
+            setPlayersArr(res.data.players);
 
-  return (
-    <div
-      style={{
-        maxWidth: "375px",
-        height: "100%",
-        //As long as I import the image from my package strcuture, I can use them like so
-        backgroundImage: `url(${background})`,
-        // backgroundImage:
-        //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
-      }}
-    >
-      {/* <h1>{title}</h1> */}
-      <h1>Name of Deck</h1>
-      <br></br>
+            /**
+             * Initialize the toggle array with the correct size and populate the array with all false values
+             */
+            toggleArr.length = res.data.players.length;
+            for (var i = 0; i < toggleArr.length; i++) {
+                toggleArr[i] = false;
+            }
+        })
 
-      <h4 classname="row">Pick Your Favorite Caption</h4>
-      <br></br>
-      {/*<img className="img2" src={Pic} />*/}
-      <img  style = {{
-        objectFit: "cover",
-        height: "325px",
-        width: "325px",
-        borderRadius: "50px",
-      }} src={Pic}/>
+        console.log("Toggle Arr: " + toggleArr);
+    }, []);
 
-      <br></br>
-      <br></br>
 
-      <Button
-        isSelected={toggle1}
-        className="selectionBtn1"
+    function changeToggle(index) {
+        console.log("Called: " + index);
+        for (var i = 0; i < toggleArr.length; i++) {
+            toggleArr[i] = false;
+        }
+        toggleArr[index] = true;
 
-        children="Shrek and Donkey"
-        destination="/selection"
-        onClick={changeToggle1}
-        conditionalLink={true}
-      />
-      <br></br>
-      <Button
-          // isSelected={toggle2}
-          className="selectionBtn2"
+        console.log("Result: " + toggleArr);
+        // setToggleState(index);
+    }
 
-          children="Shrek and Donkey"
-          destination="/selection"
-          // onClick={changeToggle2}
-          conditionalLink={true}
-      />
-      <br></br>
-      <Button
-          isSelected={toggle3}
-          className="selectionBtn1"
+    function renderCaptions() {
 
-          children="Shrek and Donkey"
-          destination="/selection"
-          onClick={changeToggle3}
-          conditionalLink={true}
-      />
-      <br></br>
-      <Button
-          isSelected={toggle3}
-          className="selectionBtn1"
+        var captions = [];
+        for (var index = 0; index < playersArr.length; index++) {
+            /**
+             * The value of index continues to increment due to the loop,
+             * so let's make a variable that does not change for the onClick function
+             * @type {number}
+             */
+            let localIndex = index;
 
-          children="Shrek and Donkey"
-          destination="/selection"
-          onClick={changeToggle3}
-          conditionalLink={true}
-      />
-      <br></br>
-      <Button
-          isSelected={toggle3}
-          className="selectionBtn1"
+            captions.push(<div>
+                <Button
+                    isSelected={toggleArr[index]}
+                    className="selectionBtn1"
 
-          children="Shrek and Donkey"
-          destination="/selection"
-          onClick={changeToggle3}
-          conditionalLink={true}
-      />
-      <br></br>
+                    children={playersArr[index].caption}
+                    destination="/selection"
+                    onClick={() => changeToggle(localIndex)}
+                    conditionalLink={true}
+                />
+                <br></br>
+            </div>);
+            console.log(index);
+        }
+        return <div>{captions}</div>;
+    }
 
-      <Button
-          isSelected={toggle3}
-          className="selectionBtn1"
 
-          children="Shrek and Donkey"
-          destination="/selection"
-          onClick={changeToggle3}
-          conditionalLink={true}
-      />
-      <br></br>
-      <Button className="fat" destination="/scoreboard" children="Vote" conditionalLink={true} />
-    </div>
-  );
+    return (
+        <div
+            style={{
+                maxWidth: "375px",
+                height: "100%",
+                //As long as I import the image from my package strcuture, I can use them like so
+                backgroundImage: `url(${background})`,
+                // backgroundImage:
+                //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
+            }}
+        >
+            <br></br>
+            <h1>Name of Deck</h1>
+            <br></br>
+
+            <h4 classname="row">Pick Your Favorite Caption</h4>
+            <br></br>
+            {/*<img className="img2" src={Pic} />*/}
+            <img style={{
+                objectFit: "cover",
+                height: "325px",
+                width: "325px",
+                borderRadius: "50px",
+            }} src={Pic}/>
+
+            <br></br>
+            <br></br>
+
+            {renderCaptions()}
+
+            <Button className="fat" destination="/scoreboard" children="Vote" conditionalLink={true}/>
+            <br></br>
+        </div>
+    );
 }
 
 export default Scoreboard;

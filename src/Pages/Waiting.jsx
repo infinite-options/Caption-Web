@@ -9,14 +9,13 @@ import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 
 
-
 export default function Waiting() {
 
     const {code, gameUID, host} = useContext(LandingContext);
     // const [names, setNames] = useEffect([]);
 
     let gameCodeText = "Game Code: " + code;
-    const [names, setNames] = useState("");
+    const [names, setNames] = useState({});
 
     // const names = [
     //     "Mike",
@@ -36,9 +35,28 @@ export default function Waiting() {
         axios.get(getURL).then((res) => {
             console.log(res);
             setNames(res.data.players_list);
+            var map4 = new Map([[["first name", "last name"],
+                ["sumit", "ghosh"]],
+                [["friend 1", "friend 2"],
+                    ["sourav","gourav"]]]);
+
+            // setNames(map4);
+            console.log(names);
+
+            console.log("Map4");
+            console.log(map4);
+            //
+            // let iterator1 = res.data.players_list.entries();
+
+
+            // console.log(keys);
+
         })
     }, []);
 
+    function printNames(){
+        console.log(names);
+    }
 
     return (
         <div
@@ -63,17 +81,19 @@ export default function Waiting() {
             <h4>Waiting for all players to join</h4>
 
             <ul className="flex-container">
-                {names.split(",").map((item) => (
+                {/*{names.map((value) => (*/}
 
-                    <li className="flex-item">
-                        {item !== "" ? <i className="fas fa-circle fa-3x" style = {{
-                            height: "200px",
-                            color: "purple"
-                        }}/> : ""}
+                {/*    <li className="flex-item">*/}
+                {/*        {value !== "" ? <i className="fas fa-circle fa-3x" style = {{*/}
+                {/*            height: "200px",*/}
+                {/*            color: "purple"*/}
+                {/*        }}/> : ""}*/}
 
-                        {item}
-                    </li>
-                ))}
+                {/*        {value}*/}
+                {/*    </li>*/}
+                {/*))}*/}
+
+
             </ul>
 
 
@@ -86,17 +106,26 @@ export default function Waiting() {
             <Button
                 className="landing"
                 children="Share with other players"
+                onClick={printNames}
+                destination="/waiting"
+                conditionalLink={true}
             />
 
             <br></br>
 
-            {host ?  <Button
+            {/*{host ? <Button*/}
+            {/*    className="landing"*/}
+            {/*    children="Start Game"*/}
+            {/*    destination="/collections"*/}
+            {/*    conditionalLink={true}*/}
+            {/*/> : <></>}*/}
+
+            <Button
                 className="landing"
                 children="Start Game"
                 destination="/collections"
                 conditionalLink={true}
-            /> : <></>}
-
+            />
 
 
         </div>

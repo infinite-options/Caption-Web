@@ -25,6 +25,9 @@ export default function Page() {
     const [timerDuration, setTimerDuration] = useState(-1);
     const [waitingPlayers, setWaitingPlayers] = useState([]);
 
+    const [roundStartTime, setRoundStartTime] = useState();
+
+
     const handleCaptionChange = (newCaption) => {
         setCaption(newCaption);
     };
@@ -39,10 +42,23 @@ export default function Page() {
     }
 
 
+
+
     useEffect(() => {
         const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/59779668";
         const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/80281686";
         const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoSubmittedCaption/39827741,1";
+        const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/39827741,2";
+
+
+        /**
+         * This axios.get() will be used to start the round
+         */
+        axios.get(startPlayingURL).then((res) =>{
+            console.log(res);
+            setRoundStartTime(res.data.round_start_time);
+        })
+
 
         /**
          * This axios.get() will be used to determine the amount of time left on the countdown timer.
@@ -111,6 +127,12 @@ export default function Page() {
             }
             console.log("The waiting players array: " + waitingPlayers);
         })
+
+        axios.get(startPlayingURL).then((res) =>{
+            console.log(res);
+
+        })
+
     }, []);
 
     function determineLag(current, start) {

@@ -12,6 +12,7 @@ function Scoreboard(props) {
     const title = props.title;
     const bestCaption = "Two dudes watching the Sharknado trailer";
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
+    const[timeStamp, setTimeStamp] = useState();
 
 
     useEffect(() => {
@@ -43,6 +44,22 @@ function Scoreboard(props) {
         );
     }
 
+
+
+    function startNextRound(){
+        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
+
+        const payload = {
+            game_code: "39827741",
+            round_number: "7",
+        }
+
+        axios.post(postURL, payload).then((res) => {
+            console.log(res);
+            // setTimeStamp(res.data.round_start_time);
+            // console.log("This is the timestamp object: " + res.data.round_start_time);
+        })
+    }
 
     return (
         <div
@@ -130,7 +147,7 @@ function Scoreboard(props) {
             {/*    votes="2"*/}
             {/*/>*/}
             <br></br>
-            <Button className="fat" destination="/" children="Next Round"/>
+            <Button className="fat" destination="/scoreboard" onClick = {startNextRound} children="Next Round" conditionalLink={true}/>
             <br/>
         </div>
     );

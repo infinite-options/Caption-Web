@@ -13,28 +13,42 @@ import Bubbles from "../Components/Bubbles";
 export default function Waiting() {
 
     const {code, gameUID, host} = useContext(LandingContext);
-    // const [names, setNames] = useEffect([]);
+    const [names, setNames] = useState([]);
 
     let gameCodeText = "Game Code: " + code;
     // const [names, setNames] = useState({});
 
-    const names = [
-        "Mike",
-        "Ron",
-        "Emma",
-        "Flo",
-        "Lola",
+    // const names = [
+    //     "Mike",
+    //     "Ron",
+    //     "Emma",
+    //     "Flo",
+    //     "Lola",
+    //
+    // ];
 
-    ];
+
+    useEffect(() => {
+        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/39827741";
+        axios.get(getURL).then((res) => {
+            console.log(res);
+
+            names.length = res.data.players_list.length;
+
+            for (var index = 0; index < res.data.players_list.length; index++) {
+                /**
+                 * The value of index continues to increment due to the loop,
+                 * so let's make a variable that does not change for the onClick function
+                 * @type {number}
+                 */
 
 
-    // useEffect(() => {
-    //     const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/200-002006";
-    //     axios.get(getURL).then((res) => {
-    //         console.log(res);
-    //         setNames(res.data.players_list);
-    //     })
-    // }, []);
+                names[index] = (res.data.players_list[index].user_alias);
+
+            }
+            console.log("This is the names array "  + names);
+        })
+    }, []);
 
 
     return (

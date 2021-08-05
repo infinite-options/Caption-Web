@@ -16,6 +16,7 @@ function Scoreboard(props) {
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
+    const [selectedCaption, setSelectedCaption] = useState("");
 
 
     useEffect(() => {
@@ -45,8 +46,24 @@ function Scoreboard(props) {
         }
         toggleArr[index] = true;
 
+        setSelectedCaption(playersArr[index].caption);
+
         console.log("Result: " + toggleArr);
         // setToggleState(index);
+    }
+
+    function postVote(){
+        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
+
+        const payload = {
+            caption: selectedCaption,
+            game_code: "39827741",
+            round_number: "1",
+        }
+
+        axios.post(postURL,payload).then((res) => {
+            console.log(res);
+        })
     }
 
     function renderCaptions() {
@@ -108,7 +125,7 @@ function Scoreboard(props) {
 
             {renderCaptions()}
 
-            <Button className="fat" destination="/scoreboard" children="Vote" conditionalLink={true}/>
+            <Button className="fat" destination="/selection" children="Vote" onClick = {postVote} conditionalLink={true}/>
             <br></br>
         </div>
     );

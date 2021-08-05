@@ -13,6 +13,7 @@ import background from "../Assets/temp.png";
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
 import axios from "axios";
 import {LandingContext} from "../App";
+import Bubbles from "../Components/Bubbles";
 
 export default function Page() {
 
@@ -22,6 +23,7 @@ export default function Page() {
     const [imageSrc, setImageSrc] = useState("");
     const [timeUp, setTimeUp] = useState(false);
     const [timerDuration, setTimerDuration] = useState(-1);
+    const [waitingPlayers, setWaitingPlayers] = useState([]);
 
     const handleCaptionChange = (newCaption) => {
         setCaption(newCaption);
@@ -40,6 +42,7 @@ export default function Page() {
     useEffect(() => {
         const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/59779668";
         const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/80281686";
+        const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoSubmittedCaption/39827741,1";
 
         /**
          * This axios.get() will be used to determine the amount of time left on the countdown timer.
@@ -92,10 +95,21 @@ export default function Page() {
 
         })
 
-
+        /**
+         * This axios.get() will be used to receive the image url
+         */
         axios.get(getImageURL).then((res) => {
             console.log(res);
             setImageSrc(res.data.image_url);
+        })
+
+
+        axios.get(getPlayersURL).then((res) => {
+            console.log(res);
+            for (var i = 0; i < res.data.players.length; i++) {
+                waitingPlayers[i] = res.data.players[i].user_alias;
+            }
+            console.log("The waiting players array: " + waitingPlayers);
         })
     }, []);
 
@@ -125,11 +139,15 @@ export default function Page() {
         })
     }
 
+    function toggleTimeUp() {
+        setTimeUp(!timeUp);
+    }
+
     return (
         <div
             style={{
                 maxWidth: "375px",
-                height: "812px",
+                height: "100%",
                 //As long as I import the image from my package strcuture, I can use them like so
                 backgroundImage: `url(${background})`,
                 // backgroundImage:
@@ -148,64 +166,82 @@ export default function Page() {
                 </h1>
                 <br></br>
 
-                <img className="centerPic" src={imageSrc} alt = "Loading Image...."/>
+                <img className="centerPic" src={imageSrc} alt="Loading Image...."/>
 
                 <br></br>
                 <br></br>
-                {timeUp ? (
-                    <div>
-                        <h1>You have captioned the above image as: "{caption}"</h1>
-                        <Button
-                            className="landing2"
-                            destination="/selection"
-                            children="Continue"
-                        />
-                    </div>
-                ) : (
-                    <div>
-                        <Form
-                            className="input2"
-                            field="Enter your caption here"
-                            onHandleChange={handleCaptionChange}
-                        />
-                        <br></br>
-                        <Row>
-                            <span style={{marginLeft: "50px"}}></span>
-                            <div
-                                style={{
-                                    background: "yellow",
-                                    borderRadius: "30px",
-                                    width: "60px",
-                                }}
+                {/*{timeUp ? (*/}
+                {/*    <div>*/}
+                {/*        <h1>You have captioned the above image as: "{caption}"</h1>*/}
+                {/*        <br></br>*/}
+                {/*        <Button*/}
+                {/*            className="landing2"*/}
+                {/*            destination="/selection"*/}
+                {/*            children="Continue"*/}
+                {/*        />*/}
+                {/*    </div>*/}
+                {/*) : (*/}
+                <div>
+                    {timeUp ? <></> : <Form
+                        className="input2"
+                        field="Enter your caption here"
+                        onHandleChange={handleCaptionChange}
+                    />
+                    }
+                    <br/>
+
+                    <Row>
+                        <span style={{marginLeft: "50px"}}></span>
+                        <div
+                            style={{
+                                background: "yellow",
+                                borderRadius: "30px",
+                                width: "60px",
+                            }}
+                        >
+                            {timerDuration != -1 ? <CountdownCircleTimer
+                                background="red"
+                                size={60}
+                                strokeWidth={5}
+                                isPlaying
+                                duration={timerDuration}
+                                colors="#000000"
+                                // onComplete={transition}
                             >
-                                {timerDuration != -1 ? <CountdownCircleTimer
-                                    background="red"
-                                    size={60}
-                                    strokeWidth={5}
-                                    isPlaying
-                                    duration={timerDuration}
-                                    colors="#000000"
-                                    // onComplete={transition}
-                                >
-                                    {({remainingTime}) => (
-                                        <div className="countdownText">{remainingTime}</div>
-                                    )}
-                                </CountdownCircleTimer> : <></>}
+                                {({remainingTime}) => (
+                                    <div className="countdownText">{remainingTime}</div>
+                                )}
+                            </CountdownCircleTimer> : <></>}
 
-                            </div>
-                            <span style={{marginLeft: "60px"}}></span>
-                            <br></br>{" "}
-                            <Button
-                                className="fat"
-                                destination= "/page"
-                                onClick={postSubmitCaption}
-                                children="Submit"
-                                conditionalLink={true}
-                            />
-                        </Row>
-                    </div>
-                )}
+                        </div>
+                        <span style={{marginLeft: "60px"}}></span>
+                        <br></br>{" "}
+
+                        {timeUp ? <Button
+                            className="fat"
+                            destination="/page"
+                            // onClick={postSubmitCaption}
+                            // onClick={toggleTimeUp}
+                            children="Submitted"
+                            conditionalLink={true}
+                        /> : <Button
+                            className="fat"
+                            destination="/page"
+                            onClick={postSubmitCaption}
+                            onClick={toggleTimeUp}
+                            children="Submit"
+                            conditionalLink={true}
+                        />
+                        }
+
+                    </Row>
+                </div>
+                {/*)}*/}
             </div>
+
+            <br/>
+            {timeUp ?
+                <div> Waiting for everybody to submit their captions... <Bubbles items={waitingPlayers}/></div> : <></>}
         </div>
     );
 }

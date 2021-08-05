@@ -7,6 +7,7 @@ import "../Styles/Waiting.css";
 import {Row, Col, Card} from "reactstrap";
 import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
+import Bubbles from "../Components/Bubbles";
 
 
 export default function Waiting() {
@@ -15,48 +16,26 @@ export default function Waiting() {
     // const [names, setNames] = useEffect([]);
 
     let gameCodeText = "Game Code: " + code;
-    const [names, setNames] = useState({});
+    // const [names, setNames] = useState({});
 
-    // const names = [
-    //     "Mike",
-    //     "Ron",
-    //     "Emma",
-    //     "Flo",
-    //     "Lola",
-    //
-    // ];
+    const names = [
+        "Mike",
+        "Ron",
+        "Emma",
+        "Flo",
+        "Lola",
 
-    // const [names, setNames] = useEffect([]);
-    const [namesLoaded, setNamesLoaded] = useState(false);
+    ];
 
 
-    useEffect(() => {
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/200-002006";
-        axios.get(getURL).then((res) => {
-            console.log(res);
-            setNames(res.data.players_list);
-            var map4 = new Map([[["first name", "last name"],
-                ["sumit", "ghosh"]],
-                [["friend 1", "friend 2"],
-                    ["sourav","gourav"]]]);
+    // useEffect(() => {
+    //     const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/200-002006";
+    //     axios.get(getURL).then((res) => {
+    //         console.log(res);
+    //         setNames(res.data.players_list);
+    //     })
+    // }, []);
 
-            // setNames(map4);
-            console.log(names);
-
-            console.log("Map4");
-            console.log(map4);
-            //
-            // let iterator1 = res.data.players_list.entries();
-
-
-            // console.log(keys);
-
-        })
-    }, []);
-
-    function printNames(){
-        console.log(names);
-    }
 
     return (
         <div
@@ -80,21 +59,7 @@ export default function Waiting() {
 
             <h4>Waiting for all players to join</h4>
 
-            <ul className="flex-container">
-                {/*{names.map((value) => (*/}
-
-                {/*    <li className="flex-item">*/}
-                {/*        {value !== "" ? <i className="fas fa-circle fa-3x" style = {{*/}
-                {/*            height: "200px",*/}
-                {/*            color: "purple"*/}
-                {/*        }}/> : ""}*/}
-
-                {/*        {value}*/}
-                {/*    </li>*/}
-                {/*))}*/}
-
-
-            </ul>
+            <Bubbles items = {names}/>
 
 
             <Button
@@ -106,7 +71,7 @@ export default function Waiting() {
             <Button
                 className="landing"
                 children="Share with other players"
-                onClick={printNames}
+                // onClick={printNames}
                 destination="/waiting"
                 conditionalLink={true}
             />

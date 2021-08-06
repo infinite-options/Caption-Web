@@ -29,8 +29,8 @@ export default function Waiting() {
 
 
     useEffect(() => {
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/39827741";
-        axios.get(getURL).then((res) => {
+        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+        axios.get(getURL + code).then((res) => {
             console.log(res);
 
             names.length = res.data.players_list.length;
@@ -73,8 +73,24 @@ export default function Waiting() {
 
             <h4>Waiting for all players to join</h4>
 
+
+
+
+
             <Bubbles items = {names}/>
 
+            {/*<ul className="flex-container">*/}
+            {/*    {names.map((value) => (*/}
+            {/*        <li className="flex-item">*/}
+            {/*            {value !== "" ? <i className="fas fa-circle fa-3x" style = {{*/}
+            {/*                height: "200px",*/}
+            {/*                color: "purple"*/}
+            {/*            }}/> : ""}*/}
+
+            {/*            {value}*/}
+            {/*        </li>*/}
+            {/*    ))}*/}
+            {/*</ul>*/}
 
             <Button
                 className="cardStyle"
@@ -92,19 +108,19 @@ export default function Waiting() {
 
             <br></br>
 
-            {/*{host ? <Button*/}
-            {/*    className="landing"*/}
-            {/*    children="Start Game"*/}
-            {/*    destination="/collections"*/}
-            {/*    conditionalLink={true}*/}
-            {/*/> : <></>}*/}
-
-            <Button
+            {host ? <Button
                 className="landing"
                 children="Start Game"
                 destination="/collections"
                 conditionalLink={true}
-            />
+            /> : <></>}
+
+            {/*<Button*/}
+            {/*    className="landing"*/}
+            {/*    children="Start Game"*/}
+            {/*    destination="/collections"*/}
+            {/*    conditionalLink={true}*/}
+            {/*/>*/}
 
 
         </div>

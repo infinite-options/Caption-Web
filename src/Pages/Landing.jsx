@@ -71,14 +71,24 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
     function joinGame() {
         if (validateInputToJoinGame()) {
-            const getURL =
-                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame";
+            const postURL =
+                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
 
-            axios.get(getURL + "/" + code).then((res) => {
+            const payload = {
+                user_name: name,
+                user_alias: alias,
+                user_email: email,
+                user_zip: zipCode,
+                game_code: code,
+            };
+
+            axios.post(postURL, payload).then((res) => {
                 console.log(res);
+                setGameUID(res.data.game_uid);
+
 
                 try {
-                    if (res.data.warning === "Invalid game code") {
+                    if (res.data.message === "Invalid game code") {
                         console.log("Looks like an invalid game code. Time to send you to the error screen");
 
                         window.location.href = "/error";
@@ -88,7 +98,6 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                     }
                 } catch {
                     console.log("Catch Clause: No error message. Game on!");
-
                 }
             })
 

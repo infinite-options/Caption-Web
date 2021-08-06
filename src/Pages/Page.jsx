@@ -17,7 +17,7 @@ import Bubbles from "../Components/Bubbles";
 
 export default function Page() {
 
-    const {code} = useContext(LandingContext);
+    const {code, roundNumber} = useContext(LandingContext);
 
     const [caption, setCaption] = useState("");
     const [imageSrc, setImageSrc] = useState("");
@@ -45,29 +45,33 @@ export default function Page() {
 
 
     useEffect(() => {
-        const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/59779668";
-        const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/80281686";
-        const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoSubmittedCaption/39827741,1";
-        const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/39827741,2";
+        const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+        const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/";
+        const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
+        const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
 
 
         /**
-         * This axios.get() will be used to start the round
+         * Axios.Get() #1
+         * Start the round
          */
-        axios.get(startPlayingURL).then((res) =>{
+
+        axios.get(startPlayingURL + code + "," + roundNumber).then((res) =>{
             console.log(res);
             setRoundStartTime(res.data.round_start_time);
         })
 
 
         /**
-         * This axios.get() will be used to determine the amount of time left on the countdown timer.
+         *
+         * Axios.Get() #2
+         * Determine the amount of time left on the countdown timer.
          *
          * s = the second at which the round has started
          * c = the second at which the clock is currently on
          * d = the seconds for the duration of the round
          */
-        axios.get(getTimerURL).then((res) => {
+        axios.get(getTimerURL + code).then((res) => {
             console.log(res);
 
             /**
@@ -111,16 +115,21 @@ export default function Page() {
 
         })
 
+
         /**
-         * This axios.get() will be used to receive the image url
+         * Axios.Get() #3
+         * Receive the image url
          */
-        axios.get(getImageURL).then((res) => {
+        axios.get(getImageURL + code).then((res) => {
             console.log(res);
             setImageSrc(res.data.image_url);
         })
 
-
-        axios.get(getPlayersURL).then((res) => {
+        /**
+         * Axios.Get() #4
+         * Recieve the waiting players
+         */
+        axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
             console.log(res);
             for (var i = 0; i < res.data.players.length; i++) {
                 waitingPlayers[i] = res.data.players[i].user_alias;
@@ -128,10 +137,7 @@ export default function Page() {
             console.log("The waiting players array: " + waitingPlayers);
         })
 
-        axios.get(startPlayingURL).then((res) =>{
-            console.log(res);
 
-        })
 
     }, []);
 

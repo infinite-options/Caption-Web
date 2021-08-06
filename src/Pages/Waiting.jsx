@@ -27,6 +27,22 @@ export default function Waiting() {
     //
     // ];
 
+    function renderBubbles() {
+
+        return (<ul className="flex-container">
+            {names.map((value) => (
+                <li className="flex-item">
+                    {value !== "" ? <i className="fas fa-circle fa-3x" style={{
+                        height: "200px",
+                        color: "purple"
+                    }}/> : ""}
+                    {value}
+                </li>
+            ))}
+        </ul>);
+
+    }
+
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
@@ -46,9 +62,11 @@ export default function Waiting() {
                 names[index] = (res.data.players_list[index].user_alias);
 
             }
-            console.log("This is the names array "  + names);
+            console.log("This is the names array " + names);
         })
-    }, []);
+    }, [gameCodeText]);
+
+
 
 
     return (
@@ -73,11 +91,7 @@ export default function Waiting() {
 
             <h4>Waiting for all players to join</h4>
 
-
-
-
-
-            <Bubbles items = {names}/>
+            {renderBubbles()}
 
             {/*<ul className="flex-container">*/}
             {/*    {names.map((value) => (*/}
@@ -86,7 +100,6 @@ export default function Waiting() {
             {/*                height: "200px",*/}
             {/*                color: "purple"*/}
             {/*            }}/> : ""}*/}
-
             {/*            {value}*/}
             {/*        </li>*/}
             {/*    ))}*/}
@@ -95,6 +108,8 @@ export default function Waiting() {
             <Button
                 className="cardStyle"
                 children={gameCodeText}
+                destination="/waiting"
+                conditionalLink={true}
             />
             <br></br>
 

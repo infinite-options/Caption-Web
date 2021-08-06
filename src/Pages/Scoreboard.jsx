@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState, useContext} from "react";
 import Pic from "../Assets/sd.jpg";
 import {Row, Col, Card} from "reactstrap";
 import "../Styles/Scoreboard.css";
@@ -7,12 +7,16 @@ import {Button} from "../Components/Button";
 import background from "../Assets/temp2.png";
 import axios from "axios";
 import Deck from "../Components/Deck";
+import {LandingContext} from "../App";
 
-function Scoreboard(props) {
-    const title = props.title;
+function Scoreboard({setRoundNumber}) {
+
     const bestCaption = "Two dudes watching the Sharknado trailer";
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
     const[timeStamp, setTimeStamp] = useState();
+
+
+    const{code, roundNumber} = useContext(LandingContext);
 
 
     useEffect(() => {
@@ -50,8 +54,8 @@ function Scoreboard(props) {
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
 
         const payload = {
-            game_code: "39827741",
-            round_number: "7",
+            game_code: code,
+            round_number: roundNumber,
         }
 
         axios.post(postURL, payload).then((res) => {
@@ -59,6 +63,8 @@ function Scoreboard(props) {
             // setTimeStamp(res.data.round_start_time);
             // console.log("This is the timestamp object: " + res.data.round_start_time);
         })
+
+        setRoundNumber(roundNumber++);
     }
 
     return (

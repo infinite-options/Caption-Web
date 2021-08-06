@@ -17,7 +17,7 @@ import {LandingContext} from "./App";
 
 export default function Nav() {
 
-    const {setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost} = useContext(LandingContext);
+    const {setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber} = useContext(LandingContext);
 
     return (
         <Router>
@@ -34,7 +34,12 @@ export default function Nav() {
 
 
                 <Route exact path="/collections" component={Collections}/>
-                <Route exact path="/scoreboard" component={Scoreboard}/>
+
+
+                <Route exact path='/scoreboard'>
+                    <Scoreboard setRoundNumber = {setRoundNumber} />
+                </Route>
+
                 <Route exact path="/page" component={Page1}/>
                 <Route exact path="/selection" component={Selection}/>
                 {/*<Route exact path="/waiting" component={Waiting} />*/}
@@ -50,7 +55,7 @@ export default function Nav() {
 
 
                 <Route exact path='/rounds'>
-                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration}/>
+                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} />
                 </Route>
             </Switch>
         </Router>

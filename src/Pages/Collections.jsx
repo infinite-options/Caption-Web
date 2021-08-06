@@ -48,7 +48,6 @@ function Collections() {
         axios.get(getURL).then((res) => {
             console.log(res);
             setDeckArray(res.data.decks_info);
-
         })
     }, []);
 
@@ -88,9 +87,9 @@ function Collections() {
             <br></br>
             <br></br>
 
-            <ul class="flex-container">
+            <ul className="flex-container">
                 {deckArray.map((deck) => (
-                    <li class="flex-item">
+                    <li className="flex-item">
                         <Deck
                             id = {deck.deck_uid}
                             src={deck.deck_thumbnail_url}

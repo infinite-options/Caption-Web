@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import Pic from "../Assets/sd.jpg";
 import {Row, Col, Card} from "reactstrap";
 import "../Styles/Scoreboard.css";
@@ -7,11 +7,14 @@ import {Button} from "../Components/Button";
 import background from "../Assets/temp.png";
 import axios from "axios";
 import Deck from "../Components/Deck";
+import {LandingContext} from "../App";
 
 
 function Scoreboard(props) {
     // const title = props.title;
     // const bestCaption = "Two dudes watching the Sharknado trailer";
+
+    const {code, roundNumber} = useContext(LandingContext);
 
 
     const [toggleArr, setToggleArr] = useState([]);
@@ -21,8 +24,11 @@ function Scoreboard(props) {
 
     useEffect(() => {
 
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/39827741,1";
-        axios.get(getURL).then((res) => {
+        // const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/39827741,1";
+        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
+
+
+        axios.get(getURL + code + "," + roundNumber).then((res) => {
             console.log(res);
             setPlayersArr(res.data.players);
 
@@ -52,16 +58,16 @@ function Scoreboard(props) {
         // setToggleState(index);
     }
 
-    function postVote(){
+    function postVote() {
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
 
         const payload = {
             caption: selectedCaption,
-            game_code: "39827741",
-            round_number: "1",
+            game_code: code,
+            round_number: roundNumber
         }
 
-        axios.post(postURL,payload).then((res) => {
+        axios.post(postURL, payload).then((res) => {
             console.log(res);
         })
     }
@@ -125,7 +131,8 @@ function Scoreboard(props) {
 
             {renderCaptions()}
 
-            <Button className="fat" destination="/selection" children="Vote" onClick = {postVote} conditionalLink={true}/>
+            <Button className="fat" destination="/scoreboard" children="Vote" onClick={postVote}
+                    conditionalLink={true}/>
             <br></br>
         </div>
     );

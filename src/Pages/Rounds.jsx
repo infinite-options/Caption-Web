@@ -10,18 +10,19 @@ import {LandingContext} from "../App";
 import Form from "../Components/Form";
 
 
-
 export default function Rounds({setRounds, setRoundDuration}) {
 
     const {code, rounds, roundDuration} = useContext(LandingContext);
 
 
-    {/*Need some way to check that the input is an integer*/}
+    {/*Need some way to check that the input is an integer*/
+    }
     const handleRoundsChange = (roundsInput) => {
         setRounds(roundsInput);
     };
 
-    {/*Need some way to check that the input is an integer*/}
+    {/*Need some way to check that the input is an integer*/
+    }
     const handleRoundsDurationChange = (durationInput) => {
         setRoundDuration(durationInput);
     };
@@ -29,8 +30,8 @@ export default function Rounds({setRounds, setRoundDuration}) {
     function postRoundInfo() {
 
         const payload = {
-             number_of_rounds: rounds,
-             game_code: code,
+            number_of_rounds: rounds,
+            game_code: code,
             round_duration: roundDuration,
         };
 
@@ -39,7 +40,6 @@ export default function Rounds({setRounds, setRoundDuration}) {
             console.log(res);
         })
     }
-
 
 
     return (
@@ -53,7 +53,7 @@ export default function Rounds({setRounds, setRoundDuration}) {
             <img className="innerImage1" src={circle}/>
             <img className="innerImage2" src={thing}/>
 
-            <div className ="spacer"/>
+            <div className="spacer"/>
 
 
             <h4> Enter the number of rounds and time for each round</h4>
@@ -66,7 +66,8 @@ export default function Rounds({setRounds, setRoundDuration}) {
                 field="10"
                 onHandleChange={handleRoundsChange}
             />
-            <h5>This means how many images would you like to go through during your game. <br></br> (1 image = 1 round)</h5>
+            <h5>This means how many images would you like to go through during your game. <br></br> (1 image = 1 round)
+            </h5>
 
             <br></br>
 
@@ -76,11 +77,13 @@ export default function Rounds({setRounds, setRoundDuration}) {
                 field="30"
                 onHandleChange={handleRoundsDurationChange}
             />
-            <h5>This defines how many seconds you would like to give everyone to caption an image. <br></br> We recommend 30 seconds!</h5>
+            <h5>This defines how many seconds you would like to give everyone to caption an image. <br></br> We
+                recommend 30 seconds!</h5>
 
             <br></br>
 
-            <Button className="landing"  conditionalLink={true} destination= "/page"onClick={postRoundInfo} children = "Start Playing"/>
+            <Button className="landing" conditionalLink={true} destination="/page" onClick={postRoundInfo}
+                    children="Start Playing"/>
 
         </div>
     )

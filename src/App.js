@@ -15,6 +15,7 @@ export default function App() {
     const [rounds, setRounds] = useState("");
     const [roundDuration, setRoundDuration] = useState("");
     const [host, setHost] = useState("");
+    const [playerUID, setPlayerUID] = useState("");
 
     /**
      * Implement round number
@@ -35,6 +36,7 @@ export default function App() {
                 roundDuration,
                 host,
                 roundNumber,
+                playerUID,
                 setCode,
                 setName,
                 setEmail,
@@ -44,7 +46,8 @@ export default function App() {
                 setRounds,
                 setRoundDuration,
                 setHost,
-                setRoundNumber
+                setRoundNumber,
+                setPlayerUID
             }}>
                 <Nav/>
             </LandingContext.Provider>

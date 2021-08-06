@@ -3,16 +3,19 @@ import "../Styles/Deck.css";
 import {Link} from "react-router-dom";
 
 import axios from "axios";
+import {LandingContext} from "../App";
 
 export default function DeckCard(props) {
+
+    const {code, roundNumber} = useContext(LandingContext);
 
 
     function selectThisDeck() {
 
         const payload = {
-            game_uid: "200-002006",
+            game_code: code,
             deck_uid: props.id,
-            round_number: "1",
+            round_number: roundNumber.toString(),
         };
 
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";

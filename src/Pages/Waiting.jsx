@@ -14,60 +14,81 @@ export default function Waiting() {
 
     const {code, gameUID, host} = useContext(LandingContext);
     const [names, setNames] = useState([]);
+    const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
     let gameCodeText = "Game Code: " + code;
-    // const [names, setNames] = useState({});
 
-    // const names = [
-    //     "Mike",
-    //     "Ron",
-    //     "Emma",
-    //     "Flo",
-    //     "Lola",
-    //
-    // ];
-
-    function renderBubbles() {
-
-        return (<ul className="flex-container">
-            {names.map((value) => (
-                <li className="flex-item">
-                    {value !== "" ? <i className="fas fa-circle fa-3x" style={{
-                        height: "200px",
-                        color: "purple"
-                    }}/> : ""}
-                    {value}
-                </li>
-            ))}
-        </ul>);
-
-    }
-
+    // function renderBubbles() {
+    //     return (<ul className="flex-container">
+    //         {names.map((value) => (
+    //             <li className="flex-item">
+    //                 {value !== "" ? <i className="fas fa-circle fa-3x" style={{
+    //                     height: "200px",
+    //                     color: "purple"
+    //                 }}/> : ""}
+    //                 {value}
+    //             </li>
+    //         ))}
+    //     </ul>);
+    // }
 
     useEffect(() => {
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
-        axios.get(getURL + code).then((res) => {
-            console.log(res);
-
-            names.length = res.data.players_list.length;
-
-            for (var index = 0; index < res.data.players_list.length; index++) {
-                /**
-                 * The value of index continues to increment due to the loop,
-                 * so let's make a variable that does not change for the onClick function
-                 * @type {number}
-                 */
 
 
-                names[index] = (res.data.players_list[index].user_alias);
+            setTimeout(function () {
 
-            }
-            console.log("This is the names array " + names);
-        })
-    }, [gameCodeText]);
+                if (grandfatherClock != "gameHasBegun") {
+                    if (grandfatherClock == "tick") {
+                        setGrandfatherClock("tock");
+                    } else {
+                        setGrandfatherClock("tick");
+                    }
+
+                    console.log(grandfatherClock);
 
 
+                    /**
+                     * This axios.get() is to fetch the names of the players in the waiting room
+                     * @type {string}
+                     */
+                    const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+                    axios.get(getURL + code).then((res) => {
+                        console.log(res);
 
+                        names.length = res.data.players_list.length;
+
+                        for (var index = 0; index < res.data.players_list.length; index++) {
+                            /**
+                             * The value of index continues to increment due to the loop,
+                             * so let's make a variable that does not change for the onClick function
+                             * @type {number}
+                             */
+
+
+                            names[index] = (res.data.players_list[index].user_alias);
+
+                        }
+                        console.log("This is the names array " + names);
+                    })
+
+
+                    if (grandfatherClock != "gameHasBegun") {
+                        const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+
+                        axios.get(getTimerURL + code).then((res) => {
+                            try {
+                                var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                                setGrandfatherClock("gameHasBegun");
+                            } catch (err) {
+                                console.log("game has not started yet");
+                            }
+                        })
+                    }
+
+                }
+            }, 2000);
+
+    });
 
     return (
         <div
@@ -91,19 +112,17 @@ export default function Waiting() {
 
             <h4>Waiting for all players to join</h4>
 
-            {renderBubbles()}
-
-            {/*<ul className="flex-container">*/}
-            {/*    {names.map((value) => (*/}
-            {/*        <li className="flex-item">*/}
-            {/*            {value !== "" ? <i className="fas fa-circle fa-3x" style = {{*/}
-            {/*                height: "200px",*/}
-            {/*                color: "purple"*/}
-            {/*            }}/> : ""}*/}
-            {/*            {value}*/}
-            {/*        </li>*/}
-            {/*    ))}*/}
-            {/*</ul>*/}
+            <ul className="flex-container">
+                {names.map((value) => (
+                    <li className="flex-item">
+                        {value !== "" ? <i className="fas fa-circle fa-3x" style={{
+                            height: "200px",
+                            color: "purple"
+                        }}/> : ""}
+                        {value}
+                    </li>
+                ))}
+            </ul>
 
             <Button
                 className="cardStyle"
@@ -130,6 +149,15 @@ export default function Waiting() {
                 conditionalLink={true}
             /> : <></>}
 
+            {grandfatherClock === "gameHasBegun" ?
+                <Button
+                    className="landing"
+                    children="Start Game"
+                    destination="/page"
+                    conditionalLink={true}
+                />
+                : <></>}
+
             {/*<Button*/}
             {/*    className="landing"*/}
             {/*    children="Start Game"*/}
@@ -141,21 +169,3 @@ export default function Waiting() {
         </div>
     )
 }
-
-// export function joinGame() {
-//
-//     const {code, name, alias, email, zipCode} = useContext(LandingContext);
-//
-//
-//     if (name !== "" && email !== "" && zipCode !== "") {
-//         const getURL =
-//             "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame";
-//
-//         axios.get(getURL + "/" + code).then((res) => {
-//             console.log(res);
-//         })
-//
-//     } else {
-//         window.alert("To join a game, fill out the necessary information and the correct gamecode.");
-//     }
-// }

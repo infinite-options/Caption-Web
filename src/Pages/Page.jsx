@@ -17,15 +17,22 @@ import Bubbles from "../Components/Bubbles";
 
 export default function Page() {
 
-    const {code, roundNumber} = useContext(LandingContext);
+    const {code, roundNumber, host, playerUID} = useContext(LandingContext);
 
     const [caption, setCaption] = useState("");
     const [imageSrc, setImageSrc] = useState("");
-    const [timeUp, setTimeUp] = useState(false);
+
+    const [captionSubmitted, setCaptionSubmitted] = useState(false);
+    const [roundHasStarted, setRoundHasStarted] = useState(false);
     const [timerDuration, setTimerDuration] = useState(-1);
     const [waitingPlayers, setWaitingPlayers] = useState([]);
 
     const [roundStartTime, setRoundStartTime] = useState();
+
+    const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
+    const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+    const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/";
+    const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
 
 
     const handleCaptionChange = (newCaption) => {
@@ -33,7 +40,7 @@ export default function Page() {
     };
 
     function countdownComplete() {
-        setTimeUp(true);
+        setCaptionSubmitted(true);
     }
 
     function transition() {
@@ -41,105 +48,111 @@ export default function Page() {
         //this is not good because all internal state gets wiped whenever the page reloads
     }
 
-
-
-
     useEffect(() => {
-        const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-        const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/";
-        const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
-        const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
-
 
         /**
-         * Axios.Get() #1
-         * Start the round
+         * Mayukh: I don't know why this works, but I am sure that the getTimer endpoint must be called after startPlaying.
+         * By arranging the endpoint calls in this fashion, I am able to create a 'magical' delay that works in my favor.
          */
 
-        axios.get(startPlayingURL + code + "," + roundNumber).then((res) =>{
-            console.log(res);
-            setRoundStartTime(res.data.round_start_time);
-        })
+        if (host) {
+            /**
+             * Axios.Get() #1
+             * Start the round
+             */
+            axios.get(startPlayingURL + code + "," + roundNumber).then((res) => {
+                console.log(res);
+                setRoundStartTime(res.data.round_start_time);
+                setRoundHasStarted(true);
+            })
+        }
 
 
         /**
-         *
          * Axios.Get() #2
-         * Determine the amount of time left on the countdown timer.
-         *
-         * s = the second at which the round has started
-         * c = the second at which the clock is currently on
-         * d = the seconds for the duration of the round
-         */
-        axios.get(getTimerURL + code).then((res) => {
-            console.log(res);
-
-            /**
-             * This c variable records the value of the seconds within the 'server clock'
-             * @type {number}
-             */
-            let serverClock = parseInt(res.data.current_time.substring(17));
-
-            /**
-             * This c variable records the value of the seconds within the 'client clock'
-             * @type {number}
-             */
-            let clientClock = new Date().getSeconds();
-
-            let c = serverClock;
-
-
-            // console.log("Server Clock: " + serverClock);
-            // console.log("Client Clock: " + serverClock);
-
-
-            let s = parseInt(res.data.round_started_at.substring(17));
-
-            let d = parseInt(res.data.round_duration.substring(17));
-
-            // console.log("Current Second: " + c);
-            // console.log("Start Second: " + s);
-            // console.log("Calculated Lag: " + determineLag(c,s));
-            // console.log("Round Duration: " + d);
-
-
-            setTimerDuration(d - determineLag(c, s));
-            // console.log("Determined duration: " + (d-1));
-            // console.log("Determined duration: " + timerDuration);
-
-            // console.log("Time before addition : " + time);
-
-            // console.log(time.getSeconds());
-            // console.log(duration.getSeconds());
-            // console.log("Time after addition : "+ time);
-
-        })
-
-
-        /**
-         * Axios.Get() #3
          * Receive the image url
+         */
+        /**
+         * Issue: Sam is going to update this endpoint into a post call. Payload will demand both round number and game code.
          */
         axios.get(getImageURL + code).then((res) => {
             console.log(res);
             setImageSrc(res.data.image_url);
         })
 
+        // /**
+        //  * Axios.Get() #3
+        //  * Recieve the waiting players
+        //  */
+        // axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+        //     console.log(res);
+        //     for (var i = 0; i < res.data.players.length; i++) {
+        //         waitingPlayers[i] = res.data.players[i].user_alias;
+        //     }
+        //     console.log("The waiting players array: " + waitingPlayers);
+        // })
+
+
         /**
-         * Axios.Get() #4
-         * Recieve the waiting players
+         * Mayukh: This is officially the worst way to synchronize any asynchronous axios code.
          */
-        axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
-            console.log(res);
-            for (var i = 0; i < res.data.players.length; i++) {
-                waitingPlayers[i] = res.data.players[i].user_alias;
-            }
-            console.log("The waiting players array: " + waitingPlayers);
-        })
+        setTimeout(function () {
+            /**
+             * Axios.Get() #4
+             * Determine the amount of time left on the countdown timer.
+             *
+             * s = the second at which the round has started
+             * c = the second at which the clock is currently on
+             * d = the seconds for the duration of the round
+             */
+            axios.get(getTimerURL + code).then((res) => {
+                console.log(res);
 
+                /**
+                 * This c variable records the value of the seconds within the 'server clock'
+                 * @type {number}
+                 */
+                let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
 
+                /**
+                 * This c variable records the value of the seconds within the 'client clock'
+                 * @type {number}
+                 */
+                let clientClock = new Date().getSeconds();
+
+                var c = serverClock;
+                console.log("current second = " + c);
+                var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                console.log("started second = " + s);
+                var d = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                console.log("round duration = " + d);
+                setTimerDuration(d - determineLag(c, s));
+                console.log(timerDuration);
+            })
+        }, 1000)
 
     }, []);
+
+    useEffect(() => {
+
+
+        setTimeout(function () {
+
+            if (captionSubmitted) {
+                /**
+                 * Axios.Get() #3
+                 * Recieve the waiting players
+                 */
+                axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+                    console.log(res);
+                    for (var i = 0; i < res.data.players.length; i++) {
+                        waitingPlayers[i] = res.data.players[i].user_alias;
+                    }
+                    console.log("The waiting players array: " + waitingPlayers);
+                })
+            }
+        }, 2000);
+    });
 
     function determineLag(current, start) {
         if (current - start >= 0) {
@@ -155,9 +168,12 @@ export default function Page() {
         const payload = {
             caption: caption,
             game_code: code,
-            // game_code: "30699551",
-            round_number: "1",
-            user_uid: "100-000014"
+            round_number: roundNumber,
+            /**
+             * Issue: user_uid should be dynamic
+             */
+            // user_uid: "100-000014"
+            user_uid:playerUID
         }
 
         console.log(code);
@@ -168,7 +184,7 @@ export default function Page() {
     }
 
     function toggleTimeUp() {
-        setTimeUp(!timeUp);
+        setCaptionSubmitted(!captionSubmitted);
     }
 
     return (
@@ -198,7 +214,7 @@ export default function Page() {
 
                 <br></br>
                 <br></br>
-                {/*{timeUp ? (*/}
+                {/*{captionSubmitted ? (*/}
                 {/*    <div>*/}
                 {/*        <h1>You have captioned the above image as: "{caption}"</h1>*/}
                 {/*        <br></br>*/}
@@ -210,7 +226,7 @@ export default function Page() {
                 {/*    </div>*/}
                 {/*) : (*/}
                 <div>
-                    {timeUp ? <></> : <Form
+                    {captionSubmitted ? <></> : <Form
                         className="input2"
                         field="Enter your caption here"
                         onHandleChange={handleCaptionChange}
@@ -234,7 +250,7 @@ export default function Page() {
                                 isPlaying
                                 duration={timerDuration}
                                 colors="#000000"
-                                // onComplete={transition}
+                                onComplete={transition}
                             >
                                 {({remainingTime}) => (
                                     <div className="countdownText">{remainingTime}</div>
@@ -245,7 +261,7 @@ export default function Page() {
                         <span style={{marginLeft: "60px"}}></span>
                         <br></br>{" "}
 
-                        {timeUp ? <Button
+                        {captionSubmitted ? <Button
                             className="fat"
                             destination="/page"
                             // onClick={postSubmitCaption}
@@ -268,7 +284,7 @@ export default function Page() {
             </div>
 
             <br/>
-            {timeUp ?
+            {captionSubmitted ?
                 <div> Waiting for everybody to submit their captions... <Bubbles items={waitingPlayers}/></div> : <></>}
         </div>
     );

@@ -51,6 +51,8 @@ function Collections() {
         })
     }, []);
 
+
+
     return (
         <div
             style={{

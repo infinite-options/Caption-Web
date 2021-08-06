@@ -7,7 +7,7 @@ import "../Styles/Landing.css";
 import {LandingContext} from "../App";
 import {Card} from "reactstrap";
 
-export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost}) {
+export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID}) {
 
     const {code, name, alias, email, zipCode, host} = useContext(LandingContext);
 
@@ -50,15 +50,12 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 user_alias: alias,
                 user_email: email,
                 user_zip: zipCode,
-                // user_name: "Sam",
-                // user_alias: "Sampat",
-                // user_email: "sam@sjsu.edu",
-                // user_zip: "95121",
             };
 
             axios.post(postURL, payload).then((res) => {
                 console.log(res);
                 setCode(res.data.game_code);
+                setPlayerUID(res.data.host_id);
 
             })
 
@@ -85,6 +82,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             axios.post(postURL, payload).then((res) => {
                 console.log(res);
                 setGameUID(res.data.game_uid);
+                setPlayerUID(res.data.user_uid);
 
 
                 try {

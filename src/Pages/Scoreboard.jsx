@@ -23,7 +23,6 @@ function Scoreboard({setRoundNumber}) {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/39827741,1";
         axios.get(getURL).then((res) => {
             console.log(res);
-
             setScoreboardInfo(res.data.players);
         })
     }, []);
@@ -64,7 +63,7 @@ function Scoreboard({setRoundNumber}) {
             // console.log("This is the timestamp object: " + res.data.round_start_time);
         })
 
-        setRoundNumber(roundNumber++);
+        setRoundNumber(roundNumber + 1);
     }
 
     return (
@@ -153,7 +152,7 @@ function Scoreboard({setRoundNumber}) {
             {/*    votes="2"*/}
             {/*/>*/}
             <br></br>
-            <Button className="fat" destination="/scoreboard" onClick = {startNextRound} children="Next Round" conditionalLink={true}/>
+            <Button className="fat" destination="/page" onClick = {startNextRound} children="Next Round" conditionalLink={true}/>
             <br/>
         </div>
     );

@@ -22,8 +22,14 @@ export default function Page() {
     const [caption, setCaption] = useState("");
     const [imageSrc, setImageSrc] = useState("");
 
+    /**
+     * Boolean State to keep track of gameplay
+     */
     const [captionSubmitted, setCaptionSubmitted] = useState(false);
     const [roundHasStarted, setRoundHasStarted] = useState(false);
+    const [timeUp, setTimeUp] = useState(false);
+
+
     const [timerDuration, setTimerDuration] = useState(-1);
     const [waitingPlayers, setWaitingPlayers] = useState([]);
 
@@ -31,8 +37,9 @@ export default function Page() {
 
     const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
     const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-    const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/";
+    const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
+    const getImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/";
 
 
     const handleCaptionChange = (newCaption) => {
@@ -43,10 +50,10 @@ export default function Page() {
         setCaptionSubmitted(true);
     }
 
-    function transition() {
-        window.location.href = "/selection";
-        //this is not good because all internal state gets wiped whenever the page reloads
-    }
+    // function transition() {
+    //     window.location.href = "/selection";
+    //     //this is not good because all internal state gets wiped whenever the page reloads
+    // }
 
     useEffect(() => {
 
@@ -65,20 +72,31 @@ export default function Page() {
                 setRoundStartTime(res.data.round_start_time);
                 setRoundHasStarted(true);
             })
+
+            /**
+             * In the host I need to call --> getImageinRound
+             */
+
+            axios.get(getImageInRound + code + "," + roundNumber).then((res) => {
+                console.log(res);
+                setImageSrc(res.data.image_url);
+            })
+
+
         }
 
 
-        /**
-         * Axios.Get() #2
-         * Receive the image url
-         */
-        /**
-         * Issue: Sam is going to update this endpoint into a post call. Payload will demand both round number and game code.
-         */
-        axios.get(getImageURL + code).then((res) => {
-            console.log(res);
-            setImageSrc(res.data.image_url);
-        })
+        // /**
+        //  * Axios.Get() #2
+        //  * Receive the image url
+        //  */
+        // /**
+        //  * Issue: Sam is going to update this endpoint into a post call. Payload will demand both round number and game code.
+        //  */
+        // axios.get(getImageURL + code + "," + roundNumber).then((res) => {
+        //     console.log(res);
+        //     setImageSrc(res.data.image_url);
+        // })
 
         // /**
         //  * Axios.Get() #3
@@ -129,13 +147,27 @@ export default function Page() {
                 setTimerDuration(d - determineLag(c, s));
                 console.log(timerDuration);
             })
-        }, 1000)
+
+
+            if(imageSrc === ""){
+                /**
+                 * Axios.Get() #2
+                 * Receive the image url
+                 */
+                /**
+                 * Issue: Sam is going to update this endpoint into a post call. Payload will demand both round number and game code.
+                 */
+                axios.get(getImageURL + code + "," + roundNumber).then((res) => {
+                    console.log(res);
+                    setImageSrc(res.data.image_url);
+                })
+            }
+        }, 2000)
 
     }, []);
 
+
     useEffect(() => {
-
-
         setTimeout(function () {
 
             if (captionSubmitted) {
@@ -164,16 +196,18 @@ export default function Page() {
 
 
     function postSubmitCaption() {
+        setCaptionSubmitted(true);
+        console.log("called");
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
             caption: caption,
-            game_code: code,
-            round_number: roundNumber,
+            game_code: code.toString(),
+            round_number: roundNumber.toString(),
             /**
              * Issue: user_uid should be dynamic
              */
             // user_uid: "100-000014"
-            user_uid:playerUID
+            user_uid:playerUID.toString()
         }
 
         console.log(code);
@@ -183,8 +217,13 @@ export default function Page() {
         })
     }
 
-    function toggleTimeUp() {
+    function toggleCaptionSubmitted() {
+        console.log("Toggle caption submitted()");
         setCaptionSubmitted(!captionSubmitted);
+    }
+
+    function toggleTimeUp(){
+        setTimeUp(true);
     }
 
     return (
@@ -250,7 +289,7 @@ export default function Page() {
                                 isPlaying
                                 duration={timerDuration}
                                 colors="#000000"
-                                onComplete={transition}
+                                onComplete={toggleTimeUp}
                             >
                                 {({remainingTime}) => (
                                     <div className="countdownText">{remainingTime}</div>
@@ -265,14 +304,13 @@ export default function Page() {
                             className="fat"
                             destination="/page"
                             // onClick={postSubmitCaption}
-                            // onClick={toggleTimeUp}
+                            // onClick={toggleCaptionSubmitted}
                             children="Submitted"
                             conditionalLink={true}
                         /> : <Button
                             className="fat"
                             destination="/page"
                             onClick={postSubmitCaption}
-                            onClick={toggleTimeUp}
                             children="Submit"
                             conditionalLink={true}
                         />
@@ -284,8 +322,21 @@ export default function Page() {
             </div>
 
             <br/>
+
+            {/*Issue:*/}
+            {/* This Bubble component is not optimal for rendering the information in real time --> look at the code in Waiting.jsx for reference.*/}
             {captionSubmitted ?
                 <div> Waiting for everybody to submit their captions... <Bubbles items={waitingPlayers}/></div> : <></>}
+
+
+            {timeUp ?
+                <Button
+                    className="landing"
+                    children="continue"
+                    destination="/selection"
+                    conditionalLink={true}
+                />
+                : <></>}
         </div>
     );
 }

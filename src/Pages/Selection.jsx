@@ -10,22 +10,26 @@ import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 
 
-function Scoreboard(props) {
-    // const title = props.title;
-    // const bestCaption = "Two dudes watching the Sharknado trailer";
+export default function Scoreboard(props) {
 
     const {code, roundNumber} = useContext(LandingContext);
-
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
     const [selectedCaption, setSelectedCaption] = useState("");
 
+    const [localUserVoted, setLocalUserVoted] = useState(false);
+    const [everybodyVoted, setEverybodyVoted] = useState(false);
+
 
     useEffect(() => {
-
-        // const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/39827741,1";
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
+
+        /**
+         * Issue:
+         * The user should not be able to select/vote for their own caption.
+         * Should be easy --> match internal state with info in the endpoint result.
+         */
 
 
         axios.get(getURL + code + "," + roundNumber).then((res) => {
@@ -44,6 +48,24 @@ function Scoreboard(props) {
         console.log("Toggle Arr: " + toggleArr);
     }, []);
 
+    useEffect(() => {
+
+
+        setTimeout(function () {
+
+            if (!everybodyVoted) {
+                const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+                axios.get(getURL + code + "," + roundNumber).then((res) => {
+                    console.log(res);
+                    if (res.data.players_count == 0) {
+                        setEverybodyVoted(true);
+                    }
+                })
+            }
+        }, 2000);
+
+    });
+
 
     function changeToggle(index) {
         console.log("Called: " + index);
@@ -59,12 +81,15 @@ function Scoreboard(props) {
     }
 
     function postVote() {
+
+        setLocalUserVoted(true);
+
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
 
         const payload = {
             caption: selectedCaption,
-            game_code: code,
-            round_number: roundNumber
+            game_code: code.toString(),
+            round_number: roundNumber.toString()
         }
 
         axios.post(postURL, payload).then((res) => {
@@ -131,11 +156,38 @@ function Scoreboard(props) {
 
             {renderCaptions()}
 
-            <Button className="fat" destination="/scoreboard" children="Vote" onClick={postVote}
-                    conditionalLink={true}/>
+
+            {/*{everybodyVoted ?*/}
+            {/*    <Button*/}
+            {/*        className="fat"*/}
+            {/*        destination="/scoreboard"*/}
+            {/*        children="Continue to Scoreboard"*/}
+            {/*        conditionalLink={true}*/}
+            {/*    />*/}
+            {/*    :  <Button*/}
+            {/*        className="fat"*/}
+            {/*        destination="/selection"*/}
+            {/*        children="Please wait for everybody to submit their votes"*/}
+            {/*        conditionalLink={true}*/}
+            {/*    />}*/}
+
+
+            {everybodyVoted ?
+                <Button
+                    className="fat"
+                    destination="/scoreboard"
+                    children="Continue to Scoreboard"
+                    conditionalLink={true}
+                />
+                :  <></>}
+
+            {localUserVoted ?
+                <></>
+                : <Button className="fat" destination="/selection" children="Vote" onClick={postVote}
+                          conditionalLink={true}/>}
+
             <br></br>
         </div>
     );
-}
+};
 
-export default Scoreboard;

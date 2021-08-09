@@ -21,15 +21,20 @@ function Scoreboard({setRoundNumber}) {
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
 
-    const {code, roundNumber, host} = useContext(LandingContext);
+    const {code, roundNumber, host, imageURL} = useContext(LandingContext);
 
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
         axios.get(getURL + code + "," + roundNumber).then((res) => {
             console.log(res);
-            setScoreboardInfo(res.data.players);
+            // setScoreboardInfo(res.data.players);
+            setScoreboardInfo(res.data.scoreboard);
         })
+
+        if(!host){
+            setRoundNumber(roundNumber + 1);
+        }
     }, []);
 
     function renderReports() {
@@ -43,7 +48,7 @@ function Scoreboard({setRoundNumber}) {
                             alias={item.user_alias}
                             caption={item.caption}
                             points={item.score}
-                            totalPts= {item.game_score}
+                            totalPts={item.game_score}
                             votes={item.votes}
                         />
                     ))
@@ -57,8 +62,8 @@ function Scoreboard({setRoundNumber}) {
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
 
         const payload = {
-            game_code: code,
-            round_number: roundNumber,
+            game_code: code.toString(),
+            round_number: roundNumber.toString(),
         }
 
         axios.post(postURL, payload).then((res) => {
@@ -73,37 +78,38 @@ function Scoreboard({setRoundNumber}) {
 
     useEffect(() => {
 
+       if(!host) {
+           setTimeout(function () {
 
-        setTimeout(function () {
+               if (grandfatherClock != "gameHasBegun") {
+                   if (grandfatherClock == "tick") {
+                       setGrandfatherClock("tock");
+                   } else {
+                       setGrandfatherClock("tick");
+                   }
 
-            if (grandfatherClock != "gameHasBegun") {
-                if (grandfatherClock == "tick") {
-                    setGrandfatherClock("tock");
-                } else {
-                    setGrandfatherClock("tick");
-                }
-
-                console.log(grandfatherClock);
+                   console.log(grandfatherClock);
 
 
-                /**
-                 * Issue: We are going to add roundNumber to the gameTimer endpoint
-                 */
-                if (grandfatherClock != "gameHasBegun") {
-                    const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+                   /**
+                    * Issue: We are going to add roundNumber to the gameTimer endpoint
+                    */
+                   if (grandfatherClock != "gameHasBegun") {
+                       const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
 
-                    axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                        try {
-                            var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                            setGrandfatherClock("gameHasBegun");
-                        } catch (err) {
-                            console.log("game has not started yet");
-                        }
-                    })
-                }
+                       axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                           try {
+                               var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                               setGrandfatherClock("gameHasBegun");
+                           } catch (err) {
+                               console.log("game has not started yet");
+                           }
+                       })
+                   }
 
-            }
-        }, 2000);
+               }
+           }, 2000);
+       }
 
     });
 
@@ -142,7 +148,7 @@ function Scoreboard({setRoundNumber}) {
                 height: "255px",
                 width: "255px",
             }}
-                 src={Pic}/>
+                 src={imageURL}/>
             <br/>
 
             {/*<div className="flip-card">*/}
@@ -167,8 +173,15 @@ function Scoreboard({setRoundNumber}) {
 
 
             <br></br>
-            {host ? <Button className="fat" destination="/page" onClick={startNextRound} children="Next Round"
-                            conditionalLink={true}/> : <></>}
+            {host ?
+                <Button
+                    className="fat"
+                    destination="/page"
+                    onClick={startNextRound}
+                    children="Next Round"
+                    conditionalLink={true}
+                />
+                : <></>}
 
             {grandfatherClock === "gameHasBegun" && !host ?
                 <Button

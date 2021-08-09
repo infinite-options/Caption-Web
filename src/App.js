@@ -17,7 +17,7 @@ export default function App() {
     const [host, setHost] = useState("");
     const [playerUID, setPlayerUID] = useState("");
     const [roundNumber, setRoundNumber] = useState(1);
-    const [imageURL, setImageURL] = useState();
+    const [imageURL, setImageURL] = useState("");
 
 
     return (

@@ -1,18 +1,18 @@
 import React, {useContext, useEffect, useState} from "react";
 import Pic from "../Assets/sd.jpg";
-import {Row, Col, Card} from "reactstrap";
+// import {Row, Col, Card} from "reactstrap";
 import "../Styles/Scoreboard.css";
-import Report from "../Components/Report";
+// import Report from "../Components/Report";
 import {Button} from "../Components/Button";
 import background from "../Assets/temp.png";
 import axios from "axios";
-import Deck from "../Components/Deck";
+// import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 
 
 export default function Scoreboard(props) {
 
-    const {code, roundNumber} = useContext(LandingContext);
+    const {code, roundNumber, imageURL} = useContext(LandingContext);
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
@@ -161,7 +161,7 @@ export default function Scoreboard(props) {
                 height: "325px",
                 width: "325px",
                 borderRadius: "50px",
-            }} src={Pic}/>
+            }} src={imageURL}/>
 
             <br></br>
             <br></br>

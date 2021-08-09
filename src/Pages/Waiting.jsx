@@ -12,8 +12,12 @@ import Bubbles from "../Components/Bubbles";
 
 export default function Waiting() {
 
-    const {code, gameUID, host} = useContext(LandingContext);
+    const {code, gameUID, host, roundNumber} = useContext(LandingContext);
     const [names, setNames] = useState([]);
+
+    /**
+     * Setup grandfather clock for the Waiting Page
+     */
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
     let gameCodeText = "Game Code: " + code;
@@ -75,7 +79,7 @@ export default function Waiting() {
                     if (grandfatherClock != "gameHasBegun") {
                         const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
 
-                        axios.get(getTimerURL + code).then((res) => {
+                        axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
                             try {
                                 var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
                                 setGrandfatherClock("gameHasBegun");

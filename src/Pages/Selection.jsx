@@ -54,13 +54,25 @@ export default function Scoreboard(props) {
         setTimeout(function () {
 
             if (!everybodyVoted) {
-                const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-                axios.get(getURL + code + "," + roundNumber).then((res) => {
-                    console.log(res);
-                    if (res.data.players_count == 0) {
-                        setEverybodyVoted(true);
+                // const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+                // axios.get(getURL + code + "," + roundNumber).then((res) => {
+                //     console.log(res);
+                //     if (res.data.players_count == 0) {
+                //         setEverybodyVoted(true);
+                //     }
+                // })
+                setTimeout(function () {
+
+                    if (!everybodyVoted) {
+                        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+                        axios.get(getURL + code + "," + roundNumber).then((res) => {
+                            console.log(res);
+                            if (res.data.players_count == 0) {
+                                setEverybodyVoted(true);
+                            }
+                        })
                     }
-                })
+                }, 2000);
             }
         }, 2000);
 

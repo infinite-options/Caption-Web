@@ -13,10 +13,15 @@ function Scoreboard({setRoundNumber}) {
 
     const bestCaption = "Two dudes watching the Sharknado trailer";
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
-    const[timeStamp, setTimeStamp] = useState();
+    const [timeStamp, setTimeStamp] = useState();
+
+    /**
+     * Setup grandfather clock for the Scoreboard page
+     */
+    const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
 
-    const{code, roundNumber} = useContext(LandingContext);
+    const {code, roundNumber, host} = useContext(LandingContext);
 
 
     useEffect(() => {
@@ -31,25 +36,24 @@ function Scoreboard({setRoundNumber}) {
 
         return (
             <div>
-            {
-                scoreboardInfo.map((item) => (
-                    <Report
-                        isWinner="false"
-                        alias={item.user_alias}
-                        caption={item.caption}
-                        points={item.score}
-                        totalPts=""
-                        votes={item.votes}
-                    />
-                ))
-            }
+                {
+                    scoreboardInfo.map((item) => (
+                        <Report
+                            isWinner="false"
+                            alias={item.user_alias}
+                            caption={item.caption}
+                            points={item.score}
+                            totalPts= {item.game_score}
+                            votes={item.votes}
+                        />
+                    ))
+                }
             </div>
         );
     }
 
 
-
-    function startNextRound(){
+    function startNextRound() {
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
 
         const payload = {
@@ -65,6 +69,43 @@ function Scoreboard({setRoundNumber}) {
 
         setRoundNumber(roundNumber + 1);
     }
+
+
+    useEffect(() => {
+
+
+        setTimeout(function () {
+
+            if (grandfatherClock != "gameHasBegun") {
+                if (grandfatherClock == "tick") {
+                    setGrandfatherClock("tock");
+                } else {
+                    setGrandfatherClock("tick");
+                }
+
+                console.log(grandfatherClock);
+
+
+                /**
+                 * Issue: We are going to add roundNumber to the gameTimer endpoint
+                 */
+                if (grandfatherClock != "gameHasBegun") {
+                    const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+
+                    axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                        try {
+                            var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                            setGrandfatherClock("gameHasBegun");
+                        } catch (err) {
+                            console.log("game has not started yet");
+                        }
+                    })
+                }
+
+            }
+        }, 2000);
+
+    });
 
     return (
         <div
@@ -122,37 +163,22 @@ function Scoreboard({setRoundNumber}) {
             {/*</div>*/}
 
 
-            {/* <Card>{bestCaption}</Card>
-      <h4 style={{ color: "white" }}>Winning Caption!</h4> */}
-
-
             {renderReports()}
 
-            {/*<Report*/}
-            {/*    isWinner="true"*/}
-            {/*    alias="Mickey"*/}
-            {/*    caption="Shrek and Donkey"*/}
-            {/*    points="10"*/}
-            {/*    totalPts="42"*/}
-            {/*    votes="2"*/}
-            {/*/>*/}
 
-            {/*<Report*/}
-            {/*    alias="Mickey"*/}
-            {/*    caption="Scooby Doo and Shaggy"*/}
-            {/*    points="10"*/}
-            {/*    totalPts="42"*/}
-            {/*    votes="2"*/}
-            {/*/>*/}
-            {/*<Report*/}
-            {/*    alias="Mickey"*/}
-            {/*    caption="Shrek and Donkey"*/}
-            {/*    points="10"*/}
-            {/*    totalPts="42"*/}
-            {/*    votes="2"*/}
-            {/*/>*/}
             <br></br>
-            <Button className="fat" destination="/page" onClick = {startNextRound} children="Next Round" conditionalLink={true}/>
+            {host ? <Button className="fat" destination="/page" onClick={startNextRound} children="Next Round"
+                            conditionalLink={true}/> : <></>}
+
+            {grandfatherClock === "gameHasBegun" && !host ?
+                <Button
+                    className="landing"
+                    children="Start Game"
+                    destination="/page"
+                    conditionalLink={true}
+                />
+                : <></>}
+
             <br/>
         </div>
     );

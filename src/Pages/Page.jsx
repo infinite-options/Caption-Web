@@ -123,7 +123,7 @@ export default function Page() {
              * c = the second at which the clock is currently on
              * d = the seconds for the duration of the round
              */
-            axios.get(getTimerURL + code).then((res) => {
+            axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
                 console.log(res);
 
                 /**
@@ -153,9 +153,6 @@ export default function Page() {
                 /**
                  * Axios.Get() #2
                  * Receive the image url
-                 */
-                /**
-                 * Issue: Sam is going to update this endpoint into a post call. Payload will demand both round number and game code.
                  */
                 axios.get(getImageURL + code + "," + roundNumber).then((res) => {
                     console.log(res);
@@ -203,10 +200,6 @@ export default function Page() {
             caption: caption,
             game_code: code.toString(),
             round_number: roundNumber.toString(),
-            /**
-             * Issue: user_uid should be dynamic
-             */
-            // user_uid: "100-000014"
             user_uid:playerUID.toString()
         }
 

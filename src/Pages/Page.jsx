@@ -1,10 +1,6 @@
-import React, {useContext, useEffect, useState} from "react";
-import Pic from "../Assets/sd.jpg";
-import Countdown from "react-countdown";
-import {Row, Col, Card} from "reactstrap";
+import React, {useContext, useEffect, useState} from "react";import {Row} from "reactstrap";
 import Form from "../Components/Form";
 import {Button} from "../Components/Button";
-// import "../Styles/Scoreboard.css";
 import "../Styles/Page.css";
 import background from "../Assets/temp.png";
 
@@ -50,10 +46,6 @@ export default function Page({setImageURL}) {
         setCaptionSubmitted(true);
     }
 
-    // function transition() {
-    //     window.location.href = "/selection";
-    //     //this is not good because all internal state gets wiped whenever the page reloads
-    // }
 
     useEffect(() => {
 
@@ -77,6 +69,10 @@ export default function Page({setImageURL}) {
                 })
 
                 /**
+                 * /**
+                 * Axios.Get() #2
+                 * Receive the image url
+                 *
                  * In the host I need to call --> getImageinRound
                  */
 
@@ -85,34 +81,8 @@ export default function Page({setImageURL}) {
                     // setImageSrc(res.data.image_url);
                     setImageURL(res.data.image_url);
                 })
-
-
             }
 
-
-            // /**
-            //  * Axios.Get() #2
-            //  * Receive the image url
-            //  */
-            // /**
-            //  * Issue: Sam is going to update this endpoint into a post call. Payload will demand both round number and game code.
-            //  */
-            // axios.get(getImageURL + code + "," + roundNumber).then((res) => {
-            //     console.log(res);
-            //     setImageSrc(res.data.image_url);
-            // })
-
-            // /**
-            //  * Axios.Get() #3
-            //  * Recieve the waiting players
-            //  */
-            // axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
-            //     console.log(res);
-            //     for (var i = 0; i < res.data.players.length; i++) {
-            //         waitingPlayers[i] = res.data.players[i].user_alias;
-            //     }
-            //     console.log("The waiting players array: " + waitingPlayers);
-            // })
 
 
             /**
@@ -143,17 +113,18 @@ export default function Page({setImageURL}) {
                     let clientClock = new Date().getSeconds();
 
                     var c = serverClock;
-                    console.log("current second = " + c);
+                    // console.log("current second = " + c);
                     var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                    console.log("started second = " + s);
+                    // console.log("started second = " + s);
                     var d = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                    console.log("round duration = " + d);
+                    // console.log("round duration = " + d);
                     setTimerDuration(d - determineLag(c, s));
-                    console.log(timerDuration);
+                    // console.log(timerDuration);
                 })
 
 
-                if (imageURL === "") {
+                // if (imageURL === "" && !host) {
+                if(!host){
                     /**
                      * Axios.Get() #2
                      * Receive the image url
@@ -200,7 +171,7 @@ export default function Page({setImageURL}) {
 
     function postSubmitCaption() {
         setCaptionSubmitted(true);
-        console.log("called");
+        // console.log("called");
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
             caption: caption,
@@ -209,7 +180,7 @@ export default function Page({setImageURL}) {
             user_uid: playerUID.toString()
         }
 
-        console.log(code);
+        // console.log(code);
 
         axios.post(postURL, payload).then((res) => {
             console.log(res);

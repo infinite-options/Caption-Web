@@ -1,18 +1,14 @@
 import React, {useContext, useEffect, useState} from "react";
-import Pic from "../Assets/sd.jpg";
-// import {Row, Col, Card} from "reactstrap";
 import "../Styles/Scoreboard.css";
-// import Report from "../Components/Report";
 import {Button} from "../Components/Button";
 import background from "../Assets/temp.png";
 import axios from "axios";
-// import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 
 
-export default function Scoreboard(props) {
+export default function Scoreboard() {
 
-    const {code, roundNumber, imageURL} = useContext(LandingContext);
+    const {code, roundNumber, imageURL, host, rounds, playerUID} = useContext(LandingContext);
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
@@ -64,17 +60,26 @@ export default function Scoreboard(props) {
                 setTimeout(function () {
 
                     if (!everybodyVoted) {
-                        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-                        axios.get(getURL + code + "," + roundNumber).then((res) => {
+                        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+                        axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
                             console.log(res);
                             if (res.data.players_count == 0) {
                                 setEverybodyVoted(true);
+
+                                if (host) {
+                                    const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+                                    axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
+                                        console.log(res);
+                                    })
+                                }
                             }
                         })
                     }
-                }, 2000);
+                }, 1000);
+
+
             }
-        }, 2000);
+        }, 1000);
 
     });
 
@@ -123,7 +128,9 @@ export default function Scoreboard(props) {
             captions.push(<div>
                 <Button
                     isSelected={toggleArr[index]}
-                    className="selectionBtn1"
+                    // className="selectionBtn1"
+                    className={playersArr[index].round_user_id === playerUID ? "selectionBtn1"
+                        : "selectionBtn2"}
 
                     children={playersArr[index].caption}
                     destination="/selection"
@@ -132,7 +139,9 @@ export default function Scoreboard(props) {
                 />
                 <br></br>
             </div>);
-            console.log(index);
+            console.log("Endpoint result: " + playersArr[index].round_user_id);
+            console.log("Application State: " + playerUID);
+            console.log(playersArr[index].round_user_id === playerUID);
         }
         return <div>{captions}</div>;
     }
@@ -187,11 +196,12 @@ export default function Scoreboard(props) {
             {everybodyVoted ?
                 <Button
                     className="fat"
-                    destination="/scoreboard"
+                    // destination="/scoreboard"
+                    destination={roundNumber == rounds ? "/endgame" : "/scoreboard"}
                     children="Continue to Scoreboard"
                     conditionalLink={true}
                 />
-                :  <></>}
+                : <></>}
 
             {localUserVoted ?
                 <></>

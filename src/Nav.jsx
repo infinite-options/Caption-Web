@@ -1,6 +1,6 @@
-import React, {useContext, useState} from "react";
+import React, {useContext} from "react";
 import {BrowserRouter as Router} from "react-router-dom";
-import {Redirect, Route, Switch} from "react-router-dom";
+import { Route, Switch} from "react-router-dom";
 import Page1 from "./Pages/Page";
 import Collections from "./Pages/Collections";
 import Scoreboard from "./Pages/Scoreboard";
@@ -11,6 +11,7 @@ import GameRules from "./Pages/GameRules"
 import DeckInfo from "./Pages/DeckInfo"
 import Error from "./Pages/Error";
 import Rounds from "./Pages/Rounds";
+import Endgame from "./Pages/Endgame";
 import {LandingContext} from "./App";
 
 // export const LandingContext = React.createContext();
@@ -59,6 +60,10 @@ export default function Nav() {
 
                 <Route exact path='/rounds'>
                     <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} />
+                </Route>
+
+                <Route exact path='/endgame'>
+                    <Endgame setRoundNumber = {setRoundNumber} />
                 </Route>
             </Switch>
         </Router>

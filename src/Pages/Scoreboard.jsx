@@ -21,20 +21,16 @@ function Scoreboard({setRoundNumber}) {
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
 
-    const {code, roundNumber, host, imageURL, rounds} = useContext(LandingContext);
+    const {code, roundNumber, host, imageURL} = useContext(LandingContext);
 
 
     useEffect(() => {
-
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
         axios.get(getURL + code + "," + roundNumber).then((res) => {
             console.log(res);
             // setScoreboardInfo(res.data.players);
             setScoreboardInfo(res.data.scoreboard);
         })
-
-
-
 
         if(!host){
             setRoundNumber(roundNumber + 1);

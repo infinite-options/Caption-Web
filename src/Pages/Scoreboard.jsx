@@ -25,8 +25,8 @@ function Scoreboard({setRoundNumber}) {
 
 
     useEffect(() => {
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
-        axios.get(getURL + code + "," + roundNumber).then((res) => {
+        const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
+        axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
             console.log(res);
             // setScoreboardInfo(res.data.players);
             setScoreboardInfo(res.data.scoreboard);

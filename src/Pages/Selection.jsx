@@ -12,7 +12,7 @@ import {LandingContext} from "../App";
 
 export default function Scoreboard(props) {
 
-    const {code, roundNumber, imageURL, rounds} = useContext(LandingContext);
+    const {code, roundNumber, imageURL, rounds, host} = useContext(LandingContext);
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
@@ -64,17 +64,26 @@ export default function Scoreboard(props) {
                 setTimeout(function () {
 
                     if (!everybodyVoted) {
-                        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-                        axios.get(getURL + code + "," + roundNumber).then((res) => {
+                        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+                        axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
                             console.log(res);
                             if (res.data.players_count == 0) {
                                 setEverybodyVoted(true);
+
+                                if (host) {
+                                    const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+                                    axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
+                                        console.log(res);
+                                    })
+                                }
                             }
                         })
                     }
-                }, 2000);
+                }, 1000);
+
+
             }
-        }, 2000);
+        }, 1000);
 
     });
 
@@ -187,7 +196,7 @@ export default function Scoreboard(props) {
             {everybodyVoted ?
                 <Button
                     className="fat"
-                    destination= {rounds === roundNumber ? "/endgame" : "/selection"}
+                    destination= {rounds === roundNumber ? "/endgame" : "/scoreboard"}
                     children="Continue to Scoreboard"
                     conditionalLink={true}
                 />

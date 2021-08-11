@@ -155,7 +155,8 @@ export default function Page({setImageURL, setRounds}) {
                 })
 
 
-                if (imageURL === "") {
+                // if (imageURL === "") {
+                if(!host){
                     /**
                      * Axios.Get() #2
                      * Receive the image url

@@ -15,7 +15,7 @@ import axios from "axios";
 import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
-export default function Page({setImageURL}) {
+export default function Page({setImageURL, setRounds}) {
 
     const {code, roundNumber, host, playerUID, imageURL} = useContext(LandingContext);
 
@@ -129,6 +129,8 @@ export default function Page({setImageURL}) {
                  */
                 axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
                     console.log(res);
+
+                    setRounds(res.data.total_number_of_rounds);
 
                     /**
                      * This c variable records the value of the seconds within the 'server clock'

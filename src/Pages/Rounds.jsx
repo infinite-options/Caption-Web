@@ -18,7 +18,7 @@ export default function Rounds({setRounds, setRoundDuration}) {
     {/*Need some way to check that the input is an integer*/
     }
     const handleRoundsChange = (roundsInput) => {
-        setRounds(roundsInput);
+        setRounds(parseInt(roundsInput));
     };
 
     {/*Need some way to check that the input is an integer*/
@@ -30,7 +30,7 @@ export default function Rounds({setRounds, setRoundDuration}) {
     function postRoundInfo() {
 
         const payload = {
-            number_of_rounds: rounds,
+            number_of_rounds: rounds.toString(),
             game_code: code,
             round_duration: roundDuration,
         };

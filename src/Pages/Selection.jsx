@@ -12,7 +12,7 @@ import {LandingContext} from "../App";
 
 export default function Scoreboard(props) {
 
-    const {code, roundNumber, imageURL} = useContext(LandingContext);
+    const {code, roundNumber, imageURL, rounds} = useContext(LandingContext);
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
@@ -187,7 +187,7 @@ export default function Scoreboard(props) {
             {everybodyVoted ?
                 <Button
                     className="fat"
-                    destination="/scoreboard"
+                    destination= {rounds === roundNumber ? "/endgame" : "/selection"}
                     children="Continue to Scoreboard"
                     conditionalLink={true}
                 />

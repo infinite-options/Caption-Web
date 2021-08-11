@@ -11,6 +11,7 @@ import GameRules from "./Pages/GameRules"
 import DeckInfo from "./Pages/DeckInfo"
 import Error from "./Pages/Error";
 import Rounds from "./Pages/Rounds";
+import Endgame from "./Pages/Endgame";
 import {LandingContext} from "./App";
 
 // export const LandingContext = React.createContext();
@@ -42,7 +43,7 @@ export default function Nav() {
 
                 {/*<Route exact path="/page" component={Page1}/>*/}
                 <Route exact path = "/page">
-                    <Page1 setImageURL = {setImageURL}/>
+                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds}/>
                 </Route>
 
                 <Route exact path="/selection" component={Selection}/>
@@ -59,6 +60,10 @@ export default function Nav() {
 
                 <Route exact path='/rounds'>
                     <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} />
+                </Route>
+
+                <Route exact path='/endgame'>
+                    <Endgame setRoundNumber = {setRoundNumber} />
                 </Route>
             </Switch>
         </Router>

@@ -21,10 +21,12 @@ export default function Endgame() {
             setScoreboardInfo(res.data.scoreboard);
         })
 
-        const endgameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/endGame/";
-        axios.get(endgameURL + code).then((res) => {
-            console.log(res);
-        })
+        if(host) {
+            const endgameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/endGame/";
+            axios.get(endgameURL + code).then((res) => {
+                console.log(res);
+            })
+        }
 
     }, []);
 

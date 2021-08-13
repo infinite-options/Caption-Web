@@ -6,6 +6,7 @@
     "@testing-library/jest-dom": "^5.14.1",
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
+    "ably": "^1.2.13",
     "axios": "^0.21.1",
     "react": "^17.0.2",
     "react-countdown": "^2.3.2",
@@ -19,6 +20,9 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start-player2": "set PORT=3001&& react-scripts start",
+    "start-player3": "set PORT=3002&& react-scripts start",
+    "start-player4": "set PORT=3003&& react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

@@ -18,7 +18,7 @@ import {LandingContext} from "./App";
 
 export default function Nav() {
 
-    const {setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL} = useContext(LandingContext);
+    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL} = useContext(LandingContext);
 
     return (
         <Router>

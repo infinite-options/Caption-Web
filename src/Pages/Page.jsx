@@ -20,7 +20,7 @@ const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 export default function Page({setImageURL, setRounds}) {
 
     const {code, roundNumber, host, playerUID, imageURL} = useContext(LandingContext);
-    const channel = client.channels.get(`comments/${code}`);
+    const channel = client.channels.get(`Captions/${code}`);
 
     const [caption, setCaption] = useState("");
     // const [imageSrc, setImageSrc] = useState("");

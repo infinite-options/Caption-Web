@@ -184,7 +184,7 @@ export default function Page({setImageURL, setRounds}) {
             await channel.subscribe(newVote => {
                 console.log("A comment was received ", newVote);
                 if (newVote.data.playersLeft == 0) {
-                    alert('Everyone has voted');
+                    // alert('Everyone has voted');
                     setTimeUp(true);
                 }
             });
@@ -193,9 +193,8 @@ export default function Page({setImageURL, setRounds}) {
         subscribe();
     
         return function cleanup() {
-        channel.unsubscribe();
+            channel.unsubscribe();
         };
-
     }, []);
 
 

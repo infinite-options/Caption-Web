@@ -15,8 +15,7 @@ import axios from "axios";
 import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
-export default function Page({setImageURL, setRounds, channel}) {
-    console.log('channel = ', channel);
+export default function Page({setImageURL, setRounds, channel_page}) {
     const {code, roundNumber, host, playerUID, imageURL} = useContext(LandingContext);
 
     const [caption, setCaption] = useState("");
@@ -53,7 +52,7 @@ export default function Page({setImageURL, setRounds, channel}) {
 
     const pub = (playerCount) => {
         console.log('In pub function');
-        channel.publish({data: {playersLeft: playerCount}});
+        channel_page.publish({data: {playersLeft: playerCount}});
     };
 
     // function transition() {
@@ -178,7 +177,7 @@ export default function Page({setImageURL, setRounds, channel}) {
 
         async function subscribe() 
         {
-            await channel.subscribe(newVote => {
+            await channel_page.subscribe(newVote => {
                 console.log("A comment was received ", newVote);
                 if (newVote.data.playersLeft == 0) {
                     // alert('Everyone has voted');
@@ -190,7 +189,7 @@ export default function Page({setImageURL, setRounds, channel}) {
         subscribe();
     
         return function cleanup() {
-            channel.unsubscribe();
+            channel_page.unsubscribe();
         };
     }, []);
 

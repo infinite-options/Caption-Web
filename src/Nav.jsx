@@ -21,7 +21,9 @@ const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 export default function Nav() {
 
     const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL} = useContext(LandingContext);
-    const channel = client.channels.get(`Captions/${code}`);
+    const channel_page = client.channels.get(`Captions/Page/${code}`);
+    const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
+    const channel_rounds = client.channels.get(`Captions/Rounds/${code}`);
 
     return (
         <Router>
@@ -46,13 +48,13 @@ export default function Nav() {
 
                 {/*<Route exact path="/page" component={Page1}/>*/}
                 <Route exact path = "/page">
-                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel}/>
+                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page}/>
                 </Route>
 
                 <Route exact path="/selection" component={Selection}/>
 
                 <Route exact path='/waiting'>
-                    <Waiting channel = {channel}/>
+                    <Waiting channel = {channel_waiting}/>
                 </Route>
 
                 <Route exact path="/gamerules" component={GameRules}/>
@@ -62,7 +64,7 @@ export default function Nav() {
 
 
                 <Route exact path='/rounds'>
-                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} channel = {channel} />
+                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} channel = {channel_rounds} />
                 </Route>
 
                 <Route exact path='/endgame'>

@@ -15,8 +15,7 @@ import axios from "axios";
 import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
-export default function Page({setImageURL, setRounds}) {
-
+export default function Page({setImageURL, setRounds, channel}) {
     const {code, roundNumber, host, playerUID, imageURL} = useContext(LandingContext);
 
     const [caption, setCaption] = useState("");
@@ -32,6 +31,7 @@ export default function Page({setImageURL, setRounds}) {
 
     const [timerDuration, setTimerDuration] = useState(-1);
     const [waitingPlayers, setWaitingPlayers] = useState([]);
+    const [moveOn, setMoveOn] = useState(false);
 
     const [roundStartTime, setRoundStartTime] = useState();
 
@@ -49,6 +49,11 @@ export default function Page({setImageURL, setRounds}) {
     function countdownComplete() {
         setCaptionSubmitted(true);
     }
+
+    const pub = (playerCount) => {
+        console.log('In pub function');
+        channel.publish({data: {playersLeft: playerCount}});
+    };
 
     // function transition() {
     //     window.location.href = "/selection";
@@ -144,6 +149,7 @@ export default function Page({setImageURL, setRounds}) {
                      */
                     let clientClock = new Date().getSeconds();
 
+                    if(res.data.round_started_at != undefined){
                     var c = serverClock;
                     console.log("current second = " + c);
                     var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
@@ -152,6 +158,7 @@ export default function Page({setImageURL, setRounds}) {
                     console.log("round duration = " + d);
                     setTimerDuration(d - determineLag(c, s));
                     console.log(timerDuration);
+                    }
                 })
 
 
@@ -170,6 +177,22 @@ export default function Page({setImageURL, setRounds}) {
             }, 2000)
         }, 500)
 
+        async function subscribe() 
+        {
+            await channel.subscribe(newVote => {
+                console.log("A comment was received ", newVote);
+                if (newVote.data.playersLeft == 0) {
+                    // alert('Everyone has voted');
+                    setTimeUp(true);
+                }
+            });
+        }
+        
+        subscribe();
+    
+        return function cleanup() {
+            channel.unsubscribe();
+        };
     }, []);
 
 
@@ -183,10 +206,13 @@ export default function Page({setImageURL, setRounds}) {
                  */
                 axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
                     console.log(res);
+                    const readyForNextRound = res.data.players.length == 0;
                     for (var i = 0; i < res.data.players.length; i++) {
                         waitingPlayers[i] = res.data.players[i].user_alias;
                     }
                     console.log("The waiting players array: " + waitingPlayers);
+                    if (readyForNextRound)
+                        setMoveOn(true);
                 })
             }
         }, 2000);
@@ -201,7 +227,7 @@ export default function Page({setImageURL, setRounds}) {
     }
 
 
-    function postSubmitCaption() {
+    async function postSubmitCaption() {
         setCaptionSubmitted(true);
         console.log("called");
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
@@ -214,8 +240,12 @@ export default function Page({setImageURL, setRounds}) {
 
         console.log(code);
 
-        axios.post(postURL, payload).then((res) => {
+        await axios.post(postURL, payload).then((res) => {
             console.log(res);
+        })
+
+        axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+            pub(res.data.players.length);
         })
     }
 
@@ -255,7 +285,7 @@ export default function Page({setImageURL, setRounds}) {
 
                 <br></br>
                 <br></br>
-                {/*{captionSubmitted ? (*/}
+                {/* {captionSubmitted ? (*/}
                 {/*    <div>*/}
                 {/*        <h1>You have captioned the above image as: "{caption}"</h1>*/}
                 {/*        <br></br>*/}
@@ -265,7 +295,7 @@ export default function Page({setImageURL, setRounds}) {
                 {/*            children="Continue"*/}
                 {/*        />*/}
                 {/*    </div>*/}
-                {/*) : (*/}
+                {/*) : ( */}
                 <div>
                     {captionSubmitted ? <></> : <Form
                         className="input2"

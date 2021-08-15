@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react'
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import circle from "../Assets/circle.png";
 import thing from "../Assets/idk.png";
@@ -10,11 +11,11 @@ import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
 
-export default function Waiting() {
+export default function Waiting({channel, channel2}) {
 
     const {code, gameUID, host, roundNumber} = useContext(LandingContext);
     const [names, setNames] = useState([]);
-
+    const history = useHistory();
     /**
      * Setup grandfather clock for the Waiting Page
      */
@@ -36,62 +37,84 @@ export default function Waiting() {
     //     </ul>);
     // }
 
+
+
     useEffect(() => {
+        /**
+         * This axios.get() is to fetch the names of the players in the waiting room
+         * @type {string}
+         */
+        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+        axios.get(getURL + code).then((res) => {
+            console.log(res);
 
+            const init_names = [];
 
-            setTimeout(function () {
+            for (var index = 0; index < res.data.players_list.length; index++) {
+                /**
+                 * The value of index continues to increment due to the loop,
+                 * so let's make a variable that does not change for the onClick function
+                 * @type {number}
+                 */
+
+                init_names.push(res.data.players_list[index].user_alias);
+
+            }
+            setNames(init_names);
+        });
+
+        setTimeout(function () {
+
+            if (grandfatherClock != "gameHasBegun") {
+                if (grandfatherClock == "tick") {
+                    setGrandfatherClock("tock");
+                } else {
+                    setGrandfatherClock("tick");
+                }
+
+                
+                console.log(grandfatherClock);
 
                 if (grandfatherClock != "gameHasBegun") {
-                    if (grandfatherClock == "tick") {
-                        setGrandfatherClock("tock");
-                    } else {
-                        setGrandfatherClock("tick");
-                    }
+                    const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
 
-                    console.log(grandfatherClock);
-
-
-                    /**
-                     * This axios.get() is to fetch the names of the players in the waiting room
-                     * @type {string}
-                     */
-                    const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
-                    axios.get(getURL + code).then((res) => {
-                        console.log(res);
-
-                        names.length = res.data.players_list.length;
-
-                        for (var index = 0; index < res.data.players_list.length; index++) {
-                            /**
-                             * The value of index continues to increment due to the loop,
-                             * so let's make a variable that does not change for the onClick function
-                             * @type {number}
-                             */
-
-
-                            names[index] = (res.data.players_list[index].user_alias);
-
+                    axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                        try {
+                            var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                            setGrandfatherClock("gameHasBegun");
+                        } catch (err) {
+                            console.log("game has not started yet");
                         }
-                        console.log("This is the names array " + names);
                     })
-
-
-                    if (grandfatherClock != "gameHasBegun") {
-                        const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-
-                        axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                            try {
-                                var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                                setGrandfatherClock("gameHasBegun");
-                            } catch (err) {
-                                console.log("game has not started yet");
-                            }
-                        })
-                    }
-
                 }
-            }, 2000);
 
+            }
+        }, 2000);
+
+
+        async function subscribe() 
+        {
+            await channel.subscribe(newPlayer => {
+                const newNames = [...names];
+                newNames.push(newPlayer.data.newPlayerName);
+                setNames(newNames);
+            });
+
+            await channel2.subscribe(newGame => {
+                if(newGame.data.gameStarted) {
+                    history.push('/page');
+                }
+            })
+
+
+        }
+        
+        subscribe();
+    
+        return function cleanup() {
+            channel.unsubscribe();
+            channel2.unsubscribe();
+        };
     });
 
     return (

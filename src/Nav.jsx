@@ -13,12 +13,17 @@ import Error from "./Pages/Error";
 import Rounds from "./Pages/Rounds";
 import Endgame from "./Pages/Endgame";
 import {LandingContext} from "./App";
+import Ably from 'ably/promises';
+const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 // export const LandingContext = React.createContext();
 
 export default function Nav() {
 
-    const {setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL} = useContext(LandingContext);
+    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL} = useContext(LandingContext);
+    const channel_page = client.channels.get(`Captions/Page/${code}`);
+    const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
+    const channel_rounds = client.channels.get(`Captions/Rounds/${code}`);
 
     return (
         <Router>
@@ -26,7 +31,7 @@ export default function Nav() {
 
                 <Route exact path='/'>
                     <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
-                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID}/>
+                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} channel = {channel_waiting}/>
                 </Route>
 
                 {/*This way of rendering the component forces re-renders in a way that I don't want atm*/}
@@ -43,13 +48,13 @@ export default function Nav() {
 
                 {/*<Route exact path="/page" component={Page1}/>*/}
                 <Route exact path = "/page">
-                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds}/>
+                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page}/>
                 </Route>
 
                 <Route exact path="/selection" component={Selection}/>
 
                 <Route exact path='/waiting'>
-                    <Waiting/>
+                    <Waiting channel = {channel_waiting} channel2 = {channel_rounds} />
                 </Route>
 
                 <Route exact path="/gamerules" component={GameRules}/>
@@ -59,7 +64,7 @@ export default function Nav() {
 
 
                 <Route exact path='/rounds'>
-                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} />
+                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} channel = {channel_rounds} />
                 </Route>
 
                 <Route exact path='/endgame'>

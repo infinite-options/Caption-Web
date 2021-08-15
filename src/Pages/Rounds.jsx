@@ -10,7 +10,7 @@ import {LandingContext} from "../App";
 import Form from "../Components/Form";
 
 
-export default function Rounds({setRounds, setRoundDuration}) {
+export default function Rounds({setRounds, setRoundDuration, channel}) {
 
     const {code, rounds, roundDuration} = useContext(LandingContext);
 
@@ -27,6 +27,11 @@ export default function Rounds({setRounds, setRoundDuration}) {
         setRoundDuration(durationInput);
     };
 
+    const pub = ()=> {
+        console.log('sending players to start game')
+        channel.publish({data: {gameStarted: true}});
+    };
+
     function postRoundInfo() {
 
         const payload = {
@@ -39,7 +44,10 @@ export default function Rounds({setRounds, setRoundDuration}) {
         axios.post(postURL, payload).then((res) => {
             console.log(res);
         })
+        
+        pub();
     }
+
 
 
     return (

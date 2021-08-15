@@ -7,7 +7,6 @@ import {Button} from "../Components/Button";
 // import "../Styles/Scoreboard.css";
 import "../Styles/Page.css";
 import background from "../Assets/temp.png";
-import Ably from 'ably/promises';
 
 //Documentation for the CountdownCircleTimer component
 //https://github.com/vydimitrov/react-countdown-circle-timer#props-for-both-reactreact-native
@@ -15,12 +14,10 @@ import {CountdownCircleTimer} from "react-countdown-circle-timer";
 import axios from "axios";
 import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
-const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
-export default function Page({setImageURL, setRounds}) {
-
+export default function Page({setImageURL, setRounds, channel}) {
+    console.log('channel = ', channel);
     const {code, roundNumber, host, playerUID, imageURL} = useContext(LandingContext);
-    const channel = client.channels.get(`Captions/${code}`);
 
     const [caption, setCaption] = useState("");
     // const [imageSrc, setImageSrc] = useState("");

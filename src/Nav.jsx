@@ -13,12 +13,15 @@ import Error from "./Pages/Error";
 import Rounds from "./Pages/Rounds";
 import Endgame from "./Pages/Endgame";
 import {LandingContext} from "./App";
+import Ably from 'ably/promises';
+const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 // export const LandingContext = React.createContext();
 
 export default function Nav() {
 
-    const {setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL} = useContext(LandingContext);
+    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL} = useContext(LandingContext);
+    const channel = client.channels.get(`Captions/${code}`);
 
     return (
         <Router>
@@ -43,13 +46,13 @@ export default function Nav() {
 
                 {/*<Route exact path="/page" component={Page1}/>*/}
                 <Route exact path = "/page">
-                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds}/>
+                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel}/>
                 </Route>
 
                 <Route exact path="/selection" component={Selection}/>
 
                 <Route exact path='/waiting'>
-                    <Waiting/>
+                    <Waiting channel = {channel}/>
                 </Route>
 
                 <Route exact path="/gamerules" component={GameRules}/>
@@ -59,7 +62,7 @@ export default function Nav() {
 
 
                 <Route exact path='/rounds'>
-                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} />
+                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} channel = {channel} />
                 </Route>
 
                 <Route exact path='/endgame'>

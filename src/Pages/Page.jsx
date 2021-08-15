@@ -149,6 +149,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                      */
                     let clientClock = new Date().getSeconds();
 
+                    if(res.data.round_started_at != undefined){
                     var c = serverClock;
                     console.log("current second = " + c);
                     var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
@@ -157,6 +158,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                     console.log("round duration = " + d);
                     setTimerDuration(d - determineLag(c, s));
                     console.log(timerDuration);
+                    }
                 })
 
 

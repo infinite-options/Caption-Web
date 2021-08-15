@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from 'react'
+import { useHistory } from "react-router-dom";
 import axios from "axios";
 import circle from "../Assets/circle.png";
 import thing from "../Assets/idk.png";
@@ -10,11 +11,11 @@ import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
 
-export default function Waiting({channel}) {
+export default function Waiting({channel, channel2}) {
 
     const {code, gameUID, host, roundNumber} = useContext(LandingContext);
     const [names, setNames] = useState([]);
-
+    const history = useHistory();
     /**
      * Setup grandfather clock for the Waiting Page
      */
@@ -69,6 +70,7 @@ export default function Waiting({channel}) {
                     setGrandfatherClock("tick");
                 }
 
+                
                 console.log(grandfatherClock);
 
                 if (grandfatherClock != "gameHasBegun") {
@@ -95,12 +97,21 @@ export default function Waiting({channel}) {
                 newNames.push(newPlayer.data.newPlayerName);
                 setNames(newNames);
             });
+
+            await channel2.subscribe(newGame => {
+                if(newGame.data.gameStarted) {
+                    history.push('/page');
+                }
+            })
+
+
         }
         
         subscribe();
     
         return function cleanup() {
             channel.unsubscribe();
+            channel2.unsubscribe();
         };
     });
 

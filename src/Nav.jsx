@@ -54,7 +54,7 @@ export default function Nav() {
                 <Route exact path="/selection" component={Selection}/>
 
                 <Route exact path='/waiting'>
-                    <Waiting channel = {channel_waiting}/>
+                    <Waiting channel = {channel_waiting} channel2 = {channel_rounds} />
                 </Route>
 
                 <Route exact path="/gamerules" component={GameRules}/>

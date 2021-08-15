@@ -31,7 +31,7 @@ export default function Nav() {
 
                 <Route exact path='/'>
                     <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
-                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID}/>
+                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} channel = {channel_waiting}/>
                 </Route>
 
                 {/*This way of rendering the component forces re-renders in a way that I don't want atm*/}

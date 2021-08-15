@@ -7,7 +7,7 @@ import "../Styles/Landing.css";
 import {LandingContext} from "../App";
 import {Card} from "reactstrap";
 
-export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID}) {
+export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, channel}) {
 
     const {code, name, alias, email, zipCode, host} = useContext(LandingContext);
 
@@ -60,14 +60,20 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             })
 
             setHost(true);
-
+            pub();
         } else {
             window.alert("To create a game, fill out the necessary information");
         }
     }
 
+    const pub = () => {
+        console.log('publishing new player');
+        channel.publish({data: {newPlayerName: alias}});
+    };
+
     function joinGame() {
         if (validateInputToJoinGame()) {
+            pub();
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
 

@@ -10,7 +10,7 @@ import axios from "axios";
 import {LandingContext} from "../App";
 
 
-export default function Scoreboard(props) {
+export default function Scoreboard({channel}) {
 
     const {code, roundNumber, imageURL, rounds, host} = useContext(LandingContext);
 
@@ -21,6 +21,9 @@ export default function Scoreboard(props) {
     const [localUserVoted, setLocalUserVoted] = useState(false);
     const [everybodyVoted, setEverybodyVoted] = useState(false);
 
+    const pub = (playerCount) => {
+        channel.publish({data: {playersLeft: playerCount}});
+    };
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
@@ -46,6 +49,21 @@ export default function Scoreboard(props) {
         })
 
         console.log("Toggle Arr: " + toggleArr);
+
+        async function subscribe() 
+        {
+            await channel.subscribe(newVote => {
+                if (newVote.data.playersLeft == 0) {
+                    setEverybodyVoted(true);
+                }
+            });
+        }
+        
+        subscribe();
+    
+        return function cleanup() {
+            channel.unsubscribe();
+        };
     }, []);
 
     useEffect(() => {
@@ -101,7 +119,7 @@ export default function Scoreboard(props) {
         // setToggleState(index);
     }
 
-    function postVote() {
+    async function postVote() {
 
         setLocalUserVoted(true);
 
@@ -113,9 +131,14 @@ export default function Scoreboard(props) {
             round_number: roundNumber.toString()
         }
 
-        axios.post(postURL, payload).then((res) => {
+        await axios.post(postURL, payload).then((res) => {
             console.log(res);
-        })
+        });
+
+        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+        await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
+            pub(res.data.players_count);
+        });
     }
 
     function renderCaptions() {

@@ -24,6 +24,7 @@ export default function Nav() {
     const channel_page = client.channels.get(`Captions/Page/${code}`);
     const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
     const channel_rounds = client.channels.get(`Captions/Rounds/${code}`);
+    const channel_voted = client.channels.get(`Captions/Vote/${code}`);
 
     return (
         <Router>
@@ -51,7 +52,9 @@ export default function Nav() {
                     <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page}/>
                 </Route>
 
-                <Route exact path="/selection" component={Selection}/>
+                <Route exact path="/selection" >
+                    <Selection channel = {channel_voted}/>
+                </Route>
 
                 <Route exact path='/waiting'>
                     <Waiting channel = {channel_waiting} channel2 = {channel_rounds} />

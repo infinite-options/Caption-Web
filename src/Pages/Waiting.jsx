@@ -91,26 +91,73 @@ export default function Waiting({channel, channel2}) {
     });
 
     useEffect(() => {
-        console.log('Init useEffect in waiting.jsx. Code = ', code, ', listening on channel: ', channel.name);
+        // console.log('Init useEffect in waiting.jsx. Code = ', code, ', listening on channel: ', channel.name);
+        // /**
+        //  * This axios.get() is to fetch the names of the players in the waiting room
+        //  * @type {string}
+        // */
+        // async function getPlayers () {
+        //     const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+        //     await axios.get(getURL + code).then((res) => {    
+        //         const init_names = [];
+    
+        //         for (var index = 0; index < res.data.players_list.length; index++) {  
+        //             init_names.push(res.data.players_list[index].user_alias);
+        //         }
+        //         setNames(init_names);
+        //     });
+        // }
+
+        // getPlayers();
+
+        // async function subscribe() 
+        // {
+        //     await channel2.subscribe(newGame => {
+        //         if(newGame.data.gameStarted) {
+        //             history.push('/page');
+        //         }
+        //     })
+        // }
+        
+        // subscribe();
+    
+        // return function cleanup() {
+        //     channel2.unsubscribe();
+        // };
+    }, []);
+
+    useEffect(() => {
         /**
          * This axios.get() is to fetch the names of the players in the waiting room
          * @type {string}
         */
-        async function getPlayers () {
-            const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
-            await axios.get(getURL + code).then((res) => {    
-                const init_names = [];
-    
-                for (var index = 0; index < res.data.players_list.length; index++) {  
-                    init_names.push(res.data.players_list[index].user_alias);
+
+        async function subscribe1() 
+        {
+            await channel.subscribe(newPlayer => {
+                async function getPlayers () {
+                    const names_db = [];
+                    console.log('in getPlayers');
+                    const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+                    await axios.get(getURL + code)
+                    .then((res) => {
+                        for (var index = 0; index < res.data.players_list.length; index++) {
+                            names_db.push(res.data.players_list[index].user_alias);
+                        }
+                        console.log('names_db = ', names_db);
+                        // names_db.push(newPlayer.data.newPlayerName);
+                        console.log('setting names with newNames = ', names_db);
+                        setNames(names_db);
+                    })
+                    .catch(err => console.error('error = ', err));
+
+                    return names_db;
                 }
-                setNames(init_names);
+        
+                getPlayers();
             });
         }
-
-        getPlayers();
-
-        async function subscribe() 
+        async function subscribe2() 
         {
             await channel2.subscribe(newGame => {
                 if(newGame.data.gameStarted) {
@@ -119,29 +166,20 @@ export default function Waiting({channel, channel2}) {
             })
         }
         
-        subscribe();
-    
-        return function cleanup() {
-            channel2.unsubscribe();
-        };
-    }, []);
-
-    useEffect(() => {
-        async function subscribe() 
-        {
-            await channel.subscribe(newPlayer => {
-                const newNames = [...names];
-                newNames.push(newPlayer.data.newPlayerName);
-                setNames(newNames);
-            });
-        }
+        subscribe1();
+        subscribe2();
         
-        if (code)
-            subscribe();
-    
         return function cleanup() {
             channel.unsubscribe();
+            channel2.unsubscribe();
         };
+        
+        // if (code)
+        //     subscribe();
+    
+        // return function cleanup() {
+        //     channel.unsubscribe();
+        // };
     }, [code]);
 
     return (

@@ -38,58 +38,95 @@ export default function Waiting({channel, channel2}) {
     // }
 
     useEffect(() => {
+        // /**
+        //  * This axios.get() is to fetch the names of the players in the waiting room
+        //  * @type {string}
+        //  */
+        // const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+        // axios.get(getURL + code).then((res) => {
+        //     console.log(res);
+
+        //     const init_names = [];
+
+        //     for (var index = 0; index < res.data.players_list.length; index++) {
+        //         /**
+        //          * The value of index continues to increment due to the loop,
+        //          * so let's make a variable that does not change for the onClick function
+        //          * @type {number}
+        //          */
+
+        //         init_names.push(res.data.players_list[index].user_alias);
+        //     }
+        //     setNames(init_names);
+        // });
+
+        // setTimeout(function () {
+
+        //     if (grandfatherClock != "gameHasBegun") {
+        //         if (grandfatherClock == "tick") {
+        //             setGrandfatherClock("tock");
+        //         } else {
+        //             setGrandfatherClock("tick");
+        //         }
+
+                
+        //         console.log(grandfatherClock);
+
+        //         if (grandfatherClock != "gameHasBegun") {
+        //             const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+        //             console.log('In Waiting.jsx: code = ', code);
+
+        //             axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+        //                 try {
+        //                     var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+        //                     setGrandfatherClock("gameHasBegun");
+        //                 } catch (err) {
+        //                     console.log("game has not started yet");
+        //                 }
+        //             })
+        //         }
+
+        //     }
+        // }, 2000);
+    });
+
+    useEffect(() => {
+        console.log('Init useEffect in waiting.jsx. Code = ', code, ', listening on channel: ', channel.name);
         /**
          * This axios.get() is to fetch the names of the players in the waiting room
          * @type {string}
-         */
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
-        axios.get(getURL + code).then((res) => {
-            console.log(res);
-
-            const init_names = [];
-
-            for (var index = 0; index < res.data.players_list.length; index++) {
-                /**
-                 * The value of index continues to increment due to the loop,
-                 * so let's make a variable that does not change for the onClick function
-                 * @type {number}
-                 */
-
-                init_names.push(res.data.players_list[index].user_alias);
-
-            }
-            setNames(init_names);
-        });
-
-        setTimeout(function () {
-
-            if (grandfatherClock != "gameHasBegun") {
-                if (grandfatherClock == "tick") {
-                    setGrandfatherClock("tock");
-                } else {
-                    setGrandfatherClock("tick");
+        */
+        async function getPlayers () {
+            const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+            await axios.get(getURL + code).then((res) => {    
+                const init_names = [];
+    
+                for (var index = 0; index < res.data.players_list.length; index++) {  
+                    init_names.push(res.data.players_list[index].user_alias);
                 }
+                setNames(init_names);
+            });
+        }
 
-                
-                console.log(grandfatherClock);
+        getPlayers();
 
-                if (grandfatherClock != "gameHasBegun") {
-                    const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-
-                    axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                        try {
-                            var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                            setGrandfatherClock("gameHasBegun");
-                        } catch (err) {
-                            console.log("game has not started yet");
-                        }
-                    })
+        async function subscribe() 
+        {
+            await channel2.subscribe(newGame => {
+                if(newGame.data.gameStarted) {
+                    history.push('/page');
                 }
+            })
+        }
+        
+        subscribe();
+    
+        return function cleanup() {
+            channel2.unsubscribe();
+        };
+    }, []);
 
-            }
-        }, 2000);
-
-
+    useEffect(() => {
         async function subscribe() 
         {
             await channel.subscribe(newPlayer => {
@@ -97,23 +134,15 @@ export default function Waiting({channel, channel2}) {
                 newNames.push(newPlayer.data.newPlayerName);
                 setNames(newNames);
             });
-
-            await channel2.subscribe(newGame => {
-                if(newGame.data.gameStarted) {
-                    history.push('/page');
-                }
-            })
-
-
         }
         
-        subscribe();
+        if (code)
+            subscribe();
     
         return function cleanup() {
             channel.unsubscribe();
-            channel2.unsubscribe();
         };
-    });
+    }, [code]);
 
     return (
         <div

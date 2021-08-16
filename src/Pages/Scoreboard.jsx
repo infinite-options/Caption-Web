@@ -28,7 +28,6 @@ function Scoreboard({setRoundNumber}) {
         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
         axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
             console.log(res);
-            // setScoreboardInfo(res.data.players);
             setScoreboardInfo(res.data.scoreboard);
         })
 
@@ -96,15 +95,20 @@ function Scoreboard({setRoundNumber}) {
                     */
                    if (grandfatherClock != "gameHasBegun") {
                        const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+                       console.log('In Scoreboard.jsx: code = ', code, ' roundNumber = ', roundNumber);
 
-                       axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                           try {
-                               var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                               setGrandfatherClock("gameHasBegun");
-                           } catch (err) {
-                               console.log("game has not started yet");
-                           }
-                       })
+                        try {
+                            axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                                try {
+                                    var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                                    setGrandfatherClock("gameHasBegun");
+                                } catch (err) {
+                                    console.log("game has not started yet");
+                                }
+                            })
+                        } catch (err) {
+                            console.error(err);
+                        }
                    }
 
                }

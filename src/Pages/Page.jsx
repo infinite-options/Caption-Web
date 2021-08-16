@@ -95,31 +95,6 @@ export default function Page({setImageURL, setRounds, channel}) {
             }
 
 
-            // /**
-            //  * Axios.Get() #2
-            //  * Receive the image url
-            //  */
-            // /**
-            //  * Issue: Sam is going to update this endpoint into a post call. Payload will demand both round number and game code.
-            //  */
-            // axios.get(getImageURL + code + "," + roundNumber).then((res) => {
-            //     console.log(res);
-            //     setImageSrc(res.data.image_url);
-            // })
-
-            // /**
-            //  * Axios.Get() #3
-            //  * Recieve the waiting players
-            //  */
-            // axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
-            //     console.log(res);
-            //     for (var i = 0; i < res.data.players.length; i++) {
-            //         waitingPlayers[i] = res.data.players[i].user_alias;
-            //     }
-            //     console.log("The waiting players array: " + waitingPlayers);
-            // })
-
-
             /**
              * Mayukh: This is officially the worst way to synchronize any asynchronous axios code.
              */
@@ -132,6 +107,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                  * c = the second at which the clock is currently on
                  * d = the seconds for the duration of the round
                  */
+                console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber);
                 axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
                     console.log(res);
 
@@ -182,7 +158,6 @@ export default function Page({setImageURL, setRounds, channel}) {
             await channel.subscribe(newVote => {
                 console.log("A comment was received ", newVote);
                 if (newVote.data.playersLeft == 0) {
-                    // alert('Everyone has voted');
                     setTimeUp(true);
                 }
             });
@@ -229,7 +204,6 @@ export default function Page({setImageURL, setRounds, channel}) {
 
     async function postSubmitCaption() {
         setCaptionSubmitted(true);
-        console.log("called");
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
             caption: caption,
@@ -238,8 +212,6 @@ export default function Page({setImageURL, setRounds, channel}) {
             user_uid: playerUID.toString()
         }
 
-        console.log(code);
-
         await axios.post(postURL, payload).then((res) => {
             console.log(res);
         })
@@ -247,11 +219,6 @@ export default function Page({setImageURL, setRounds, channel}) {
         axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
             pub(res.data.players.length);
         })
-    }
-
-    function toggleCaptionSubmitted() {
-        console.log("Toggle caption submitted()");
-        setCaptionSubmitted(!captionSubmitted);
     }
 
     function toggleTimeUp() {
@@ -263,10 +230,7 @@ export default function Page({setImageURL, setRounds, channel}) {
             style={{
                 maxWidth: "375px",
                 height: "100%",
-                //As long as I import the image from my package strcuture, I can use them like so
                 backgroundImage: `url(${background})`,
-                // backgroundImage:
-                //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
             }}
         >
             <div style={{padding: "20px"}}>
@@ -285,17 +249,7 @@ export default function Page({setImageURL, setRounds, channel}) {
 
                 <br></br>
                 <br></br>
-                {/* {captionSubmitted ? (*/}
-                {/*    <div>*/}
-                {/*        <h1>You have captioned the above image as: "{caption}"</h1>*/}
-                {/*        <br></br>*/}
-                {/*        <Button*/}
-                {/*            className="landing2"*/}
-                {/*            destination="/selection"*/}
-                {/*            children="Continue"*/}
-                {/*        />*/}
-                {/*    </div>*/}
-                {/*) : ( */}
+
                 <div>
                     {captionSubmitted ? <></> : <Form
                         className="input2"

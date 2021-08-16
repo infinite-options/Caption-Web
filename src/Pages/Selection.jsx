@@ -62,7 +62,7 @@ export default function Scoreboard(props) {
                 //     }
                 // })
                 setTimeout(function () {
-
+                    console.log('In Selection.jsx: roundNumber = ', roundNumber);
                     if (!everybodyVoted) {
                         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
                         axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {

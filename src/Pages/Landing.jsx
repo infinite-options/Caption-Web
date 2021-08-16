@@ -7,7 +7,7 @@ import "../Styles/Landing.css";
 import {LandingContext} from "../App";
 import {Card} from "reactstrap";
 
-export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, channel}) {
+export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client}) {
 
     const {code, name, alias, email, zipCode, host} = useContext(LandingContext);
 
@@ -39,10 +39,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         return (code !== "" && validateInputToCreateGame());
     }
 
-    function createGame() {
+    async function createGame() {
         if (validateInputToCreateGame()) {
-
-
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
             const payload = {
@@ -52,28 +50,27 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 user_zip: zipCode,
             };
 
-            axios.post(postURL, payload).then((res) => {
+            await axios.post(postURL, payload).then((res) => {
                 console.log(res);
                 setCode(res.data.game_code);
                 setPlayerUID(res.data.host_id);
-
-            })
+                pub(res.data.game_code);
+            });
 
             setHost(true);
-            pub();
         } else {
             window.alert("To create a game, fill out the necessary information");
         }
     }
 
-    const pub = () => {
-        console.log('publishing new player');
+    const pub = (game_code) => {
+        const channel = client.channels.get(`Captions/Waiting/${game_code}`);
         channel.publish({data: {newPlayerName: alias}});
     };
 
     function joinGame() {
         if (validateInputToJoinGame()) {
-            pub();
+            pub(code);
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
 

@@ -5,7 +5,6 @@ import {Button} from "../Components/Button.jsx";
 import background from "../Assets/landing.png";
 import "../Styles/Landing.css";
 import {LandingContext} from "../App";
-import {Card} from "reactstrap";
 
 export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client}) {
 

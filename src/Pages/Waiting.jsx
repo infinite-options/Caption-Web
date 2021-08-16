@@ -5,15 +5,12 @@ import circle from "../Assets/circle.png";
 import thing from "../Assets/idk.png";
 import {Button} from '../Components/Button';
 import "../Styles/Waiting.css";
-import {Row, Col, Card} from "reactstrap";
-import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
-import Bubbles from "../Components/Bubbles";
 
 
 export default function Waiting({channel, channel2}) {
 
-    const {code, gameUID, host, roundNumber} = useContext(LandingContext);
+    const {code, host} = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const history = useHistory();
     /**
@@ -24,15 +21,8 @@ export default function Waiting({channel, channel2}) {
     let gameCodeText = "Game Code: " + code;
 
     useEffect(() => {
-        /**
-         * This axios.get() is to fetch the names of the players in the waiting room
-         * @type {string}
-        */
-
         async function subscribe1() 
         {
-            // if (!host)
-            //     console.log('Not host and here above getPlayers with code = ', code, ' and channel = ', channel);
             await channel.subscribe(newPlayer => {
                 async function getPlayers () {
                     const names_db = [];
@@ -88,8 +78,6 @@ export default function Waiting({channel, channel2}) {
             <br></br>
             <br></br>
 
-            {/* <div className = "spacer"/> */}
-
             <h4>Waiting for all players to join</h4>
 
             <ul className="flex-container">
@@ -115,7 +103,6 @@ export default function Waiting({channel, channel2}) {
             <Button
                 className="landing"
                 children="Share with other players"
-                // onClick={printNames}
                 destination="/waiting"
                 conditionalLink={true}
             />
@@ -137,15 +124,6 @@ export default function Waiting({channel, channel2}) {
                     conditionalLink={true}
                 />
                 : <></>}
-
-            {/*<Button*/}
-            {/*    className="landing"*/}
-            {/*    children="Start Game"*/}
-            {/*    destination="/collections"*/}
-            {/*    conditionalLink={true}*/}
-            {/*/>*/}
-
-
         </div>
     )
 }

@@ -67,42 +67,22 @@ export default function Scoreboard({channel}) {
     }, []);
 
     useEffect(() => {
+        if (!everybodyVoted) {
+            const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+            axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
+                console.log('res = ', res);
+                if (res.data.players_count == 0) {
+                    setEverybodyVoted(true);
 
-
-        setTimeout(function () {
-
-            if (!everybodyVoted) {
-                // const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-                // axios.get(getURL + code + "," + roundNumber).then((res) => {
-                //     console.log(res);
-                //     if (res.data.players_count == 0) {
-                //         setEverybodyVoted(true);
-                //     }
-                // })
-                setTimeout(function () {
-                    console.log('In Selection.jsx: roundNumber = ', roundNumber);
-                    if (!everybodyVoted) {
-                        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-                        axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
+                    if (host) {
+                        const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+                        axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
                             console.log(res);
-                            if (res.data.players_count == 0) {
-                                setEverybodyVoted(true);
-
-                                if (host) {
-                                    const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
-                                    axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
-                                        console.log(res);
-                                    })
-                                }
-                            }
                         })
                     }
-                }, 1000);
-
-
-            }
-        }, 1000);
-
+                }
+            })
+        }
     });
 
 
@@ -129,14 +109,17 @@ export default function Scoreboard({channel}) {
             caption: selectedCaption,
             game_code: code.toString(),
             round_number: roundNumber.toString()
-        }
+        };
 
         await axios.post(postURL, payload).then((res) => {
             console.log(res);
         });
 
+        console.log('here');
+
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
         await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
+            console.log('publishing with res.data.players_count = ', res.data.players_count);
             pub(res.data.players_count);
         });
     }
@@ -185,7 +168,7 @@ export default function Scoreboard({channel}) {
             <h1>Name of Deck</h1>
             <br></br>
 
-            <h4 classname="row">Pick Your Favorite Caption</h4>
+            <h4>Pick Your Favorite Caption</h4>
             <br></br>
             {/*<img className="img2" src={Pic} />*/}
             <img style={{
@@ -227,8 +210,11 @@ export default function Scoreboard({channel}) {
 
             {localUserVoted ?
                 <></>
-                : <Button className="fat" destination="/selection" children="Vote" onClick={postVote}
-                          conditionalLink={true}/>}
+                : selectedCaption ?
+                    <Button className="fat" destination="/selection" children="Vote" onClick={postVote}
+                          conditionalLink={true}/>
+                    : <></>
+            }
 
             <br></br>
         </div>

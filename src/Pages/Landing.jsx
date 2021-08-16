@@ -66,11 +66,11 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     const pub = (game_code) => {
         const channel = client.channels.get(`Captions/Waiting/${game_code}`);
         channel.publish({data: {newPlayerName: alias}});
+        console.log('channel = ', channel, ', game_code = ', game_code);
     };
 
     function joinGame() {
         if (validateInputToJoinGame()) {
-            pub(code);
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
 
@@ -86,6 +86,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 console.log(res);
                 setGameUID(res.data.game_uid);
                 setPlayerUID(res.data.user_uid);
+                pub(code);
 
 
                 try {

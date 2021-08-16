@@ -134,13 +134,17 @@ export default function Waiting({channel, channel2}) {
 
         async function subscribe1() 
         {
+            // if (!host)
+            //     console.log('Not host and here above getPlayers with code = ', code, ' and channel = ', channel);
             await channel.subscribe(newPlayer => {
                 async function getPlayers () {
                     const names_db = [];
-                    console.log('in getPlayers');
                     const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+                    if (!host)
+                        console.log('Not host and here with code = ', code);
                     await axios.get(getURL + code)
                     .then((res) => {
+                        console.log('code =  ', code);
                         for (var index = 0; index < res.data.players_list.length; index++) {
                             names_db.push(res.data.players_list[index].user_alias);
                         }
@@ -150,10 +154,9 @@ export default function Waiting({channel, channel2}) {
                         setNames(names_db);
                     })
                     .catch(err => console.error('error = ', err));
-
-                    return names_db;
                 }
         
+                console.log('above getPlayers called');
                 getPlayers();
             });
         }
@@ -166,20 +169,15 @@ export default function Waiting({channel, channel2}) {
             })
         }
         
-        subscribe1();
-        subscribe2();
+        if (code) {
+            subscribe1();
+            subscribe2();
+        }
         
         return function cleanup() {
             channel.unsubscribe();
             channel2.unsubscribe();
         };
-        
-        // if (code)
-        //     subscribe();
-    
-        // return function cleanup() {
-        //     channel.unsubscribe();
-        // };
     }, [code]);
 
     return (

@@ -66,7 +66,6 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     const pub = (game_code) => {
         const channel = client.channels.get(`Captions/Waiting/${game_code}`);
         channel.publish({data: {newPlayerName: alias}});
-        console.log('channel = ', channel, ', game_code = ', game_code);
     };
 
     function joinGame() {

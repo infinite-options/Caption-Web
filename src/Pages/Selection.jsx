@@ -34,9 +34,9 @@ export default function Scoreboard({channel}) {
          * Should be easy --> match internal state with info in the endpoint result.
          */
 
-
+        console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
         axios.get(getURL + code + "," + roundNumber).then((res) => {
-            console.log(res);
+            console.log('res = ', res);
             setPlayersArr(res.data.players);
 
             /**
@@ -115,8 +115,6 @@ export default function Scoreboard({channel}) {
             console.log(res);
         });
 
-        console.log('here');
-
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
         await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
             console.log('publishing with res.data.players_count = ', res.data.players_count);
@@ -127,6 +125,7 @@ export default function Scoreboard({channel}) {
     function renderCaptions() {
 
         var captions = [];
+        console.log('playersArr.length = ', playersArr.length);
         for (var index = 0; index < playersArr.length; index++) {
             /**
              * The value of index continues to increment due to the loop,
@@ -147,8 +146,8 @@ export default function Scoreboard({channel}) {
                 />
                 <br></br>
             </div>);
-            console.log(index);
         }
+        console.log('captions = ', captions);
         return <div>{captions}</div>;
     }
 

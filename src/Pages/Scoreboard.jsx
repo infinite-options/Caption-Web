@@ -31,10 +31,15 @@ function Scoreboard({setRoundNumber}) {
             setScoreboardInfo(res.data.scoreboard);
         })
 
-        if(!host){
-            setRoundNumber(roundNumber + 1);
-        }
+        console.log('Mounting with roundNumber = ', roundNumber);
+        // if(!host){
+        //     setRoundNumber(roundNumber + 1);
+        // }
     }, []);
+
+    useEffect(() => {
+        console.log('change in roundNumber, it now equals: ', roundNumber);
+    }, [roundNumber]);
 
     function renderReports() {
 
@@ -66,56 +71,55 @@ function Scoreboard({setRoundNumber}) {
         }
 
         axios.post(postURL, payload).then((res) => {
-            console.log(res);
+            console.log('res = ', res);
             // setTimeStamp(res.data.round_start_time);
-            // console.log("This is the timestamp object: " + res.data.round_start_time);
         })
 
         setRoundNumber(roundNumber + 1);
     }
 
 
-    useEffect(() => {
+    // useEffect(() => {
 
-       if(!host) {
-           setTimeout(function () {
+    //    if(!host) {
+    //        setTimeout(function () {
 
-               if (grandfatherClock != "gameHasBegun") {
-                   if (grandfatherClock == "tick") {
-                       setGrandfatherClock("tock");
-                   } else {
-                       setGrandfatherClock("tick");
-                   }
+    //            if (grandfatherClock != "gameHasBegun") {
+    //                if (grandfatherClock == "tick") {
+    //                    setGrandfatherClock("tock");
+    //                } else {
+    //                    setGrandfatherClock("tick");
+    //                }
 
-                   console.log(grandfatherClock);
+    //                console.log(grandfatherClock);
 
 
-                   /**
-                    * Issue: We are going to add roundNumber to the gameTimer endpoint
-                    */
-                   if (grandfatherClock != "gameHasBegun") {
-                       const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-                       console.log('In Scoreboard.jsx: code = ', code, ' roundNumber = ', roundNumber);
+    //                /**
+    //                 * Issue: We are going to add roundNumber to the gameTimer endpoint
+    //                 */
+    //                if (grandfatherClock != "gameHasBegun") {
+    //                    const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+    //                    console.log('In Scoreboard.jsx: roundNumber = ', roundNumber, ` and am ${host ? '' : 'not'} the host, getURL_FULL = ${getTimerURL + code + "," + roundNumber}`);
+    //                     try {
+    //                         axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+    //                             try {
+    //                                 var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+    //                                 setGrandfatherClock("gameHasBegun");
+    //                             } catch (err) {
+    //                                 console.log("game has not started yet");
+    //                             }
+    //                         })
+    //                         .catch(err => console.error(err));
+    //                     } catch (err) {
+    //                         console.error(err);
+    //                     }
+    //                }
 
-                        try {
-                            axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                                try {
-                                    var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                                    setGrandfatherClock("gameHasBegun");
-                                } catch (err) {
-                                    console.log("game has not started yet");
-                                }
-                            })
-                        } catch (err) {
-                            console.error(err);
-                        }
-                   }
+    //            }
+    //        }, 2000);
+    //    }
 
-               }
-           }, 2000);
-       }
-
-    });
+    // });
 
     return (
         <div
@@ -177,16 +181,14 @@ function Scoreboard({setRoundNumber}) {
 
 
             <br></br>
-            {host ?
-                <Button
-                    className="fat"
-                    destination="/page"
-                    onClick={startNextRound}
-                    children="Next Round"
-                    conditionalLink={true}
-                />
-                : <></>}
-
+            <Button
+                className="fat"
+                destination="/page"
+                onClick={startNextRound}
+                children="Next Round"
+                conditionalLink={true}
+            />
+{/* 
             {grandfatherClock === "gameHasBegun" && !host ?
                 <Button
                     className="landing"
@@ -194,7 +196,7 @@ function Scoreboard({setRoundNumber}) {
                     destination="/page"
                     conditionalLink={true}
                 />
-                : <></>}
+                : <></>} */}
 
             <br/>
         </div>

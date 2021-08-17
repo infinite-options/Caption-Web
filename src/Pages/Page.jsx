@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
+import {useHistory} from 'react-router-dom';
 import Pic from "../Assets/sd.jpg";
 import Countdown from "react-countdown";
 import {Row, Col, Card} from "reactstrap";
@@ -17,6 +18,7 @@ import Bubbles from "../Components/Bubbles";
 
 export default function Page({setImageURL, setRounds, channel}) {
     const {code, roundNumber, host, playerUID, imageURL} = useContext(LandingContext);
+    const history = useHistory();
 
     const [caption, setCaption] = useState("");
     // const [imageSrc, setImageSrc] = useState("");
@@ -107,9 +109,9 @@ export default function Page({setImageURL, setRounds, channel}) {
                  * c = the second at which the clock is currently on
                  * d = the seconds for the duration of the round
                  */
-                console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber);
+                console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber, ` fullURL = ${getTimerURL + code + "," + roundNumber}`);
                 axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                    console.log(res);
+                    console.log('res = ', res.data);
 
                     setRounds(res.data.total_number_of_rounds);
 
@@ -126,14 +128,14 @@ export default function Page({setImageURL, setRounds, channel}) {
                     let clientClock = new Date().getSeconds();
 
                     if(res.data.round_started_at != undefined){
-                    var c = serverClock;
-                    console.log("current second = " + c);
-                    var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                    console.log("started second = " + s);
-                    var d = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                    console.log("round duration = " + d);
-                    setTimerDuration(d - determineLag(c, s));
-                    console.log(timerDuration);
+                        var c = serverClock;
+                        console.log("current second = " + c);
+                        var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                        console.log("started second = " + s);
+                        var d = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                        console.log("round duration = " + d);
+                        setTimerDuration(d - determineLag(c, s));
+                        console.log(timerDuration);
                     }
                 })
 
@@ -156,9 +158,9 @@ export default function Page({setImageURL, setRounds, channel}) {
         async function subscribe() 
         {
             await channel.subscribe(newVote => {
-                console.log("A comment was received ", newVote);
                 if (newVote.data.playersLeft == 0) {
-                    setTimeUp(true);
+                    // setTimeUp(true);
+                    history.push('/selection');
                 }
             });
         }

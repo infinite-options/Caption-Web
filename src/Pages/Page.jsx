@@ -205,6 +205,7 @@ export default function Page({setImageURL, setRounds, channel}) {
 
 
     async function postSubmitCaption() {
+        console.log('posting new caption');
         setCaptionSubmitted(true);
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
@@ -217,6 +218,8 @@ export default function Page({setImageURL, setRounds, channel}) {
         await axios.post(postURL, payload).then((res) => {
             console.log(res);
         })
+
+        console.log('payload = ', payload);
 
         axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
             pub(res.data.players.length);

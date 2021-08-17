@@ -11,8 +11,8 @@ import {LandingContext} from "../App";
 
 
 export default function Scoreboard({channel}) {
-
     const {code, roundNumber, imageURL, rounds, host} = useContext(LandingContext);
+    console.log('code = ', code);
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);

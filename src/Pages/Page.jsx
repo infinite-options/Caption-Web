@@ -182,7 +182,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                  * Recieve the waiting players
                  */
                 axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
-                    console.log(res);
+                    console.log('pageres = ', res);
                     const readyForNextRound = res.data.players.length == 0;
                     for (var i = 0; i < res.data.players.length; i++) {
                         waitingPlayers[i] = res.data.players[i].user_alias;
@@ -205,7 +205,17 @@ export default function Page({setImageURL, setRounds, channel}) {
 
 
     async function postSubmitCaption() {
-        console.log('posting new caption');
+        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
+
+        /**
+         * Issue:
+         * The user should not be able to select/vote for their own caption.
+         * Should be easy --> match internal state with info in the endpoint result.
+         */
+        await axios.get(getURL + code + "," + roundNumber).then((res) => {
+            console.log('page_get_res before post = ', res);
+        });
+
         setCaptionSubmitted(true);
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
@@ -219,9 +229,13 @@ export default function Page({setImageURL, setRounds, channel}) {
             console.log(res);
         })
 
+        await axios.get(getURL + code + "," + roundNumber).then((res) => {
+            console.log('page_get_res after = ', res);
+        });
+
         console.log('payload = ', payload);
 
-        axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+        await axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
             pub(res.data.players.length);
         })
     }

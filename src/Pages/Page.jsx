@@ -206,6 +206,7 @@ export default function Page({setImageURL, setRounds, channel}) {
 
     async function postSubmitCaption() {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
+        console.log('Posting caption');
 
         /**
          * Issue:
@@ -226,8 +227,8 @@ export default function Page({setImageURL, setRounds, channel}) {
         }
 
         await axios.post(postURL, payload).then((res) => {
-            console.log(res);
-        })
+            console.log('posting object = ', res);
+        });
 
         await axios.get(getURL + code + "," + roundNumber).then((res) => {
             console.log('page_get_res after = ', res);

@@ -32,9 +32,9 @@ function Scoreboard({setRoundNumber}) {
         })
 
         console.log('Mounting with roundNumber = ', roundNumber);
-        // if(!host){
-        //     setRoundNumber(roundNumber + 1);
-        // }
+        if(!host){
+            setRoundNumber(roundNumber + 1);
+        }
     }, []);
 
     useEffect(() => {
@@ -63,7 +63,11 @@ function Scoreboard({setRoundNumber}) {
 
 
     function startNextRound() {
+        if (!host)
+            return;
+
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
+        console.log('starting next round');
 
         const payload = {
             game_code: code.toString(),

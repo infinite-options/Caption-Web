@@ -55,6 +55,14 @@ export default function Scoreboard({channel}) {
             await channel.subscribe(newVote => {
                 if (newVote.data.playersLeft == 0) {
                     setEverybodyVoted(true);
+                    
+                    if (host) {
+                        const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+                        axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
+                            console.log('test 2: updating scores');
+                            console.log(res);
+                        })
+                    }
                 }
             });
         }
@@ -65,26 +73,6 @@ export default function Scoreboard({channel}) {
             channel.unsubscribe();
         };
     }, []);
-
-    useEffect(() => {
-        if (!everybodyVoted) {
-            const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-            axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
-                console.log('res = ', res);
-                if (res.data.players_count == 0) {
-                    setEverybodyVoted(true);
-
-                    if (host) {
-                        const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
-                        axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
-                            console.log(res);
-                        })
-                    }
-                }
-            })
-        }
-    });
-
 
     function changeToggle(index) {
         console.log("Called: " + index);

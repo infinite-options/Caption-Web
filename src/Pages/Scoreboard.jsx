@@ -1,4 +1,5 @@
 import React, {useEffect, useState, useContext} from "react";
+import {useHistory} from 'react-router-dom';
 import Pic from "../Assets/sd.jpg";
 import {Row, Col, Card} from "reactstrap";
 import "../Styles/Scoreboard.css";
@@ -9,11 +10,12 @@ import axios from "axios";
 import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 
-function Scoreboard({setRoundNumber}) {
+function Scoreboard({setRoundNumber, channel}) {
 
     const bestCaption = "Two dudes watching the Sharknado trailer";
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
     const [timeStamp, setTimeStamp] = useState();
+    const history = useHistory();
 
     /**
      * Setup grandfather clock for the Scoreboard page
@@ -34,8 +36,26 @@ function Scoreboard({setRoundNumber}) {
         console.log('Mounting with roundNumber = ', roundNumber);
         if(!host){
             setRoundNumber(roundNumber + 1);
+            
+            async function subscribe() 
+            {
+                await channel.subscribe(roundStarted => {
+                    if (roundStarted.data.roundStarted)
+                        history.push('/page');
+                });
+            }
+            
+            subscribe();
+        
+            return function cleanup() {
+                channel.unsubscribe();
+            };
         }
     }, []);
+
+    const pub = () => {
+        channel.publish({data: {roundStarted: true}});
+    }
 
     useEffect(() => {
         console.log('change in roundNumber, it now equals: ', roundNumber);
@@ -74,12 +94,10 @@ function Scoreboard({setRoundNumber}) {
             round_number: roundNumber.toString(),
         }
 
-        axios.post(postURL, payload).then((res) => {
-            console.log('res = ', res);
-            // setTimeStamp(res.data.round_start_time);
-        })
+        axios.post(postURL, payload);
 
         setRoundNumber(roundNumber + 1);
+        pub();
     }
 
 
@@ -185,13 +203,15 @@ function Scoreboard({setRoundNumber}) {
 
 
             <br></br>
-            <Button
-                className="fat"
-                destination="/page"
-                onClick={startNextRound}
-                children="Next Round"
-                conditionalLink={true}
-            />
+            { host ?
+                <Button
+                    className="fat"
+                    destination="/page"
+                    onClick={startNextRound}
+                    children="Next Round"
+                    conditionalLink={true}
+                /> : <></>
+            }
 {/* 
             {grandfatherClock === "gameHasBegun" && !host ?
                 <Button

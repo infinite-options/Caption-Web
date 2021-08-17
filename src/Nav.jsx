@@ -25,6 +25,7 @@ export default function Nav() {
     const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
     const channel_rounds = client.channels.get(`Captions/Rounds/${code}`);
     const channel_voted = client.channels.get(`Captions/Vote/${code}`);
+    const channel_scoreboard = client.channels.get(`Captions/Scoreboard/${code}`);
 
     return (
         <Router>
@@ -44,7 +45,7 @@ export default function Nav() {
 
 
                 <Route exact path='/scoreboard'>
-                    <Scoreboard setRoundNumber = {setRoundNumber} />
+                    <Scoreboard setRoundNumber = {setRoundNumber} channel = {channel_scoreboard} />
                 </Route>
 
                 {/*<Route exact path="/page" component={Page1}/>*/}

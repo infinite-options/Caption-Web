@@ -22,6 +22,7 @@ export default function Scoreboard({channel}) {
     const [everybodyVoted, setEverybodyVoted] = useState(false);
 
     const pub = (playerCount) => {
+        console.log('Publishing in selection with ', playerCount, ' players left to vote');
         channel.publish({data: {playersLeft: playerCount}});
     };
 
@@ -38,6 +39,8 @@ export default function Scoreboard({channel}) {
         axios.get(getURL + code + "," + roundNumber).then((res) => {
             console.log('res = ', res);
             setPlayersArr(res.data.players);
+            if (res.data.players.length === 0)
+                pub(0);
 
             /**
              * Initialize the toggle array with the correct size and populate the array with all false values

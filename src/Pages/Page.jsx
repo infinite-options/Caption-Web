@@ -53,7 +53,7 @@ export default function Page({setImageURL, setRounds, channel}) {
     }
 
     const pub = (playerCount) => {
-        console.log('In pub function');
+        console.log('In pub function with playerCount == ', playerCount);
         channel.publish({data: {playersLeft: playerCount}});
     };
 
@@ -297,9 +297,13 @@ export default function Page({setImageURL, setRounds, channel}) {
                                 colors="#000000"
                                 onComplete={toggleTimeUp}
                             >
-                                {({remainingTime}) => (
-                                    <div className="countdownText">{remainingTime}</div>
-                                )}
+                                {({remainingTime}) => {
+
+                                        if (remainingTime === 0)
+                                            pub(0);
+                                        return (<div className="countdownText">{remainingTime}</div>);
+                                    }
+                                }
                             </CountdownCircleTimer> : <></>}
 
                         </div>
@@ -335,7 +339,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                 <div> Waiting for everybody to submit their captions... <Bubbles items={waitingPlayers}/></div> : <></>}
 
 
-            {timeUp ?
+            {timeUp && host ?
                 <Button
                     className="landing"
                     children="continue"

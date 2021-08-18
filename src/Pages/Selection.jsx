@@ -1,4 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
+import {useHistory} from 'react-router-dom';
 import Pic from "../Assets/sd.jpg";
 // import {Row, Col, Card} from "reactstrap";
 import "../Styles/Scoreboard.css";
@@ -12,6 +13,7 @@ import {LandingContext} from "../App";
 
 export default function Scoreboard({channel}) {
     const {code, roundNumber, imageURL, rounds, host, playerUID} = useContext(LandingContext);
+    const history = useHistory();
     console.log('code = ', code, ', playerUID = ', playerUID);
 
     const [toggleArr, setToggleArr] = useState([]);
@@ -69,16 +71,19 @@ export default function Scoreboard({channel}) {
         async function subscribe() 
         {
             await channel.subscribe(newVote => {
+                console.log('new vote posted!');
                 if (newVote.data.playersLeft == 0) {
-                    setEverybodyVoted(true);
-                    
-                    if (host) {
-                        const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
-                        axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
-                            console.log('test 2: updating scores');
-                            console.log(res);
-                        })
-                    }
+                    console.log('no players left need to vote!');
+                    const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+                    axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
+                        console.log('test 2: updating scores');
+                        console.log(res);
+                    });
+
+                    console.log('all votes in, pushing to /selection');
+                    history.push('/scoreboard');
+                } else {
+                    console.log(`${newVote.data.playersLeft} vote(s) left`);
                 }
             });
         }

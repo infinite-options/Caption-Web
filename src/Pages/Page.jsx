@@ -169,21 +169,16 @@ export default function Page({setImageURL, setRounds, channel}) {
     useEffect(() => {
         async function subscribe() 
         {
-            console.log('waitingPlayers at top of subscribe: ', waitingPlayers);
             await channel.subscribe(newVote => {
-                console.log('newVote: ', newVote, ', waitingPlayers: ', waitingPlayers);
                 const newWaitingPlayers = [];
                 for (let i = 0; i < waitingPlayers.length; i++)
                     if (waitingPlayers[i] !== newVote.data.userWhoVoted)
                         newWaitingPlayers.push(waitingPlayers[i]);
-                
-                console.log('newWaitingPlayers == ', newWaitingPlayers, ' waitingPlayers == ', waitingPlayers);
+
                 if (newVote.data.playersLeft == 0) {
                     // setTimeUp(true);
-                    console.log('in the if -- not setting waitingPlayers and pushing to selection');
                     history.push('/selection');
                 } else {
-                    console.log('in the else -- setting waitingPlayers');
                     setWaitingPlayers(newWaitingPlayers);
                 }
             });

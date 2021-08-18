@@ -57,10 +57,6 @@ function Scoreboard({setRoundNumber, channel}) {
         channel.publish({data: {roundStarted: true}});
     }
 
-    useEffect(() => {
-        console.log('change in roundNumber, it now equals: ', roundNumber);
-    }, [roundNumber]);
-
     function renderReports() {
 
         return (

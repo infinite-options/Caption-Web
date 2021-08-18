@@ -12,7 +12,7 @@ import {LandingContext} from "../App";
 
 
 export default function Scoreboard({channel}) {
-    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID} = useContext(LandingContext);
+    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias} = useContext(LandingContext);
     const history = useHistory();
     console.log('code = ', code, ', playerUID = ', playerUID);
 
@@ -82,17 +82,23 @@ export default function Scoreboard({channel}) {
             await channel.subscribe(newVote => {
                 console.log('new vote posted!');
                 if (newVote.data.playersLeft == 0) {
-                    console.log('no players left need to vote!');
-                    const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
-                    axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
-                        console.log('test 2: updating scores');
-                        console.log(res);
-                    });
+                    const blah = async () => {
+                        console.log('no players left need to vote!');
+                        const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+                        await axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
+                            console.log('test 2: updating scores');
+                            console.log(res);
+                        });
+                        const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
+                        await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
+                            console.log('response for getScoreboard after voting: ', res);
+                        });
+    
+                        history.push('/scoreboard');
+                    }
 
-                    console.log('all votes in, pushing to /selection');
-                    history.push('/scoreboard');
-                } else {
-                    console.log(`${newVote.data.playersLeft} vote(s) left`);
+                    if (host)
+                        blah();
                 }
             });
         }
@@ -130,6 +136,7 @@ export default function Scoreboard({channel}) {
             round_number: roundNumber.toString()
         };
 
+        console.log('user ', alias, ' is posting vote with payload: ', payload);
         await axios.post(postURL, payload).then((res) => {
             console.log(res);
         });

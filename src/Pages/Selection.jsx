@@ -11,8 +11,8 @@ import {LandingContext} from "../App";
 
 
 export default function Scoreboard({channel}) {
-    const {code, roundNumber, imageURL, rounds, host} = useContext(LandingContext);
-    console.log('code = ', code);
+    const {code, roundNumber, imageURL, rounds, host, playerUID} = useContext(LandingContext);
+    console.log('code = ', code, ', playerUID = ', playerUID);
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
@@ -22,7 +22,6 @@ export default function Scoreboard({channel}) {
     const [everybodyVoted, setEverybodyVoted] = useState(false);
 
     const pub = (playerCount) => {
-        console.log('Publishing in selection with ', playerCount, ' players left to vote');
         channel.publish({data: {playersLeft: playerCount}});
     };
 
@@ -37,10 +36,24 @@ export default function Scoreboard({channel}) {
 
         console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
         axios.get(getURL + code + "," + roundNumber).then((res) => {
-            console.log('res = ', res);
-            setPlayersArr(res.data.players);
+            console.log('players_response = ', res.data.players);
+            const temp_players_arr = [];
+            for (let i = 0; i < res.data.players.length; i++)
+                if (res.data.players[i].round_user_uid !== playerUID)
+                    temp_players_arr.push(res.data.players[i]);
+            setPlayersArr(temp_players_arr);
             if (res.data.players.length === 0)
-                pub(0);
+            {
+                async function noPlayersThenSubmit()
+                {
+                    const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+                    await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
+                        pub(res.data.players_count);
+                    });
+                }
+
+                noPlayersThenSubmit();
+            }
 
             /**
              * Initialize the toggle array with the correct size and populate the array with all false values

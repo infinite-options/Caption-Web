@@ -41,7 +41,7 @@ export default function Scoreboard({channel}) {
             console.log('players_response = ', res.data.players);
             const temp_players_arr = [];
             for (let i = 0; i < res.data.players.length; i++)
-                if (res.data.players[i].round_user_uid !== playerUID)
+                // if (res.data.players[i].round_user_uid !== playerUID)
                     temp_players_arr.push(res.data.players[i]);
             setPlayersArr(temp_players_arr);
             if (res.data.players.length === 0)
@@ -73,17 +73,19 @@ export default function Scoreboard({channel}) {
             await channel.subscribe(newVote => {
                 console.log('new vote posted!');
                 if (newVote.data.playersLeft == 0) {
-                    console.log('no players left need to vote!');
-                    const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
-                    axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
-                        console.log('test 2: updating scores');
-                        console.log(res);
-                    });
-
-                    console.log('all votes in, pushing to /selection');
+                    const updateScores = async () => {
+                        const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+                        await axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
+                            console.log('test 2: updating scores');
+                            console.log(res);
+                        });
+                    };
+                    if (host) {
+                        console.log('test 1: calling updateScores!');
+                        updateScores();
+                        console.log('test 3: pushing to scoreboard');
+                    }
                     history.push('/scoreboard');
-                } else {
-                    console.log(`${newVote.data.playersLeft} vote(s) left`);
                 }
             });
         }

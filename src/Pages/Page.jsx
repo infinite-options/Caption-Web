@@ -363,14 +363,14 @@ export default function Page({setImageURL, setRounds, channel}) {
                 <div> Waiting for everybody to submit their captions... <Bubbles items={waitingPlayers}/></div> : <></>}
 
 
-            {timeUp && host ?
+            {/* {timeUp && host ?
                 <Button
                     className="landing"
                     children="continue"
                     destination="/selection"
                     conditionalLink={true}
                 />
-                : <></>}
+                : <></>} */}
         </div>
     );
 }

@@ -20,7 +20,7 @@ export default function Report(props) {
                         }}
                     >
                         <span className="nameTag">{alias}</span>
-                        <span className="pointTag">{totalPts} pts</span>
+                        <span className="pointTag">total: {totalPts} pts</span>
                     </Row>
                     <br></br>
                     <Row>
@@ -39,6 +39,7 @@ export default function Report(props) {
                             font: "Josefin Sans",
                             alignItems: "right",
                             color: "white",
+                            float: "right"
                         }}
                     >
                         {/*<i class="fa fa-thumbs-up fa-2x"></i>*/}
@@ -52,6 +53,7 @@ export default function Report(props) {
                             font: "Josefin Sans",
                             fontSize: "32px",
                             color: "white",
+                            float: "right"
                         }}
                     >
                         {pts} pts

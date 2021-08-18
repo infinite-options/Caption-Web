@@ -159,6 +159,22 @@ selectionBtn1:hover {
   border: none;
 }
 
+.cannotSelectBtn {
+  width: 342px;
+  height: 60px;
+  border-radius: 25px;
+  border-color: black;
+  border-width: 1px;
+  background-color: gray;
+  font-size: 18px;
+  font-weight: normal;
+  line-height: 3;
+}
+.cannotSelectBtn:hover {
+  outline:none;
+  border: none;
+}
+
 
 .selectionBtn2 {
   width: 342px;

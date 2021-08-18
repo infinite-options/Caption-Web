@@ -12,7 +12,7 @@ import {LandingContext} from "../App";
 
 
 export default function Scoreboard({channel}) {
-    const {code, roundNumber, imageURL, rounds, host, playerUID} = useContext(LandingContext);
+    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID} = useContext(LandingContext);
     const history = useHistory();
     console.log('code = ', code, ', playerUID = ', playerUID);
 
@@ -22,6 +22,7 @@ export default function Scoreboard({channel}) {
 
     const [localUserVoted, setLocalUserVoted] = useState(false);
     const [everybodyVoted, setEverybodyVoted] = useState(false);
+    const [SelectedMyCaption, setSelectedMyCaption] = useState(false);
 
     const pub = (playerCount) => {
         channel.publish({data: {playersLeft: playerCount}});
@@ -40,9 +41,17 @@ export default function Scoreboard({channel}) {
         axios.get(getURL + code + "," + roundNumber).then((res) => {
             console.log('players_response = ', res.data.players);
             const temp_players_arr = [];
-            for (let i = 0; i < res.data.players.length; i++)
-                if (res.data.players[i].round_user_uid !== playerUID)
+            for (let i = 0; i < res.data.players.length; i++){
+                if (res.data.players[i].round_user_uid !== gameUID) // "this was playerUID before I changed it" - Loveleen Now it shows all captions
                     temp_players_arr.push(res.data.players[i]);
+                if (res.data.players[i].round_user_uid !== playerUID){
+                    console.log("Made it before disabling");
+                    // document.getElementsByClassName("fat").disabled = true;
+                    console.log("Made it after disabling");
+                }
+                
+            }
+
             setPlayersArr(temp_players_arr);
             if (res.data.players.length === 0)
             {
@@ -100,7 +109,8 @@ export default function Scoreboard({channel}) {
         for (var i = 0; i < toggleArr.length; i++) {
             toggleArr[i] = false;
         }
-        toggleArr[index] = true;
+        if(playersArr[index].round_user_uid !== playerUID)
+            toggleArr[index] = true;
 
         setSelectedCaption(playersArr[index].caption);
 
@@ -142,11 +152,13 @@ export default function Scoreboard({channel}) {
              * @type {number}
              */
             let localIndex = index;
+            let isMyButton = playersArr[index].round_user_uid === playerUID;
+
 
             captions.push(<div>
                 <Button
                     isSelected={toggleArr[index]}
-                    className="selectionBtn1"
+                    className= {isMyButton ? "cannotSelectBtn" : "selectionBtn1"}
 
                     children={playersArr[index].caption}
                     destination="/selection"
@@ -210,6 +222,7 @@ export default function Scoreboard({channel}) {
             {everybodyVoted ?
                 <Button
                     className="fat"
+                    disabled = {SelectedMyCaption}
                     destination= {rounds === roundNumber ? "/endgame" : "/scoreboard"}
                     children="Continue to Scoreboard"
                     conditionalLink={true}

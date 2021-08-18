@@ -17,7 +17,7 @@ import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
 export default function Page({setImageURL, setRounds, channel}) {
-    const {code, roundNumber, host, playerUID, imageURL} = useContext(LandingContext);
+    const {code, roundNumber, host, playerUID, imageURL, alias} = useContext(LandingContext);
     const history = useHistory();
 
     const [caption, setCaption] = useState("");
@@ -42,6 +42,7 @@ export default function Page({setImageURL, setRounds, channel}) {
     const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
     const getImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/";
+    console.log('waitingPlayers after a render: ', waitingPlayers);
 
 
     const handleCaptionChange = (newCaption) => {
@@ -54,7 +55,7 @@ export default function Page({setImageURL, setRounds, channel}) {
 
     const pub = (playerCount) => {
         console.log('In pub function with playerCount == ', playerCount);
-        channel.publish({data: {playersLeft: playerCount}});
+        channel.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
     };
 
     // function transition() {
@@ -95,6 +96,15 @@ export default function Page({setImageURL, setRounds, channel}) {
 
 
             }
+
+            axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+                const totalPlayers = [];
+                for (var i = 0; i < res.data.players.length; i++) {
+                    totalPlayers.push(res.data.players[i].user_alias);
+                }
+                console.log('totalPlayerse == ', totalPlayers);
+                setWaitingPlayers(totalPlayers);
+            })
 
 
             /**
@@ -154,13 +164,27 @@ export default function Page({setImageURL, setRounds, channel}) {
                 }
             }, 2000)
         }, 500)
+    }, []);
 
+    useEffect(() => {
         async function subscribe() 
         {
+            console.log('waitingPlayers at top of subscribe: ', waitingPlayers);
             await channel.subscribe(newVote => {
+                console.log('newVote: ', newVote, ', waitingPlayers: ', waitingPlayers);
+                const newWaitingPlayers = [];
+                for (let i = 0; i < waitingPlayers.length; i++)
+                    if (waitingPlayers[i] !== newVote.data.userWhoVoted)
+                        newWaitingPlayers.push(waitingPlayers[i]);
+                
+                console.log('newWaitingPlayers == ', newWaitingPlayers, ' waitingPlayers == ', waitingPlayers);
                 if (newVote.data.playersLeft == 0) {
                     // setTimeUp(true);
+                    console.log('in the if -- not setting waitingPlayers and pushing to selection');
                     history.push('/selection');
+                } else {
+                    console.log('in the else -- setting waitingPlayers');
+                    setWaitingPlayers(newWaitingPlayers);
                 }
             });
         }
@@ -170,29 +194,29 @@ export default function Page({setImageURL, setRounds, channel}) {
         return function cleanup() {
             channel.unsubscribe();
         };
-    }, []);
+    }, [waitingPlayers])
+
+    console.log('page render');
 
 
     useEffect(() => {
-        setTimeout(function () {
+        // setTimeout(function () {
 
-            if (captionSubmitted) {
-                /**
-                 * Axios.Get() #3
-                 * Recieve the waiting players
-                 */
-                axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
-                    console.log('pageres = ', res);
-                    const readyForNextRound = res.data.players.length == 0;
-                    for (var i = 0; i < res.data.players.length; i++) {
-                        waitingPlayers[i] = res.data.players[i].user_alias;
-                    }
-                    console.log("The waiting players array: " + waitingPlayers);
-                    if (readyForNextRound)
-                        setMoveOn(true);
-                })
-            }
-        }, 2000);
+        //     if (captionSubmitted) {
+        //         /**
+        //          * Axios.Get() #3
+        //          * Recieve the waiting players
+        //          */
+        //         axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+        //             console.log('pageres = ', res);
+        //             const readyForNextRound = res.data.players.length == 0;
+        //             for (var i = 0; i < res.data.players.length; i++) {
+        //                 waitingPlayers[i] = res.data.players[i].user_alias;
+        //             }
+        //             console.log("The waiting players array: " + waitingPlayers);
+        //         })
+        //     }
+        // }, 2000);
     });
 
     function determineLag(current, start) {

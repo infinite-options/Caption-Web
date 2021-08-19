@@ -173,6 +173,7 @@ selectionBtn1:hover {
 .cannotSelectBtn:hover {
   outline:none;
   border: none;
+  cursor: default;
 }
 
 

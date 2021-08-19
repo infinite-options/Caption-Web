@@ -132,10 +132,10 @@ export default function Scoreboard({channel_host, channel_all}) {
         for (var i = 0; i < toggleArr.length; i++) {
             toggleArr[i] = false;
         }
-        if(playersArr[index].round_user_uid !== playerUID)
+        if(playersArr[index].round_user_uid !== playerUID) {
             toggleArr[index] = true;
-
-        setSelectedCaption(playersArr[index].caption);
+            setSelectedCaption(playersArr[index].caption);
+        }
 
         console.log("Result: " + toggleArr);
         // setToggleState(index);
@@ -183,7 +183,6 @@ export default function Scoreboard({channel_host, channel_all}) {
                 <Button
                     isSelected={toggleArr[index]}
                     className= {isMyButton ? "cannotSelectBtn" : "selectionBtn1"}
-
                     children={playersArr[index].caption}
                     destination="/selection"
                     onClick={() => changeToggle(localIndex)}

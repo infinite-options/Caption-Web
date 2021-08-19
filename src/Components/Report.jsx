@@ -1,3 +1,4 @@
+import { throwStatement } from "@babel/types";
 import React from "react";
 import {Row, Col, Card} from "reactstrap";
 import "../Styles/Report.css";
@@ -17,10 +18,11 @@ export default function Report(props) {
                     <Row
                         style={{
                             display: "block",
+                            marginLeft: '10px',
                         }}
                     >
                         <span className="nameTag">{alias}</span>
-                        <span className="pointTag">total: {totalPts} pts</span>
+                        <span className="pointTag" style = {{marginRight: '5px'}}>total: {totalPts} pts</span>
                     </Row>
                     <br></br>
                     <Row>

@@ -62,9 +62,9 @@ function Scoreboard({setRoundNumber, channel}) {
         return (
             <div>
                 {
-                    scoreboardInfo.map((item) => (
+                    scoreboardInfo.map((item, index) => (
                         <Report
-                            isWinner="false"
+                            isWinner={index == 0}
                             alias={item.user_alias}
                             caption={item.caption}
                             points={item.score}

@@ -107,6 +107,8 @@ export default function Scoreboard({channel_host, channel_all}) {
                         console.log('test 1');
                         await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
                             console.log('test 2. res.data: ', res.data);
+                            res.data.scoreboard.sort((a, b) => (b.score - a.score));
+                            console.log('scoreboard: ', res.data.scoreboard);
                             setScoreboardInfo(res.data.scoreboard);
                         });
                         console.log('test 3');

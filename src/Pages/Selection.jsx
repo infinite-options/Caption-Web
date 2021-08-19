@@ -80,25 +80,17 @@ export default function Scoreboard({channel}) {
         async function subscribe() 
         {
             await channel.subscribe(newVote => {
-                console.log('new vote posted!');
                 if (newVote.data.playersLeft == 0) {
                     const blah = async () => {
-                        console.log('no players left need to vote!');
                         const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
-                        await axios.get(getUpdateScoresURL + code + "," + roundNumber).then((res) => {
-                            console.log('test 2: updating scores');
-                            console.log(res);
-                        });
-                        const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
-                        await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
-                            console.log('response for getScoreboard after voting: ', res);
-                        });
-    
+                        console.log('test1');
+                        if (host)
+                            await axios.get(getUpdateScoresURL + code + "," + roundNumber).then(() => console.log('test2'));
+                        console.log('test3');
                         history.push('/scoreboard');
                     }
 
-                    if (host)
-                        blah();
+                    blah();
                 }
             });
         }

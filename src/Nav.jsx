@@ -24,7 +24,8 @@ export default function Nav() {
     const channel_page = client.channels.get(`Captions/Page/${code}`);
     const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
     const channel_rounds = client.channels.get(`Captions/Rounds/${code}`);
-    const channel_voted = client.channels.get(`Captions/Vote/${code}`);
+    const channel_voted_host = client.channels.get(`Captions/Vote/Host/${code}`);
+    const channel_voted_all = client.channels.get(`Captions/Vote/All/${code}`);
     const channel_scoreboard = client.channels.get(`Captions/Scoreboard/${code}`);
 
     return (
@@ -54,7 +55,7 @@ export default function Nav() {
                 </Route>
 
                 <Route exact path="/selection" >
-                    <Selection channel = {channel_voted}/>
+                    <Selection channel_host = {channel_voted_host} channel_all = {channel_voted_all}/>
                 </Route>
 
                 <Route exact path='/waiting'>

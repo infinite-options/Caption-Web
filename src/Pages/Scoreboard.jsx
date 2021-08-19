@@ -13,7 +13,6 @@ import {LandingContext} from "../App";
 function Scoreboard({setRoundNumber, channel}) {
 
     const bestCaption = "Two dudes watching the Sharknado trailer";
-    const [scoreboardInfo, setScoreboardInfo] = useState([]);
     const [timeStamp, setTimeStamp] = useState();
     const history = useHistory();
 
@@ -23,17 +22,18 @@ function Scoreboard({setRoundNumber, channel}) {
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
 
-    const {code, roundNumber, host, imageURL} = useContext(LandingContext);
+    const {code, roundNumber, host, imageURL, alias, scoreboardInfo} = useContext(LandingContext);
 
 
     useEffect(() => {
-        const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
-        axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
-            console.log(res);
-            setScoreboardInfo(res.data.scoreboard);
-        })
+        // const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
+        // console.log('roundNumber = ', roundNumber);
+        // axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
+        //     console.log('scoreboard res = ', res);
+        //     setScoreboardInfo(res.data.scoreboard);
+        // });
+        console.log('scoreboardInfo = ', scoreboardInfo);
 
-        console.log('Mounting with roundNumber = ', roundNumber);
         if(!host){
             setRoundNumber(roundNumber + 1);
             
@@ -51,7 +51,7 @@ function Scoreboard({setRoundNumber, channel}) {
                 channel.unsubscribe();
             };
         }
-    }, []);
+    }, [scoreboardInfo]);
 
     const pub = () => {
         channel.publish({data: {roundStarted: true}});

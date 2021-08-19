@@ -11,8 +11,8 @@ import axios from "axios";
 import {LandingContext} from "../App";
 
 
-export default function Scoreboard({channel}) {
-    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias} = useContext(LandingContext);
+export default function Scoreboard({channel_host, channel_all}) {
+    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo} = useContext(LandingContext);
     const history = useHistory();
     console.log('code = ', code, ', playerUID = ', playerUID);
 
@@ -24,8 +24,12 @@ export default function Scoreboard({channel}) {
     const [everybodyVoted, setEverybodyVoted] = useState(false);
     const [SelectedMyCaption, setSelectedMyCaption] = useState(false);
 
-    const pub = (playerCount) => {
-        channel.publish({data: {playersLeft: playerCount}});
+    const pub_host = (playerCount) => {
+        channel_host.publish({data: {playersLeft: playerCount}});
+    };
+
+    const pub_all = () => {
+        channel_all.publish({data: {everybodyVoted: true}});
     };
 
     useEffect(() => {
@@ -59,7 +63,7 @@ export default function Scoreboard({channel}) {
                 {
                     const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
                     await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
-                        pub(res.data.players_count);
+                        pub_host(res.data.players_count);
                     });
                 }
 
@@ -77,28 +81,49 @@ export default function Scoreboard({channel}) {
 
         console.log("Toggle Arr: " + toggleArr);
 
-        async function subscribe() 
+        async function subscribe_host() 
         {
-            await channel.subscribe(newVote => {
+            await channel_host.subscribe(newVote => {
                 if (newVote.data.playersLeft == 0) {
                     const blah = async () => {
                         const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
-                        console.log('test1');
                         if (host)
-                            await axios.get(getUpdateScoresURL + code + "," + roundNumber).then(() => console.log('test2'));
-                        console.log('test3');
-                        history.push('/scoreboard');
+                            await axios.get(getUpdateScoresURL + code + "," + roundNumber);
+                        pub_all();
                     }
 
                     blah();
                 }
             });
         }
+
+        async function subscribe_all()
+        {
+            await channel_all.subscribe(ping => {
+                const getNewScoreboard = async () => {
+                    if (ping.data.everybodyVoted)
+                    {
+                        const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
+                        console.log('test 1');
+                        await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
+                            console.log('test 2. res.data: ', res.data);
+                            setScoreboardInfo(res.data.scoreboard);
+                        });
+                        console.log('test 3');
+                        history.push('/scoreboard');
+                    }
+                };
+                getNewScoreboard();
+            })
+        }
         
-        subscribe();
+        if (host)
+            subscribe_host();
+        subscribe_all();
     
         return function cleanup() {
-            channel.unsubscribe();
+            channel_host.unsubscribe();
+            channel_all.unsubscribe();
         };
     }, []);
 
@@ -136,7 +161,7 @@ export default function Scoreboard({channel}) {
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
         await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
             console.log('publishing with res.data.players_count = ', res.data.players_count);
-            pub(res.data.players_count);
+            pub_host(res.data.players_count);
         });
     }
 

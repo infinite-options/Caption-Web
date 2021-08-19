@@ -18,6 +18,7 @@ export default function App() {
     const [playerUID, setPlayerUID] = useState("");
     const [roundNumber, setRoundNumber] = useState(1);
     const [imageURL, setImageURL] = useState("");
+    const [scoreboardInfo, setScoreboardInfo] = useState([]);
 
 
     return (
@@ -46,7 +47,9 @@ export default function App() {
                 setHost,
                 setRoundNumber,
                 setPlayerUID,
-                setImageURL
+                setImageURL,
+                scoreboardInfo,
+                setScoreboardInfo,
             }}>
                 <Nav/>
             </LandingContext.Provider>

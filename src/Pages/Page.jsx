@@ -89,7 +89,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                  */
 
                 axios.get(getImageInRound + code + "," + roundNumber).then((res) => {
-                    console.log(res);
+                    console.log('getUnique res: ', res);
                     // setImageSrc(res.data.image_url);
                     setImageURL(res.data.image_url);
                 })

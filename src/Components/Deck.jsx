@@ -18,10 +18,9 @@ export default function DeckCard(props) {
             round_number: roundNumber.toString(),
         };
 
+        console.log('payload for deck = ', payload);
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
-        axios.post(postURL, payload).then((res) => {
-            console.log(res);
-        })
+        axios.post(postURL, payload);
     }
 
     return (

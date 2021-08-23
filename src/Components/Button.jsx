@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import "../Styles/Button.css";
 import {Link} from "react-router-dom";
+import {Typography} from '@material-ui/core';
 
 const STYLES = ["btn--primary", "btn--outline", "btn--test"];
 
@@ -29,8 +30,12 @@ const Button = ({
                 className={isSelected ? className + " selected" : className}
                 onClick={onClick}
                 type={type}
-                children={children}
-            />
+                // children={children}
+            >
+                <Typography noWrap>
+                    {children}
+                </Typography>
+            </button>
 
             {/*className={`btn ${checkButtonStyle} ${checkButtonSize}`}*/}
             {/*className={className}*/}

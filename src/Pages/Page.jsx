@@ -41,7 +41,7 @@ export default function Page({setImageURL, setRounds, channel}) {
     const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
     const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
-    const getImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+    const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/";
     console.log('waitingPlayers after a render: ', waitingPlayers);
 
 
@@ -85,10 +85,11 @@ export default function Page({setImageURL, setRounds, channel}) {
                 })
 
                 /**
-                 * In the host I need to call --> getImageinRound
+                 * In the host I need to call --> getUniqueImageinRound
                  */
 
-                axios.get(getImageInRound + code + "," + roundNumber).then((res) => {
+                console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
+                axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
                     console.log('getUnique res: ', res);
                     // setImageSrc(res.data.image_url);
                     setImageURL(res.data.image_url);

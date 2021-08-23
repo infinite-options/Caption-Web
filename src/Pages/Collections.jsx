@@ -48,9 +48,9 @@ function Collections() {
         axios.get(getURL).then((res) => {
             console.log(res);
             setDeckArray(res.data.decks_info);
+            console.log('deckArray: ', res.data.decks_info);
         })
     }, []);
-
 
 
     return (

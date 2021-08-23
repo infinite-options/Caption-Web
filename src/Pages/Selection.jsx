@@ -34,6 +34,7 @@ export default function Scoreboard({channel_host, channel_all}) {
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
+        console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
 
         /**
          * Issue:
@@ -112,7 +113,10 @@ export default function Scoreboard({channel_host, channel_all}) {
                             setScoreboardInfo(res.data.scoreboard);
                         });
                         console.log('test 3');
-                        history.push('/scoreboard');
+                        if (rounds <= roundNumber)
+                            history.push('/endgame');
+                        else
+                            history.push('/scoreboard');
                     }
                 };
                 getNewScoreboard();

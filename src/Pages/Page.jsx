@@ -139,12 +139,17 @@ export default function Page({setImageURL, setRounds, channel}) {
                     let clientClock = new Date().getSeconds();
 
                     if(res.data.round_started_at != undefined){
+                        console.log('clock-log0: round_started_at = ', res.data.round_started_at);
                         var c = serverClock;
-                        console.log("current second = " + c);
+                        console.log("clock-log1: current second = " + c);
                         var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                        console.log("started second = " + s);
-                        var d = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                        console.log("round duration = " + d);
+                        console.log("clock-log2: started second = " + s);
+                        console.log('clock-log2.5: res.data.round_duration: ', res.data.round_duration);
+                        const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                        const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+                        console.log('clock-log2.75: d_mins = ', d_mins, ', d_seconds = ', d_secs);
+                        var d = d_mins * 60 + d_secs;
+                        console.log("clock-log3: round duration = " + d);
                         setTimerDuration(d - determineLag(c, s));
                         console.log(timerDuration);
                     }

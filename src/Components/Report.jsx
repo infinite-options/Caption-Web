@@ -2,6 +2,7 @@ import { throwStatement } from "@babel/types";
 import React from "react";
 import {Row, Col, Card} from "reactstrap";
 import "../Styles/Report.css";
+import {Typography} from '@material-ui/core';
 
 export default function Report(props) {
     const alias = props.alias;
@@ -28,10 +29,16 @@ export default function Report(props) {
                     <Row>
                         {isWinner ? (
                             <Card className="card1" style={{backgroundColor: "yellow"}}>
-                                {caption}
+                                <Typography noWrap>
+                                    {caption}
+                                </Typography>
                             </Card>
                         ) : (
-                            <Card className="card1" style={{backgroundColor: "white"}}>{caption}</Card>
+                            <Card className="card1" style={{backgroundColor: "white"}}>
+                                <Typography noWrap>
+                                    {caption}
+                                </Typography>
+                            </Card>
                         )}
                     </Row>
                 </Col>

@@ -44,6 +44,10 @@ export default function Scoreboard({channel_host, channel_all}) {
 
         console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
         axios.get(getURL + code + "," + roundNumber).then((res) => {
+            if (res.data.players.length <= 1) {
+                console.log('Test-phase1: Publishing to host');
+                pub_host(0);
+            }
             console.log('players_response = ', res.data.players);
             const temp_players_arr = [];
             for (let i = 0; i < res.data.players.length; i++){
@@ -58,7 +62,7 @@ export default function Scoreboard({channel_host, channel_all}) {
             }
 
             setPlayersArr(temp_players_arr);
-            if (res.data.players.length === 0)
+            if (res.data.players.length <= 1)
             {
                 async function noPlayersThenSubmit()
                 {
@@ -86,6 +90,7 @@ export default function Scoreboard({channel_host, channel_all}) {
         {
             await channel_host.subscribe(newVote => {
                 console.log('Countdown on voting screen: PlayersLeft = ', newVote.data.playersLeft);
+                console.log('Test-phase2: playerCount = ', newVote.data.playersLeft);
                 if (newVote.data.playersLeft == 0) {
                     const blah = async () => {
                         const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";

@@ -170,6 +170,7 @@ export default function Page({setImageURL, setRounds, channel}) {
         async function subscribe() 
         {
             await channel.subscribe(newVote => {
+                console.log('Countdown on submit-caption screen: PlayersLeft = ', newVote.data.playersLeft);
                 const newWaitingPlayers = [];
                 for (let i = 0; i < waitingPlayers.length; i++)
                     if (waitingPlayers[i] !== newVote.data.userWhoVoted)

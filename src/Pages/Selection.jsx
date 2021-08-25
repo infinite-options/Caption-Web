@@ -85,6 +85,7 @@ export default function Scoreboard({channel_host, channel_all}) {
         async function subscribe_host() 
         {
             await channel_host.subscribe(newVote => {
+                console.log('Countdown on voting screen: PlayersLeft = ', newVote.data.playersLeft);
                 if (newVote.data.playersLeft == 0) {
                     const blah = async () => {
                         const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";

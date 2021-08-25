@@ -41,7 +41,7 @@ export default function Page({setImageURL, setRounds, channel}) {
     const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
     const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
-    const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageInRound/";
+    const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
     console.log('waitingPlayers after a render: ', waitingPlayers);
 
 
@@ -139,17 +139,11 @@ export default function Page({setImageURL, setRounds, channel}) {
                     let clientClock = new Date().getSeconds();
 
                     if(res.data.round_started_at != undefined){
-                        console.log('clock-log0: round_started_at = ', res.data.round_started_at);
                         var c = serverClock;
-                        console.log("clock-log1: current second = " + c);
                         var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                        console.log("clock-log2: started second = " + s);
-                        console.log('clock-log2.5: res.data.round_duration: ', res.data.round_duration);
                         const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
                         const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
-                        console.log('clock-log2.75: d_mins = ', d_mins, ', d_seconds = ', d_secs);
                         var d = d_mins * 60 + d_secs;
-                        console.log("clock-log3: round duration = " + d);
                         setTimerDuration(d - determineLag(c, s));
                         console.log(timerDuration);
                     }

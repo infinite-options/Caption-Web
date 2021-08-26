@@ -107,76 +107,52 @@ export default function Page({setImageURL, setRounds, channel}) {
                 setWaitingPlayers(totalPlayers);
             })
 
-
             /**
-             * Mayukh: This is officially the worst way to synchronize any asynchronous axios code.
+             * Axios.Get() #4
+             * Determine the amount of time left on the countdown timer.
+             *
+             * s = the second at which the round has started
+             * c = the second at which the clock is currently on
+             * d = the seconds for the duration of the round
              */
-            // setTimeout(function () {
-                /**
-                 * Axios.Get() #4
-                 * Determine the amount of time left on the countdown timer.
-                 *
-                 * s = the second at which the round has started
-                 * c = the second at which the clock is currently on
-                 * d = the seconds for the duration of the round
-                 */
-                console.log("Log 2: Finish Posting");
-                console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber, ` fullURL = ${getTimerURL + code + "," + roundNumber}`);
-                await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                    console.log('res = ', res.data);
-                    console.log("Timer URL Succeeded")
-                    console.log("Log 3: Finish Posting");
+            console.log("Log 2: Finish Posting");
+            console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber, ` fullURL = ${getTimerURL + code + "," + roundNumber}`);
+            await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                console.log('res = ', res.data);
 
-                    setRounds(res.data.total_number_of_rounds);
+                setRounds(res.data.total_number_of_rounds);
 
-                    /**
-                     * This c variable records the value of the seconds within the 'server clock'
-                     * @type {number}
-                     */
-                    let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
+                let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
+                if(res.data.round_started_at != undefined){
+                    var c = serverClock;
+                    var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                    const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                    const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+                    var d = d_mins * 60 + d_secs;
+                    console.log("setTimerDuration: ", d - determineLag(c, s));
+                    setTimerDuration(d - determineLag(c, s));
 
-                    /**
-                     * This c variable records the value of the seconds within the 'client clock'
-                     * @type {number}
-                     */
-                    let clientClock = new Date().getSeconds();
-
-                    if(res.data.round_started_at != undefined){
-                        var c = serverClock;
-                        var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                        const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                        const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
-                        var d = d_mins * 60 + d_secs;
-                        console.log("setTimerDuration: ", d - determineLag(c, s));
-                        setTimerDuration(d - determineLag(c, s));
-
-                        console.log(timerDuration);
-                    }
-                })
-                .catch(err => console.log("timer failed"))
-
-
-                // if (imageURL === "") {
-                if(!host){
-                    /**
-                     * Axios.Get() #2
-                     * Receive the image url
-                     */
-                    await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
-                        console.log(res);
-                        // setImageSrc(res.data.image_url);
-                        setImageURL(res.data.image_url);
-                    })
+                    console.log(timerDuration);
                 }
-            // }, 2000)
-        // }, 500)
-            }
-            pageAsyc();
-    }, []);
+            })
+            .catch(err => console.log("timer failed"))
 
-    useEffect(() => {
-        console.log("timerDuration: ", timerDuration);
-    }, [timerDuration])
+
+            // if (imageURL === "") {
+            if(!host){
+                /**
+                 * Axios.Get() #2
+                 * Receive the image url
+                 */
+                await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
+                    console.log(res);
+                    // setImageSrc(res.data.image_url);
+                    setImageURL(res.data.image_url);
+                })
+            }
+        }
+        pageAsyc();
+    }, []);
 
     useEffect(() => {
         async function subscribe() 
@@ -202,9 +178,7 @@ export default function Page({setImageURL, setRounds, channel}) {
         return function cleanup() {
             channel.unsubscribe();
         };
-    }, [waitingPlayers])
-
-    console.log('page render');
+    }, [waitingPlayers]);
 
 
     useEffect(() => {

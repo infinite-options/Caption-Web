@@ -65,9 +65,9 @@ export default function Page({setImageURL, setRounds, channel}) {
 
     useEffect(() => {
 
-        setTimeout(function () {
+        // setTimeout(function () {
 
-
+        async function pageAsyc(){
             /**
              * Mayukh: I don't know why this works, but I am sure that the getTimer endpoint must be called after startPlaying.
              * By arranging the endpoint calls in this fashion, I am able to create a 'magical' delay that works in my favor.
@@ -78,7 +78,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                  * Axios.Get() #1
                  * Start the round
                  */
-                axios.get(startPlayingURL + code + "," + roundNumber).then((res) => {
+                await axios.get(startPlayingURL + code + "," + roundNumber).then((res) => {
                     console.log(res);
                     setRoundStartTime(res.data.round_start_time);
                     setRoundHasStarted(true);
@@ -89,7 +89,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                  */
 
                 console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
-                axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
+                await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
                     console.log('getUnique res: ', res);
                     // setImageSrc(res.data.image_url);
                     setImageURL(res.data.image_url);
@@ -98,7 +98,7 @@ export default function Page({setImageURL, setRounds, channel}) {
 
             }
 
-            axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+            await axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
                 const totalPlayers = [];
                 for (var i = 0; i < res.data.players.length; i++) {
                     totalPlayers.push(res.data.players[i].user_alias);
@@ -111,7 +111,7 @@ export default function Page({setImageURL, setRounds, channel}) {
             /**
              * Mayukh: This is officially the worst way to synchronize any asynchronous axios code.
              */
-            setTimeout(function () {
+            // setTimeout(function () {
                 /**
                  * Axios.Get() #4
                  * Determine the amount of time left on the countdown timer.
@@ -120,9 +120,12 @@ export default function Page({setImageURL, setRounds, channel}) {
                  * c = the second at which the clock is currently on
                  * d = the seconds for the duration of the round
                  */
+                console.log("Log 2: Finish Posting");
                 console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber, ` fullURL = ${getTimerURL + code + "," + roundNumber}`);
-                axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
                     console.log('res = ', res.data);
+                    console.log("Timer URL Succeeded")
+                    console.log("Log 3: Finish Posting");
 
                     setRounds(res.data.total_number_of_rounds);
 
@@ -144,10 +147,13 @@ export default function Page({setImageURL, setRounds, channel}) {
                         const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
                         const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
                         var d = d_mins * 60 + d_secs;
+                        console.log("setTimerDuration: ", d - determineLag(c, s));
                         setTimerDuration(d - determineLag(c, s));
+
                         console.log(timerDuration);
                     }
                 })
+                .catch(err => console.log("timer failed"))
 
 
                 // if (imageURL === "") {
@@ -156,15 +162,21 @@ export default function Page({setImageURL, setRounds, channel}) {
                      * Axios.Get() #2
                      * Receive the image url
                      */
-                    axios.get(getImageURL + code + "," + roundNumber).then((res) => {
+                    await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
                         console.log(res);
                         // setImageSrc(res.data.image_url);
                         setImageURL(res.data.image_url);
                     })
                 }
-            }, 2000)
-        }, 500)
+            // }, 2000)
+        // }, 500)
+            }
+            pageAsyc();
     }, []);
+
+    useEffect(() => {
+        console.log("timerDuration: ", timerDuration);
+    }, [timerDuration])
 
     useEffect(() => {
         async function subscribe() 

@@ -8,10 +8,11 @@ import {Row, Col, Card} from "reactstrap";
 import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 import Form from "../Components/Form";
+import {useHistory} from "react-router-dom";
 
 
-export default function Rounds({setRounds, setRoundDuration, channel}) {
-
+export default function Rounds({setRounds, setRoundDuration, channel }) {
+    const history = useHistory();
     const {code, rounds, roundDuration} = useContext(LandingContext);
 
 
@@ -28,8 +29,10 @@ export default function Rounds({setRounds, setRoundDuration, channel}) {
     };
 
     const pub = ()=> {
-        console.log('sending players to start game')
+        console.log('sending players to start game');
+        console.log("Log 1.5: Finish Posting");
         channel.publish({data: {gameStarted: true}});
+        history.push("/page");
     };
 
     function postRoundInfo() {
@@ -41,11 +44,16 @@ export default function Rounds({setRounds, setRoundDuration, channel}) {
         };
 
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/changeRoundsAndDuration";
-        axios.post(postURL, payload).then((res) => {
-            console.log(res);
-        })
-        
-        pub();
+        async function postedPub() {
+            await axios.post(postURL, payload).then((res) => {
+                console.log(res);
+            })
+            console.log("Log 1: Finish Posting");
+            pub();
+            
+        }
+        postedPub();
+  
     }
 
 
@@ -90,7 +98,7 @@ export default function Rounds({setRounds, setRoundDuration, channel}) {
 
             <br></br>
 
-            <Button className="landing" conditionalLink={true} destination="/page" onClick={postRoundInfo}
+            <Button className="landing" conditionalLink={true} onClick={postRoundInfo}
                     children="Start Playing"/>
 
         </div>

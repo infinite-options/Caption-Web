@@ -89,11 +89,15 @@ function Scoreboard({setRoundNumber, channel}) {
             game_code: code.toString(),
             round_number: roundNumber.toString(),
         }
+        async function nextPub(){
+            await axios.post(postURL, payload);
 
-        axios.post(postURL, payload);
-
-        setRoundNumber(roundNumber + 1);
-        pub();
+            setRoundNumber(roundNumber + 1);
+            pub();
+            history.push("/page");
+        }
+        
+        nextPub();
     }
 
 
@@ -202,7 +206,7 @@ function Scoreboard({setRoundNumber, channel}) {
             { host ?
                 <Button
                     className="fat"
-                    destination="/page"
+                    // destination="/page"
                     onClick={startNextRound}
                     children="Next Round"
                     conditionalLink={true}

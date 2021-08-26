@@ -23,9 +23,10 @@ export default function Scoreboard({channel_host, channel_all}) {
     const [localUserVoted, setLocalUserVoted] = useState(false);
     const [everybodyVoted, setEverybodyVoted] = useState(false);
     const [SelectedMyCaption, setSelectedMyCaption] = useState(false);
+    const [waitingOnPlayers, setwaitingOnPlayers] = useState([]);
 
     const pub_host = (playerCount) => {
-        channel_host.publish({data: {playersLeft: playerCount}});
+        channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
     };
 
     const pub_all = () => {
@@ -34,13 +35,26 @@ export default function Scoreboard({channel_host, channel_all}) {
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
-        console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
+        // const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
+        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
 
+        console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
+        
         /**
          * Issue:
          * The user should not be able to select/vote for their own caption.
          * Should be easy --> match internal state with info in the endpoint result.
          */
+        
+        // axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
+        //     console.log("notVotedRes: " , res);
+        //     const totalPlayers = [];
+        //     for (var i = 0; i < res.data.players.length; i++) {
+        //         totalPlayers.push(res.data.players[i].user_alias);
+        //     }
+        //     console.log('totalPlayers === ', totalPlayers);
+        //     setwaitingOnPlayers(totalPlayers);
+        // })
 
         console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
         axios.get(getURL + code + "," + roundNumber).then((res) => {
@@ -122,6 +136,16 @@ export default function Scoreboard({channel_host, channel_all}) {
                         else
                             history.push('/scoreboard');
                     }
+                    // else {
+                    //     const newWaitingOnPlayers =[];
+                    //     for(const players of waitingOnPlayers){
+                    //         if (players !== ping.data.userWhoVoted){
+                    //             newWaitingOnPlayers.push(players);
+                                
+                    //         }
+                    //     }
+                    //     setwaitingOnPlayers(newWaitingOnPlayers);
+                    // }
                 };
                 getNewScoreboard();
             })
@@ -136,6 +160,7 @@ export default function Scoreboard({channel_host, channel_all}) {
             channel_all.unsubscribe();
         };
     }, []);
+    console.log("WaitingOnPlayers: ", waitingOnPlayers);
 
     function changeToggle(index) {
         console.log("Called: " + index);

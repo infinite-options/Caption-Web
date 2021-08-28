@@ -8,8 +8,9 @@
 }
 
 .card1 {
-  height: 60px;
-  width: 200px;
+  /* height: 60px;
+  width: 200px; */
+  display: flex;
   /* padding: 20px; */
   border-radius: 25px;
   font-size: 14px;
@@ -24,9 +25,11 @@
   color: white;
   float: left;
   font-size: 14px;
+  flex-grow: 1;
 }
 
 .pointTag {
   color: white;
   float: right;
+  flex-grow: 1;
 }

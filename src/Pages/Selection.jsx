@@ -58,10 +58,10 @@ export default function Scoreboard({channel_host, channel_all}) {
 
         console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
         axios.get(getURL + code + "," + roundNumber).then((res) => {
-            if (res.data.players.length <= 1) {
-                console.log('Test-phase1: Publishing to host');
-                pub_host(0);
-            }
+            // if (res.data.players.length <= 1) {
+            //     console.log('Test-phase1: Publishing to host');
+            //     pub_host(0);
+            // }
             console.log('players_response = ', res.data.players);
             const temp_players_arr = [];
             for (let i = 0; i < res.data.players.length; i++){
@@ -80,13 +80,27 @@ export default function Scoreboard({channel_host, channel_all}) {
             {
                 async function noPlayersThenSubmit()
                 {
-                    const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-                    await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
-                        pub_host(res.data.players_count);
-                    });
+                    if (res.data.players[0].round_user_uid != playerUID) {
+                        console.log('default vote for user ', alias);
+                        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+                        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
+    
+                        const payload = {
+                            caption: res.data.players[0].caption,
+                            game_code: code.toString(),
+                            round_number: roundNumber.toString()
+                        };
+
+                        await axios.post(postURL, payload).then((res) => {
+                            console.log(res);
+                        });
+                        await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then(res => console.log('pwhv response = ', res.data));
+                    } else
+                        pub_host(0);
                 }
 
-                noPlayersThenSubmit();
+                if (res.data.players.length == 1)
+                    noPlayersThenSubmit();
             }
 
             /**
@@ -177,6 +191,7 @@ export default function Scoreboard({channel_host, channel_all}) {
     }
 
     async function postVote() {
+        console.log('postVote called');
 
         setLocalUserVoted(true);
 

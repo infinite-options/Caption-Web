@@ -14,7 +14,58 @@ export default function Report(props) {
 
     return (
         <div className="container">
-            <Row>
+            <div style = {{display: 'flex'}}>
+                <div className="nameTag">{alias}</div>
+                <div className="pointTag" style = {{marginRight: '5px'}}>total: {totalPts} pts</div>
+                <div
+                    style={{
+                        font: "Josefin Sans",
+                        alignItems: "right",
+                        color: "white",
+                        float: "right"
+                    }}
+                >
+                    {votes} votes
+                </div>
+            </div>
+
+            <div style = {{display: 'flex'}}>
+                <div style = {{width: '226px'}}>
+                    {isWinner ? (
+                        <Card className="card1" style={{backgroundColor: "yellow", display: 'flex'}}>
+                            <Typography>
+                                {caption}
+                            </Typography>
+                        </Card>
+                    ) : (
+                        <Card className="card1" style={{backgroundColor: "white"}}>
+                            <Typography>
+                                {caption}
+                            </Typography>
+                        </Card>
+                    )}
+                </div>
+
+                <div
+                    style={{
+                        display: 'flex',
+                        flexGrow: '1',
+                    }}
+                >
+                    <Typography style = {{
+                        flexGrow: '1',
+                        textAlign: 'right',
+                        font: "Josefin Sans",
+                        fontSize: "32px",
+                        color: "white",
+                    }}>
+                        {pts} pts
+                    </Typography>
+                </div>
+            </div>
+
+
+            {/* <Row>
                 <Col>
                     <Row
                         style={{
@@ -26,10 +77,10 @@ export default function Report(props) {
                         <span className="pointTag" style = {{marginRight: '5px'}}>total: {totalPts} pts</span>
                     </Row>
                     <br></br>
-                    <Row>
+                    <Row style = {{display: 'flex', border: '2px solid red'}}>
                         {isWinner ? (
-                            <Card className="card1" style={{backgroundColor: "yellow"}}>
-                                <Typography noWrap>
+                            <Card className="card1" style={{backgroundColor: "yellow", width: '800px', border: '10px solid green'}}>
+                                <Typography style = {{border: '2px solid red'}}>
                                     {caption}
                                 </Typography>
                             </Card>
@@ -51,7 +102,6 @@ export default function Report(props) {
                             float: "right"
                         }}
                     >
-                        {/*<i class="fa fa-thumbs-up fa-2x"></i>*/}
                         <span style={{marginLeft: "40px"}}/>
                         {votes} votes
                     </Row>
@@ -68,7 +118,7 @@ export default function Report(props) {
                         {pts} pts
                     </Row>
                 </Col>
-            </Row>
+            </Row> */}
         </div>
     );
 }

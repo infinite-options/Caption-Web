@@ -31,11 +31,20 @@ const Button = ({
                 onClick={onClick}
                 type={type}
                 // children={children}
+                // style={{border: "10px solid green"}}
+                
             >
-                {/* <Typography noWrap> */}
+                <Typography noWrap 
+                style={{
+                    display:"flex",
+                    flexGrow: "1",
+                    alignItems:"center",
+                    // border: "10px solid red"
+                  }}
+                >
                 <div style={{}}>{children}</div>
                     
-                {/* </Typography> */}
+                </Typography>
             </button>
 
             {/*className={`btn ${checkButtonStyle} ${checkButtonSize}`}*/}

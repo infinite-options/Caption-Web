@@ -314,4 +314,3 @@ export default function Scoreboard({channel_host, channel_all}) {
         </div>
     );
 };
-

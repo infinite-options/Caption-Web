@@ -19,6 +19,9 @@
 
 .container {
   max-width: 500px;
+  display: grid;
+  grid-template: 1fr;
+  /* flex-direction: row; */
 }
 
 .nameTag {

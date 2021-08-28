@@ -1,71 +1,74 @@
 import { throwStatement } from "@babel/types";
 import React from "react";
-import {Row, Col, Card} from "reactstrap";
+import { Row, Col, Card } from "reactstrap";
 import "../Styles/Report.css";
-import {Typography} from '@material-ui/core';
+import { Typography } from "@material-ui/core";
 
 export default function Report(props) {
-    const alias = props.alias;
-    const caption = props.caption;
-    const pts = props.points;
-    const totalPts = props.totalPts;
-    const votes = props.votes;
-    const isWinner = props.isWinner;
+  const alias = props.alias;
+  const caption = props.caption;
+  const pts = props.points;
+  const totalPts = props.totalPts;
+  const votes = props.votes;
+  const isWinner = props.isWinner;
 
-    return (
-        <div className="container">
-            <div style = {{display: 'flex'}}>
-                <div className="nameTag">{alias}</div>
-                <div className="pointTag" style = {{marginRight: '5px'}}>total: {totalPts} pts</div>
-                <div
-                    style={{
-                        font: "Josefin Sans",
-                        alignItems: "right",
-                        color: "white",
-                        float: "right"
-                    }}
-                >
-                    {votes} votes
-                </div>
-            </div>
+  return (
+    <div className="container">
+      <div style={{ display: "block"}}>
+        <div className="nameTag" style={{float:"left"}}>{alias}</div>
+        <div
+          style={{
+            marginRight: "0px",
+            font: "Josefin Sans",
+            alignItems: "right",
+            color: "white",
+            float: "right",
+          }}
+        >
+          {votes} votes
+        </div>
+        <div className="pointTag" style={{ marginRight: "70px" }}>
+          total: {totalPts} pts
+        </div>
+      </div>
 
-            <div style = {{display: 'flex'}}>
-                <div style = {{width: '226px'}}>
-                    {isWinner ? (
-                        <Card className="card1" style={{backgroundColor: "yellow", display: 'flex'}}>
-                            <Typography>
-                                {caption}
-                            </Typography>
-                        </Card>
-                    ) : (
-                        <Card className="card1" style={{backgroundColor: "white"}}>
-                            <Typography>
-                                {caption}
-                            </Typography>
-                        </Card>
-                    )}
-                </div>
+      <div style={{ display: "flex" }}>
+        <div style={{ width: "226px" }}>
+          {isWinner ? (
+            <Card
+              className="card1"
+              style={{ backgroundColor: "yellow", display: "flex" }}
+            >
+              <Typography>{caption}</Typography>
+            </Card>
+          ) : (
+            <Card className="card1" style={{ backgroundColor: "white" }}>
+              <Typography>{caption}</Typography>
+            </Card>
+          )}
+        </div>
 
-                <div
-                    style={{
-                        display: 'flex',
-                        flexGrow: '1',
-                    }}
-                >
-                    <Typography style = {{
-                        flexGrow: '1',
-                        textAlign: 'right',
-                        font: "Josefin Sans",
-                        fontSize: "32px",
-                        color: "white",
-                    }}>
-                        {pts} pts
-                    </Typography>
-                </div>
-            </div>
+        <div
+          style={{
+            display: "flex",
+            flexGrow: "1",
+          }}
+        >
+          <Typography
+            style={{
+              flexGrow: "1",
+              textAlign: "right",
+              font: "Josefin Sans",
+              fontSize: "32px",
+              color: "white",
+            }}
+          >
+            {pts} pts
+          </Typography>
+        </div>
+      </div>
 
-
-            {/* <Row>
+      {/* <Row>
                 <Col>
                     <Row
                         style={{
@@ -119,6 +122,6 @@ export default function Report(props) {
                     </Row>
                 </Col>
             </Row> */}
-        </div>
-    );
+    </div>
+  );
 }

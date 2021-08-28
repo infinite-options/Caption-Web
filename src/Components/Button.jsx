@@ -32,9 +32,10 @@ const Button = ({
                 type={type}
                 // children={children}
             >
-                <Typography noWrap>
-                    {children}
-                </Typography>
+                {/* <Typography noWrap> */}
+                <div style={{}}>{children}</div>
+                    
+                {/* </Typography> */}
             </button>
 
             {/*className={`btn ${checkButtonStyle} ${checkButtonSize}`}*/}

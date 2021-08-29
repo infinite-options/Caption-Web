@@ -99,8 +99,12 @@ export default function Scoreboard({channel_host, channel_all}) {
                         pub_host(0);
                 }
 
-                if (res.data.players.length == 1)
+                if (res.data.players.length == 1){
                     noPlayersThenSubmit();
+                }else if(host){
+                    pub_host(0);
+                }
+
             }
 
             /**

@@ -238,7 +238,6 @@ export default function Scoreboard({channel_host, channel_all}) {
                     onClick={() => changeToggle(localIndex)}
                     conditionalLink={true}
                 />
-                <br></br>
             </div>);
         }
         console.log('captions = ', captions);

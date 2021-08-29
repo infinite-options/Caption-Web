@@ -242,7 +242,7 @@ export default function Scoreboard({channel_host, channel_all}) {
             </div>);
         }
         console.log('captions = ', captions);
-        return <div>{captions}</div>;
+        return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
 
 

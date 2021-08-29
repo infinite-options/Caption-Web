@@ -25,26 +25,28 @@ const Button = ({
     const checkButtonSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0];
 
     return (
-        <Link to={conditionalLink ? destination : ""} className="btn-mobile">
+        <Link to={conditionalLink ? destination : ""} className="btn-mobile" style = {{textDecoration: 'none'}}>
             <button
                 className={isSelected ? className + " selected" : className}
                 onClick={onClick}
                 type={type}
                 // children={children}
-                // style={{border: "10px solid green"}}
                 
             >
-                <Typography noWrap 
-                style={{
-                    display:"flex",
-                    flexGrow: "1",
-                    alignItems:"center",
-                    // border: "10px solid red"
-                  }}
-                >
-                <div style={{}}>{children}</div>
-                    
-                </Typography>
+                <div style = {{display: 'flex', flexGrow: '1'}}>
+                    <Typography
+                        style={{
+                            display:"flex",
+                            flexGrow: "1",
+                            // textAlign: 'center',
+                            // alignItems:"center",
+                            justifyContent: 'center',
+                        }}
+                    >
+                        {children}
+                        
+                    </Typography>
+                </div>
             </button>
 
             {/*className={`btn ${checkButtonStyle} ${checkButtonSize}`}*/}

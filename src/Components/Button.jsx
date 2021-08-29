@@ -41,6 +41,7 @@ const Button = ({
                             // textAlign: 'center',
                             // alignItems:"center",
                             justifyContent: 'center',
+                            wordBreak: 'break-word',
                         }}
                     >
                         {children}

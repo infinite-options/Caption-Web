@@ -9,6 +9,7 @@ import background from "../Assets/temp.png";
 import axios from "axios";
 // import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
+import {CountdownCircleTimer} from "react-countdown-circle-timer";
 
 
 export default function Scoreboard({channel_host, channel_all}) {
@@ -24,6 +25,7 @@ export default function Scoreboard({channel_host, channel_all}) {
     const [everybodyVoted, setEverybodyVoted] = useState(false);
     const [SelectedMyCaption, setSelectedMyCaption] = useState(false);
     const [waitingOnPlayers, setwaitingOnPlayers] = useState([]);
+    const [timerDuration, setTimerDuration] = useState(-1);
 
     const pub_host = (playerCount) => {
         channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
@@ -33,88 +35,126 @@ export default function Scoreboard({channel_host, channel_all}) {
         channel_all.publish({data: {everybodyVoted: true}});
     };
 
+    function determineLag(current, start) {
+        if (current - start >= 0) {
+            return current - start;
+        } else {
+            return current + (60 - start);
+        }
+    }
+
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
         // const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
 
         console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
-        
-        /**
-         * Issue:
-         * The user should not be able to select/vote for their own caption.
-         * Should be easy --> match internal state with info in the endpoint result.
-         */
-        
-        // axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
-        //     console.log("notVotedRes: " , res);
-        //     const totalPlayers = [];
-        //     for (var i = 0; i < res.data.players.length; i++) {
-        //         totalPlayers.push(res.data.players[i].user_alias);
-        //     }
-        //     console.log('totalPlayers === ', totalPlayers);
-        //     setwaitingOnPlayers(totalPlayers);
-        // })
 
-        console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
-        axios.get(getURL + code + "," + roundNumber).then((res) => {
-            // if (res.data.players.length <= 1) {
-            //     console.log('Test-phase1: Publishing to host');
-            //     pub_host(0);
-            // }
-            console.log('players_response = ', res.data.players);
-            const temp_players_arr = [];
-            for (let i = 0; i < res.data.players.length; i++){
-                if (res.data.players[i].round_user_uid !== gameUID) // "this was playerUID before I changed it" - Loveleen Now it shows all captions
-                    temp_players_arr.push(res.data.players[i]);
-                if (res.data.players[i].round_user_uid !== playerUID){
-                    console.log("Made it before disabling");
-                    // document.getElementsByClassName("fat").disabled = true;
-                    console.log("Made it after disabling");
-                }
-                
+        async function idontknow() {
+            if (host) {
+                /**
+                 * Axios.Get() #1
+                 * Start the round
+                 */
+                const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
+                await axios.get(startPlayingURL + code + "," + roundNumber);
             }
-
-            setPlayersArr(temp_players_arr);
-            if (res.data.players.length <= 1)
-            {
-                async function noPlayersThenSubmit()
-                {
-                    if (res.data.players[0].round_user_uid != playerUID) {
-                        console.log('default vote for user ', alias);
-                        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-                        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
-    
-                        const payload = {
-                            caption: res.data.players[0].caption,
-                            game_code: code.toString(),
-                            round_number: roundNumber.toString()
-                        };
-
-                        await axios.post(postURL, payload).then((res) => {
-                            console.log(res);
-                        });
-                        await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then(res => console.log('pwhv response = ', res.data));
-                    } else
-                        pub_host(0);
-                }
-
-                if (res.data.players.length == 1){
-                    noPlayersThenSubmit();
-                }else if(host){
-                    pub_host(0);
-                }
-
-            }
-
+            
             /**
-             * Initialize the toggle array with the correct size and populate the array with all false values
+             * Issue:
+             * The user should not be able to select/vote for their own caption.
+             * Should be easy --> match internal state with info in the endpoint result.
              */
-            toggleArr.length = res.data.players.length;
-            for (var i = 0; i < toggleArr.length; i++) {
-                toggleArr[i] = false;
-            }
-        })
+            
+            // axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
+            //     console.log("notVotedRes: " , res);
+            //     const totalPlayers = [];
+            //     for (var i = 0; i < res.data.players.length; i++) {
+            //         totalPlayers.push(res.data.players[i].user_alias);
+            //     }
+            //     console.log('totalPlayers === ', totalPlayers);
+            //     setwaitingOnPlayers(totalPlayers);
+            // })
+
+            console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
+            await axios.get(getURL + code + "," + roundNumber).then((res) => {
+                // if (res.data.players.length <= 1) {
+                //     console.log('Test-phase1: Publishing to host');
+                //     pub_host(0);
+                // }
+                console.log('players_response = ', res.data.players);
+                const temp_players_arr = [];
+                for (let i = 0; i < res.data.players.length; i++){
+                    if (res.data.players[i].round_user_uid !== gameUID) // "this was playerUID before I changed it" - Loveleen Now it shows all captions
+                        temp_players_arr.push(res.data.players[i]);
+                    if (res.data.players[i].round_user_uid !== playerUID){
+                        console.log("Made it before disabling");
+                        // document.getElementsByClassName("fat").disabled = true;
+                        console.log("Made it after disabling");
+                    }
+                    
+                }
+
+                setPlayersArr(temp_players_arr);
+                if (res.data.players.length <= 1)
+                {
+                    async function noPlayersThenSubmit()
+                    {
+                        if (res.data.players[0].round_user_uid != playerUID) {
+                            console.log('default vote for user ', alias);
+                            const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+                            const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
+        
+                            const payload = {
+                                caption: res.data.players[0].caption,
+                                game_code: code.toString(),
+                                round_number: roundNumber.toString()
+                            };
+
+                            await axios.post(postURL, payload).then((res) => {
+                                console.log(res);
+                            });
+                            await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then(res => console.log('pwhv response = ', res.data));
+                        } else
+                            pub_host(0);
+                    }
+
+                    if (res.data.players.length == 1){
+                        noPlayersThenSubmit();
+                    }else if(host){
+                        pub_host(0);
+                    }
+
+                }
+
+                /**
+                 * Initialize the toggle array with the correct size and populate the array with all false values
+                 */
+                toggleArr.length = res.data.players.length;
+                for (var i = 0; i < toggleArr.length; i++) {
+                    toggleArr[i] = false;
+                }
+            })
+
+            const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+            await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
+                if(res.data.round_started_at != undefined){
+                    var c = serverClock;
+                    var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                    const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                    const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+                    var d = d_mins * 60 + d_secs;
+                    console.log("setTimerDuration: ", d - determineLag(c, s));
+                    setTimerDuration(d - determineLag(c, s));
+
+                    console.log(timerDuration);
+                }
+            })
+            .catch(err => console.log("timer failed"))
+        }
+
+        idontknow();
 
         console.log("Toggle Arr: " + toggleArr);
 
@@ -178,7 +218,7 @@ export default function Scoreboard({channel_host, channel_all}) {
             channel_all.unsubscribe();
         };
     }, []);
-    console.log("WaitingOnPlayers: ", waitingOnPlayers);
+    console.log('timerDuration: ', timerDuration);
 
     function changeToggle(index) {
         console.log("Called: " + index);
@@ -313,7 +353,33 @@ export default function Scoreboard({channel_host, channel_all}) {
                     : <></>
             }
 
-            <br></br>
+            <div
+                style = {{display: 'flex', justifyContent: 'center', paddingBottom: '20px'}}
+            >
+                <div
+                    style={{
+                        background: "yellow",
+                        borderRadius: "30px",
+                        width: "60px",
+                    }}
+                >
+                    {timerDuration != -1 ? <CountdownCircleTimer
+                        background="red"
+                        size={60}
+                        strokeWidth={5}
+                        isPlaying
+                        duration={timerDuration}
+                        colors="#000000"
+                    >
+                        {({remainingTime}) => {
+                                if (remainingTime === 0)
+                                    pub_host(0);
+                                return (<div className="countdownText">{remainingTime}</div>);
+                            }
+                        }
+                    </CountdownCircleTimer> : <></>}
+                </div>
+            </div>
         </div>
     );
 };

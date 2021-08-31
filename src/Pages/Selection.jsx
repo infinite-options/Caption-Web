@@ -335,27 +335,16 @@ export default function Scoreboard({channel_host, channel_all}) {
             {/*        conditionalLink={true}*/}
             {/*    />}*/}
 
-
-            {everybodyVoted ?
-                <Button
-                    className="fat"
-                    disabled = {SelectedMyCaption}
-                    destination= {rounds === roundNumber ? "/endgame" : "/scoreboard"}
-                    children="Continue to Scoreboard"
-                    conditionalLink={true}
-                />
-                :  <></>}
-
             {localUserVoted ?
                 <></>
                 : selectedCaption ?
-                    <Button className="fat" destination="/selection" children="Vote" onClick={postVote}
+                    <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
                           conditionalLink={true}/>
                     : <></>
             }
 
             <div
-                style = {{display: 'flex', justifyContent: 'center', paddingBottom: '20px'}}
+                style = {{display: 'flex', justifyContent: 'center', paddingBottom: '20px', paddingTop: selectedCaption ? '20px' : '0px'}}
             >
                 <div
                     style={{

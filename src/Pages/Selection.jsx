@@ -28,6 +28,7 @@ export default function Scoreboard({channel_host, channel_all}) {
     const [timerDuration, setTimerDuration] = useState(-1);
 
     const pub_host = (playerCount) => {
+        console.log('in pub_host');
         channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
     };
 
@@ -370,10 +371,12 @@ export default function Scoreboard({channel_host, channel_all}) {
                         isPlaying
                         duration={timerDuration}
                         colors="#000000"
+                        onComplete={() => {
+                            if (host)
+                                pub_host(0);
+                        }}
                     >
                         {({remainingTime}) => {
-                                if (remainingTime === 0)
-                                    pub_host(0);
                                 return (<div className="countdownText">{remainingTime}</div>);
                             }
                         }

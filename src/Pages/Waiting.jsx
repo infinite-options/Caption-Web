@@ -21,6 +21,23 @@ export default function Waiting({channel, channel2, channel_joining}) {
     let gameCodeText = "Game Code: " + code;
 
     useEffect(() => {
+        async function getPlayers1() {
+            console.log("Made it in getPlayers Func");
+            const names_db = [];
+            const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+            await axios.get(getURL + code)
+            .then((res) => {
+                for (var index = 0; index < res.data.players_list.length; index++) {
+                    names_db.push(res.data.players_list[index].user_alias);
+                }
+                setNames(names_db);
+
+            })
+            .catch(err => console.error('error = ', err));
+        }
+
+        getPlayers1();
+
         async function subscribe1() 
         {
             await channel.subscribe(newPlayer => {

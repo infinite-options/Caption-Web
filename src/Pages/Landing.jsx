@@ -128,7 +128,6 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 console.log("made it to subscribe");
                 setRounds(something.data.setRounds);
                 history.push(something.data.path);
-
             })
         }
         subscribe();

@@ -9,13 +9,29 @@ class Form extends Component {
   }
 
   handleChange(event) {
+    event.preventDefault();
     this.props.onHandleChange(event.target.value);
+  }
+
+  handleSubmit(event) {
+    event.preventDefault();
+    this.props.onHandleSubmit(event.target.value);
   }
 
   render() {
     const info = this.props.variable;
     return (
-      <form onSubmit={this.handleSubmit}>
+      <form
+        onSubmit = {(e) => {
+          e.preventDefault();
+          const formData = new FormData(e.target);
+          let val = '';
+          for (const pair of formData.entries()) {
+            val = pair[1];
+          }
+          this.props.onHandleSubmit(val);
+        }}
+      >
         <div aria-label={"Enter your " + this.props.field + "here"}>
           {/*<textarea*/}
           <input

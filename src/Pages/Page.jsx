@@ -281,6 +281,12 @@ export default function Page({setImageURL, setRounds, channel}) {
                         className="input2"
                         field="Enter your caption here"
                         onHandleChange={handleCaptionChange}
+                        onHandleSubmit={(caption) => {
+                                console.log('setting caption and submitting');
+                                setCaption(caption);
+                                postSubmitCaption();
+                            }
+                        }
                     />
                     }
                     <br/>

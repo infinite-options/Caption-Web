@@ -21,6 +21,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
     let gameCodeText = "Game Code: " + code;
 
     useEffect(() => {
+        console.log('roundNumber = ', roundNumber);
         async function getPlayers1() {
             console.log("Made it in getPlayers Func");
             const names_db = [];
@@ -52,7 +53,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                         }
                         setNames(names_db);
                         console.log("made it 2");
-                        channel_joining.publish({data: {rounds: rounds, roundNumber: roundNumber, path: window.location.pathname}})
+                        channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
 
                     })
                     .catch(err => console.error('error = ', err));

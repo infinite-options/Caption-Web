@@ -11,7 +11,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     
     const history = useHistory();
 
-    const {code, name, alias, email, zipCode, host} = useContext(LandingContext);
+    const {code, name, alias, email, zipCode, host, roundNumber} = useContext(LandingContext);
     const [path, setPath] = useState('');
 
     const handleCodeChange = (codeInput) => {
@@ -124,9 +124,9 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         async function subscribe(){
             
             await channel.subscribe(something => {
-                setRoundNumber(something.data.setRoundNumber);
+                console.log('something.data = ', something.data);
+                setRoundNumber(something.data.roundNumber);
                 console.log("made it to subscribe");
-                setRounds(something.data.setRounds);
                 history.push(something.data.path);
             })
         }
@@ -137,6 +137,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             channel.unsubscribe();
         }
     }, [code] );
+
+    useEffect(() => console.log('landing roundNumber = ', roundNumber), [roundNumber]);
 
     return (
         <div

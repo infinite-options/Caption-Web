@@ -144,6 +144,7 @@ export default function Page({setImageURL, setRounds, channel}) {
                  * Axios.Get() #2
                  * Receive the image url
                  */
+                console.log('[code, roundNumber] = ', [code, roundNumber]);
                 await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
                     console.log(res);
                     // setImageSrc(res.data.image_url);

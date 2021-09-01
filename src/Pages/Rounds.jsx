@@ -19,13 +19,14 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
     {/*Need some way to check that the input is an integer*/
     }
     const handleRoundsChange = (roundsInput) => {
-        setRounds(parseInt(roundsInput));
+       setRounds(parseInt(roundsInput));
     };
 
     {/*Need some way to check that the input is an integer*/
     }
     const handleRoundsDurationChange = (durationInput) => {
-        setRoundDuration(durationInput);
+       setRoundDuration(durationInput);
+    
     };
 
     const pub = ()=> {
@@ -41,7 +42,9 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
             number_of_rounds: rounds.toString(),
             game_code: code,
             round_duration: roundDuration,
+            
         };
+        console.log("pauload: ", payload);
 
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/changeRoundsAndDuration";
         async function postedPub() {
@@ -80,8 +83,17 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
             <Form
                 className="input1 grey"
                 field="10"
+                // value="10"
                 onHandleChange={handleRoundsChange}
             />
+            {/* <form onHandleChange={handleRoundsChange} className="input1 grey" >
+                <label for="number10">number10</label><br />
+                <input type ="text" id="number10" name="number10" value="10" /><br />
+            </form>
+            <form onHandleChange={handleRoundsDurationChange} className="input1 grey" >
+                <label for="number30">number30</label><br />
+                <input type ="text" id="number30" name="number30" value="30" /><br />
+            </form> */}
             <h5>This means how many images would you like to go through during your game. <br></br> (1 image = 1 round)
             </h5>
 
@@ -91,6 +103,7 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
             <Form
                 className="input1 grey"
                 field="30"
+                // value="30"
                 onHandleChange={handleRoundsDurationChange}
             />
             <h5>This defines how many seconds you would like to give everyone to caption an image. <br></br> We

@@ -12,8 +12,8 @@ export default function App() {
     const [zipCode, setZipCode] = useState("");
     const [alias, setAlias] = useState("");
     const [gameUID, setGameUID] = useState("");
-    const [rounds, setRounds] = useState("");
-    const [roundDuration, setRoundDuration] = useState("");
+    const [rounds, setRounds] = useState("10");
+    const [roundDuration, setRoundDuration] = useState("30");
     const [host, setHost] = useState("");
     const [playerUID, setPlayerUID] = useState("");
     const [roundNumber, setRoundNumber] = useState(1);

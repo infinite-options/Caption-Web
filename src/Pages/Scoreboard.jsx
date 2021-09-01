@@ -10,7 +10,7 @@ import axios from "axios";
 import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 
-function Scoreboard({setRoundNumber, channel}) {
+function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining}) {
 
     const bestCaption = "Two dudes watching the Sharknado trailer";
     const [timeStamp, setTimeStamp] = useState();
@@ -50,6 +50,25 @@ function Scoreboard({setRoundNumber, channel}) {
             return function cleanup() {
                 channel.unsubscribe();
             };
+        }
+
+        async function subscribe1() 
+        {
+            await channel_waiting.subscribe(newPlayer => {
+                async function getPlayers () {
+                    console.log("Made it in getPlayers Func");
+                    channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
+                }
+        
+                getPlayers();
+            });
+        }
+
+        if (host)
+            subscribe1();
+
+        return function cleanup() {
+            channel_waiting.unsubscribe();
         }
     }, [scoreboardInfo]);
 

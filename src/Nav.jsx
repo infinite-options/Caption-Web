@@ -60,16 +60,16 @@ export default function Nav() {
 
 
                 <Route exact path='/scoreboard'>
-                    <Scoreboard setRoundNumber = {setRoundNumber} channel = {channel_scoreboard} />
+                    <Scoreboard setRoundNumber = {setRoundNumber} channel = {channel_scoreboard} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
                 </Route>
 
                 {/*<Route exact path="/page" component={Page1}/>*/}
                 <Route exact path = "/page">
-                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page}/>
+                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page} channel_waiting = {channel_waiting} channel_joining = {channel_joining}/>
                 </Route>
 
                 <Route exact path="/selection" >
-                    <Selection channel_host = {channel_voted_host} channel_all = {channel_voted_all}/>
+                    <Selection channel_host = {channel_voted_host} channel_all = {channel_voted_all} channel_waiting = {channel_waiting} channel_joining = {channel_joining}/>
                 </Route>
 
                 <Route exact path='/waiting'>

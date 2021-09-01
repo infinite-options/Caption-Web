@@ -16,7 +16,7 @@ import axios from "axios";
 import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
-export default function Page({setImageURL, setRounds, channel}) {
+export default function Page({setImageURL, setRounds, channel, channel_waiting, channel_joining}) {
     const {code, roundNumber, host, playerUID, imageURL, alias} = useContext(LandingContext);
     const history = useHistory();
 
@@ -175,9 +175,25 @@ export default function Page({setImageURL, setRounds, channel}) {
         }
         
         subscribe();
+
+        async function subscribe1() 
+        {
+            await channel_waiting.subscribe(newPlayer => {
+                async function getPlayers () {
+                    console.log("Made it in getPlayers Func");
+                    channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
+                }
+        
+                getPlayers();
+            });
+        }
+
+        if (host)
+            subscribe1();
     
         return function cleanup() {
             channel.unsubscribe();
+            channel_waiting.unsubscribe();
         };
     }, [waitingPlayers]);
 

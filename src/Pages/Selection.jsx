@@ -12,7 +12,7 @@ import {LandingContext} from "../App";
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
 
 
-export default function Scoreboard({channel_host, channel_all}) {
+export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
     const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo} = useContext(LandingContext);
     const history = useHistory();
     console.log('code = ', code, ', playerUID = ', playerUID);
@@ -209,14 +209,30 @@ export default function Scoreboard({channel_host, channel_all}) {
                 getNewScoreboard();
             })
         }
+
+        async function subscribe1() 
+        {
+            await channel_waiting.subscribe(newPlayer => {
+                async function getPlayers () {
+                    console.log("Made it in getPlayers Func");
+                    channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
+                }
         
-        if (host)
+                getPlayers();
+            });
+        }
+
+        if (host) {
+            subscribe1();
             subscribe_host();
+        }
+        
         subscribe_all();
     
         return function cleanup() {
             channel_host.unsubscribe();
             channel_all.unsubscribe();
+            channel_waiting.unsubscribe();
         };
     }, []);
     console.log('timerDuration: ', timerDuration);

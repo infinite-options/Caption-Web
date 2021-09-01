@@ -1,4 +1,4 @@
-import React, {useContext, useState} from "react";
+import React, {useContext, useState, useEffect} from "react";
 import {BrowserRouter as Router} from "react-router-dom";
 import {Redirect, Route, Switch} from "react-router-dom";
 import Page1 from "./Pages/Page";
@@ -20,13 +20,27 @@ const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 export default function Nav() {
 
-    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL} = useContext(LandingContext);
+    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber} = useContext(LandingContext);
     const channel_page = client.channels.get(`Captions/Page/${code}`);
     const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
     const channel_rounds = client.channels.get(`Captions/Rounds/${code}`);
     const channel_voted_host = client.channels.get(`Captions/Vote/Host/${code}`);
     const channel_voted_all = client.channels.get(`Captions/Vote/All/${code}`);
     const channel_scoreboard = client.channels.get(`Captions/Scoreboard/${code}`);
+    const channel_joining = client.channels.get(`Captions/Landing/${code}`);
+
+    useEffect(() => {
+        // async function subscribe(){
+        //     await channel_waiting.subscribe(something => {
+        //         console.log("newPlayerName", something.data.newPlayerName);
+        //         channel_joining.publish({data: {rounds: rounds, roundNumber: roundNumber, path: window.location.pathname}})
+        //     })
+        // }
+        // subscribe();
+        // return function cleanup(){
+        //     channel_joining.unsubscribe();
+        // }
+    }, []);
 
     return (
         <Router>
@@ -34,7 +48,7 @@ export default function Nav() {
 
                 <Route exact path='/'>
                     <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
-                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client}/>
+                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} />
                 </Route>
 
                 {/*This way of rendering the component forces re-renders in a way that I don't want atm*/}
@@ -59,7 +73,7 @@ export default function Nav() {
                 </Route>
 
                 <Route exact path='/waiting'>
-                    <Waiting channel = {channel_waiting} channel2 = {channel_rounds} />
+                    <Waiting channel = {channel_waiting} channel2 = {channel_rounds} channel_joining= {channel_joining} />
                 </Route>
 
                 <Route exact path="/gamerules" component={GameRules}/>

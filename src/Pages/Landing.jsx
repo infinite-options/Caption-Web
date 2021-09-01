@@ -1,14 +1,18 @@
-import React, {useContext} from "react";
+import React, {useContext, useEffect, useState} from "react";
 import axios from "axios";
 import Form from "../Components/Form";
 import {Button} from "../Components/Button.jsx";
 import background from "../Assets/landing.png";
 import "../Styles/Landing.css";
 import {LandingContext} from "../App";
+import {useHistory} from "react-router-dom";
 
-export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client}) {
+export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds}) {
+    
+    const history = useHistory();
 
     const {code, name, alias, email, zipCode, host} = useContext(LandingContext);
+    const [path, setPath] = useState('');
 
     const handleCodeChange = (codeInput) => {
         setCode(codeInput);
@@ -31,7 +35,9 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     };
 
     function validateInputToCreateGame() {
-        return (name !== "" && email !== "" && zipCode !== "" && alias !== "");
+        return (
+            // name !== "" && email !== "" && zipCode !== "" && 
+            alias !== "");
     }
 
     function validateInputToJoinGame() {
@@ -63,11 +69,13 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     }
 
     const pub = (game_code) => {
+        console.log("Made it to Pub");
         const channel = client.channels.get(`Captions/Waiting/${game_code}`);
         channel.publish({data: {newPlayerName: alias}});
     };
 
-    function joinGame() {
+    async function joinGame() {
+        console.log("Made it in Path:", path);
         if (validateInputToJoinGame()) {
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
@@ -80,11 +88,12 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 game_code: code,
             };
 
-            axios.post(postURL, payload).then((res) => {
+            await axios.post(postURL, payload).then((res) => {
                 console.log(res);
                 setGameUID(res.data.game_uid);
                 setPlayerUID(res.data.user_uid);
-                pub(code);
+                // pub(code);
+                console.log("Made it in Path:", path);
 
 
                 try {
@@ -102,11 +111,33 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             })
 
             setHost(false);
+            pub(code);
+            // console.log("path: ", path);
+            // history.push(path);
 
         } else {
             window.alert("To join a game, fill out the necessary information and the correct gamecode.");
         }
+
     }
+    useEffect(() => {
+        async function subscribe(){
+            
+            await channel.subscribe(something => {
+                setRoundNumber(something.data.setRoundNumber);
+                console.log("made it to subscribe");
+                setRounds(something.data.setRounds);
+                history.push(something.data.path);
+
+            })
+        }
+        subscribe();
+        console.log("code: ", code);
+        console.log("alias", alias);
+        return function cleanup(){
+            channel.unsubscribe();
+        }
+    }, [code] );
 
     return (
         <div
@@ -161,11 +192,12 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             <br></br>
             <Button
                 isSelected={true}
+                // onClick={()=> pub(code)}
                 onClick={joinGame}
                 className="landing"
-                destination="/waiting"
+                // destination="/waiting"
                 children="Join Game"
-                conditionalLink={validateInputToJoinGame()}
+                // conditionalLink={validateInputToJoinGame()}
             />
 
         </div>

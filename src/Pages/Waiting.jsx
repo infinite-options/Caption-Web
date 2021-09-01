@@ -8,9 +8,9 @@ import "../Styles/Waiting.css";
 import {LandingContext} from "../App";
 
 
-export default function Waiting({channel, channel2}) {
+export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host} = useContext(LandingContext);
+    const {code, host, rounds, roundNumber} = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const history = useHistory();
     /**
@@ -25,6 +25,7 @@ export default function Waiting({channel, channel2}) {
         {
             await channel.subscribe(newPlayer => {
                 async function getPlayers () {
+                    console.log("Made it in getPlayers Func");
                     const names_db = [];
                     const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
                     await axios.get(getURL + code)
@@ -33,6 +34,9 @@ export default function Waiting({channel, channel2}) {
                             names_db.push(res.data.players_list[index].user_alias);
                         }
                         setNames(names_db);
+                        console.log("made it 2");
+                        channel_joining.publish({data: {rounds: rounds, roundNumber: roundNumber, path: window.location.pathname}})
+
                     })
                     .catch(err => console.error('error = ', err));
                 }

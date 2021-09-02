@@ -136,7 +136,9 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 children="Start Game"
                 destination="/collections"
                 conditionalLink={true}
-            /> : <></>}
+                data-clipboard-target="#foo"
+            >
+                <img src="assets/clippy.svg" alt="Copy to clipboard" /></Button> : <></>}
 
             {grandfatherClock === "gameHasBegun" ?
                 <Button

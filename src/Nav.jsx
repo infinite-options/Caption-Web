@@ -12,6 +12,7 @@ import DeckInfo from "./Pages/DeckInfo"
 import Error from "./Pages/Error";
 import Rounds from "./Pages/Rounds";
 import Endgame from "./Pages/Endgame";
+import ScoreType from "./Pages/ScoreType";
 import {LandingContext} from "./App";
 import Ably from 'ably/promises';
 const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
@@ -88,6 +89,9 @@ export default function Nav() {
 
                 <Route exact path='/endgame'>
                     <Endgame setRoundNumber = {setRoundNumber} />
+                </Route>
+                <Route exact path="/scoretype">
+                    <ScoreType />
                 </Route>
             </Switch>
         </Router>

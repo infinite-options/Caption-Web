@@ -186,7 +186,7 @@ export default function Scoreboard({channel_host, channel_all}) {
                         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
                         console.log('test 1');
                         await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
-                            res.data.scoreboard.sort((a, b) => (b.score - a.score));
+                            res.data.scoreboard.sort((a, b) => (b.score===a.score ? b.game_score - a.game_score : b.score - a.score));
                             setScoreboardInfo(res.data.scoreboard);
                         });
                         console.log('test 3');

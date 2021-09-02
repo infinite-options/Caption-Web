@@ -181,42 +181,26 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
             await channel_waiting.subscribe(newPlayer => {
                 async function getPlayers () {
                     console.log("Made it in getPlayers Func");
-                    channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
+                    if (host)
+                        channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}});
+                    const temp = [newPlayer.data.newPlayerName];
+                    for (const name of waitingPlayers) {
+                        temp.push(name);
+                    }
+                    setWaitingPlayers(temp);
                 }
         
                 getPlayers();
             });
         }
 
-        if (host)
-            subscribe1();
+        subscribe1();
     
         return function cleanup() {
             channel.unsubscribe();
             channel_waiting.unsubscribe();
         };
     }, [waitingPlayers]);
-
-
-    useEffect(() => {
-        // setTimeout(function () {
-
-        //     if (captionSubmitted) {
-        //         /**
-        //          * Axios.Get() #3
-        //          * Recieve the waiting players
-        //          */
-        //         axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
-        //             console.log('pageres = ', res);
-        //             const readyForNextRound = res.data.players.length == 0;
-        //             for (var i = 0; i < res.data.players.length; i++) {
-        //                 waitingPlayers[i] = res.data.players[i].user_alias;
-        //             }
-        //             console.log("The waiting players array: " + waitingPlayers);
-        //         })
-        //     }
-        // }, 2000);
-    });
 
     function determineLag(current, start) {
         if (current - start >= 0) {
@@ -225,7 +209,6 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
             return current + (60 - start);
         }
     }
-
 
     async function postSubmitCaption() {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
@@ -260,6 +243,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
         console.log('payload = ', payload);
 
         await axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+            console.log('res.data.players = ', res.data.players);
             pub(res.data.players.length);
         })
     }

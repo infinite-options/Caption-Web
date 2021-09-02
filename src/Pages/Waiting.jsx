@@ -103,6 +103,7 @@ export default function Waiting({channel, channel2}) {
             <Button
                 className="landing"
                 children="Share with other players"
+                onClick = {() => {navigator.clipboard.writeText(code)}}
                 destination="/waiting"
                 conditionalLink={true}
             />

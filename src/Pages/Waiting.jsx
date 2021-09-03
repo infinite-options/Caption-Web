@@ -7,7 +7,6 @@ import {Button} from '../Components/Button';
 import "../Styles/Waiting.css";
 import {LandingContext} from "../App";
 
-
 export default function Waiting({channel, channel2, channel_joining}) {
 
     const {code, host, rounds, roundNumber, setImageURL} = useContext(LandingContext);
@@ -141,6 +140,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 conditionalLink={true}
             />
             <br></br>
+            
 
             <Button
                 className="landing"
@@ -154,14 +154,17 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 conditionalLink={true}
             />
 
+        
+
             <br></br>
 
             {host ? <Button
                 className="landing"
                 children="Start Game"
                 destination="/collections"
-                conditionalLink={true}
-            /> : <></>}
+                conditionalLink={true}  
+            />
+             : <></>}
 
             {grandfatherClock === "gameHasBegun" ?
                 <Button

@@ -79,6 +79,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
             console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
             await axios.get(getURL + code + "," + roundNumber).then((res) => {
+                res.data.scoreboard.sort((a, b) => (b.score===a.score ? b.game_score - a.game_score : b.score - a.score));
                 // if (res.data.players.length <= 1) {
                 //     console.log('Test-phase1: Publishing to host');
                 //     pub_host(0);

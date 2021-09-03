@@ -19,6 +19,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
     let gameCodeText = "Game Code: " + code;
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         console.log('roundNumber = ', roundNumber);
@@ -93,6 +94,14 @@ export default function Waiting({channel, channel2, channel_joining}) {
         };
     }, [code]);
 
+    useEffect(() => {
+        if (copied) {
+            setTimeout(() => {
+                setCopied(false);
+            }, 10000);
+        }
+    }, [copied])
+
     return (
         <div
             style={{
@@ -136,6 +145,11 @@ export default function Waiting({channel, channel2, channel_joining}) {
             <Button
                 className="landing"
                 children="Share with other players"
+                copied={copied}
+                onClick = {() => {
+                    setCopied(true);
+                    navigator.clipboard.writeText(code);
+                }}
                 destination="/waiting"
                 conditionalLink={true}
             />

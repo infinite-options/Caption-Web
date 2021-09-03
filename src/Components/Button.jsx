@@ -17,6 +17,7 @@ const Button = ({
                     destination,
                     isSelected,
                     conditionalLink,
+                    copied,
                 }) => {
     const checkButtonStyle = STYLES.includes(buttonStyle)
         ? buttonStyle
@@ -33,7 +34,7 @@ const Button = ({
                 // children={children}
                 
             >
-                <div style = {{display: 'flex', flexGrow: '1'}}>
+                <div style = {{display: 'flex', flexDirection: 'column', flexGrow: '1'}}>
                     <Typography
                         style={{
                             display:"flex",
@@ -46,6 +47,10 @@ const Button = ({
                     >
                         {children}
                         
+                    </Typography>
+
+                    <Typography style = {{display: 'inline-block', marginBottom: copied ? '60px' : '0px'}}>
+                        {copied ? 'Copied!' : ''}
                     </Typography>
                 </div>
             </button>

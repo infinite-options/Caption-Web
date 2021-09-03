@@ -69,7 +69,7 @@ function ScoreType() {
                     With this scoring system, the player (or players) with the most votes get 5 points regardless of
                     the number of votes received. 
                     <br />
-                    2nd place geets 3 points.
+                    2nd place gets 3 points.
                 </p>
 
             </div>

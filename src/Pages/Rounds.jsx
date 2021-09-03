@@ -33,7 +33,7 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
         console.log('sending players to start game');
         console.log("Log 1.5: Finish Posting");
         channel.publish({data: {gameStarted: true}});
-        history.push("/page");
+        history.push("/scoretype");
     };
 
     function postRoundInfo() {
@@ -42,7 +42,7 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
             number_of_rounds: rounds.toString(),
             game_code: code,
             round_duration: roundDuration,
-            
+            scoring_scheme: "V",
         };
         console.log("pauload: ", payload);
 
@@ -112,7 +112,7 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
             <br></br>
 
             <Button className="landing" conditionalLink={true} onClick={postRoundInfo}
-                    children="Start Playing"/>
+                    children="Continue"/>
 
         </div>
     )

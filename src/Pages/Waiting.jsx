@@ -19,6 +19,7 @@ export default function Waiting({channel, channel2}) {
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
     let gameCodeText = "Game Code: " + code;
+    const [copied, setCopied] = useState(false);
 
     useEffect(() => {
         async function subscribe1() 
@@ -59,6 +60,15 @@ export default function Waiting({channel, channel2}) {
             channel2.unsubscribe();
         };
     }, [code]);
+
+    useEffect(() => {
+        if (copied) {
+            setTimeout(() => {
+                console.log('toggling copied to be false');
+                setCopied(false);
+            }, 10000);
+        }
+    }, [copied])
 
     return (
         <div
@@ -103,7 +113,12 @@ export default function Waiting({channel, channel2}) {
             <Button
                 className="landing"
                 children="Share with other players"
-                onClick = {() => {navigator.clipboard.writeText(code)}}
+                copied={copied}
+                onClick = {() => {
+                    console.log('clicked');
+                    setCopied(true);
+                    navigator.clipboard.writeText(code);
+                }}
                 destination="/waiting"
                 conditionalLink={true}
             />

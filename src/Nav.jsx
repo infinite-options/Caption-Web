@@ -84,14 +84,14 @@ export default function Nav() {
 
 
                 <Route exact path='/rounds'>
-                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} channel = {channel_rounds} />
+                    <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration}  />
                 </Route>
 
                 <Route exact path='/endgame'>
                     <Endgame setRoundNumber = {setRoundNumber} />
                 </Route>
                 <Route exact path="/scoretype">
-                    <ScoreType />
+                    <ScoreType channel = {channel_rounds} />
                 </Route>
             </Switch>
         </Router>

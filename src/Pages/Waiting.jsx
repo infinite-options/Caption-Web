@@ -26,6 +26,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             console.log("Made it in getPlayers Func");
             const names_db = [];
             const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+            console.log("Code: ", code)
             await axios.get(getURL + code)
             .then((res) => {
                 for (var index = 0; index < res.data.players_list.length; index++) {
@@ -37,7 +38,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             .catch(err => console.error('error = ', err));
         }
 
-        getPlayers1();
+        // getPlayers1();
 
         async function subscribe1() 
         {
@@ -85,7 +86,9 @@ export default function Waiting({channel, channel2, channel_joining}) {
         if (code) {
             subscribe1();
             subscribe2();
+            getPlayers1()
         }
+        
         
         return function cleanup() {
             channel.unsubscribe();

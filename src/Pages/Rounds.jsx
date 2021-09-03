@@ -29,42 +29,42 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
     
     };
 
-    const pub = ()=> {
-        console.log('sending players to start game');
-        console.log("Log 1.5: Finish Posting");
-        channel.publish({data: {gameStarted: true}});
-        history.push("/scoretype");
-    };
+    // const pub = ()=> {
+    //     console.log('sending players to start game');
+    //     console.log("Log 1.5: Finish Posting");
+    //     channel.publish({data: {gameStarted: true}});
+    //     history.push("/scoretype");
+    // };
 
-    function postRoundInfo() {
+    // function postRoundInfo() {
 
-        const payload = {
-            number_of_rounds: rounds.toString(),
-            game_code: code,
-            round_duration: roundDuration,
-            scoring_scheme: "V",
-        };
-        console.log("pauload: ", payload);
+    //     const payload = {
+    //         number_of_rounds: rounds.toString(),
+    //         game_code: code,
+    //         round_duration: roundDuration,
+    //         scoring_scheme: "V",
+    //     };
+    //     console.log("pauload: ", payload);
 
-        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/changeRoundsAndDuration";
-        async function postedPub() {
-            await axios.post(postURL, payload).then((res) => {
-                console.log(res);
-            })
-            console.log("Log 1: Finish Posting");
-            pub();
+    //     const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/changeRoundsAndDuration";
+    //     async function postedPub() {
+    //         await axios.post(postURL, payload).then((res) => {
+    //             console.log(res);
+    //         })
+    //         console.log("Log 1: Finish Posting");
+    //         pub();
 
-            const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
-            console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
-            await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
-                console.log('getUnique res: ', res);
-                // setImageSrc(res.data.image_url);
-                setImageURL(res.data.image_url);
-            })
-        }
-        postedPub();
+    //         const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+    //         console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
+    //         await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
+    //             console.log('getUnique res: ', res);
+    //             // setImageSrc(res.data.image_url);
+    //             setImageURL(res.data.image_url);
+    //         })
+    //     }
+    //     postedPub();
   
-    }
+    // }
 
     return (
         <div
@@ -116,7 +116,7 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
 
             <br></br>
 
-            <Button className="landing" conditionalLink={true} onClick={postRoundInfo}
+            <Button className="landing" conditionalLink={true} destination="/scoretype"
                     children="Continue"/>
 
         </div>

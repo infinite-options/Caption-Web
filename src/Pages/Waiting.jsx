@@ -64,7 +64,6 @@ export default function Waiting({channel, channel2}) {
     useEffect(() => {
         if (copied) {
             setTimeout(() => {
-                console.log('toggling copied to be false');
                 setCopied(false);
             }, 10000);
         }
@@ -115,7 +114,6 @@ export default function Waiting({channel, channel2}) {
                 children="Share with other players"
                 copied={copied}
                 onClick = {() => {
-                    console.log('clicked');
                     setCopied(true);
                     navigator.clipboard.writeText(code);
                 }}

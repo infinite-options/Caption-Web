@@ -24,7 +24,6 @@ const Button = ({
         : STYLES[0];
 
     const checkButtonSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0];
-    console.log('copied = ', copied);
 
     return (
         <Link to={conditionalLink ? destination : ""} className="btn-mobile" style = {{textDecoration: 'none'}}>

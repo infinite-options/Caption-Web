@@ -56,7 +56,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             };
 
             await axios.post(postURL, payload).then((res) => {
-                console.log(res);
+                console.log('create-res = ', res);
                 setCode(res.data.game_code);
                 setPlayerUID(res.data.host_id);
                 pub(res.data.game_code);
@@ -120,6 +120,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         }
 
     }
+
+
     useEffect(() => {
         async function subscribe(){
             
@@ -136,7 +138,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         return function cleanup(){
             channel.unsubscribe();
         }
-    }, [code] );
+    }, [code]);
 
     useEffect(() => console.log('landing roundNumber = ', roundNumber), [roundNumber]);
 

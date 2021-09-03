@@ -88,12 +88,12 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                  * In the host I need to call --> getUniqueImageinRound
                  */
 
-                console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
-                await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
-                    console.log('getUnique res: ', res);
-                    // setImageSrc(res.data.image_url);
-                    setImageURL(res.data.image_url);
-                })
+                // console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
+                // await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
+                //     console.log('getUnique res: ', res);
+                //     // setImageSrc(res.data.image_url);
+                //     setImageURL(res.data.image_url);
+                // })
 
 
             }
@@ -144,12 +144,12 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                  * Axios.Get() #2
                  * Receive the image url
                  */
-                console.log('[code, roundNumber] = ', [code, roundNumber]);
-                await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
-                    console.log(res);
-                    // setImageSrc(res.data.image_url);
-                    setImageURL(res.data.image_url);
-                })
+                // console.log('[code, roundNumber] = ', [code, roundNumber]);
+                // await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
+                //     console.log(res);
+                //     // setImageSrc(res.data.image_url);
+                //     setImageURL(res.data.image_url);
+                // })
             }
         }
         pageAsyc();

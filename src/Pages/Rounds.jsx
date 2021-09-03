@@ -13,7 +13,7 @@ import {useHistory} from "react-router-dom";
 
 export default function Rounds({setRounds, setRoundDuration, channel }) {
     const history = useHistory();
-    const {code, rounds, roundDuration} = useContext(LandingContext);
+    const {code, rounds, roundDuration, host, setImageURL, roundNumber} = useContext(LandingContext);
 
 
     {/*Need some way to check that the input is an integer*/
@@ -42,7 +42,7 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
             number_of_rounds: rounds.toString(),
             game_code: code,
             round_duration: roundDuration,
-            
+            scoring_scheme: 'V',
         };
         console.log("pauload: ", payload);
 
@@ -53,13 +53,18 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
             })
             console.log("Log 1: Finish Posting");
             pub();
-            
+
+            const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+            console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
+            await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
+                console.log('getUnique res: ', res);
+                // setImageSrc(res.data.image_url);
+                setImageURL(res.data.image_url);
+            })
         }
         postedPub();
   
     }
-
-
 
     return (
         <div

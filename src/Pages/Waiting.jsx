@@ -10,7 +10,7 @@ import {LandingContext} from "../App";
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host, rounds, roundNumber} = useContext(LandingContext);
+    const {code, host, rounds, roundNumber, setImageURL} = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const history = useHistory();
     /**
@@ -66,7 +66,18 @@ export default function Waiting({channel, channel2, channel_joining}) {
         {
             await channel2.subscribe(newGame => {
                 if(newGame.data.gameStarted) {
-                    history.push('/page');
+                    const getImage = async () => {
+                        const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+                        console.log('[code, roundNumber] = ', [code, roundNumber]);
+                        await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
+                            console.log(res);
+                            // setImageSrc(res.data.image_url);
+                            setImageURL(res.data.image_url);
+                        })
+                        history.push('/page');
+                    };
+
+                    getImage();
                 }
             })
         }

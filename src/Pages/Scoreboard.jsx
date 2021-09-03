@@ -15,6 +15,8 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
     const bestCaption = "Two dudes watching the Sharknado trailer";
     const [timeStamp, setTimeStamp] = useState();
     const history = useHistory();
+    // const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+    // const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
 
     /**
      * Setup grandfather clock for the Scoreboard page
@@ -22,7 +24,7 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
 
 
-    const {code, roundNumber, host, imageURL, alias, scoreboardInfo} = useContext(LandingContext);
+    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL} = useContext(LandingContext);
 
 
     useEffect(() => {
@@ -40,8 +42,22 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
             async function subscribe() 
             {
                 await channel.subscribe(roundStarted => {
-                    if (roundStarted.data.roundStarted)
-                        history.push('/page');
+                    if (roundStarted.data.roundStarted) {
+                        const getImage = async () => {
+                            const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+                            const nextRound = roundNumber + 1;
+                            console.log('[code, nextRound] = ', [code, nextRound]);
+                            console.log('fullURL scoreboard = ', getImageURL + code + "," + nextRound);
+                            await axios.get(getImageURL + code + "," + nextRound).then((res) => {
+                                console.log(res);
+                                // setImageSrc(res.data.image_url);
+                                setImageURL(res.data.image_url);
+                            })
+                            history.push('/page');
+                        };
+    
+                        getImage();
+                    }
                 });
             }
             
@@ -71,6 +87,7 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
             channel_waiting.unsubscribe();
         }
     }, [scoreboardInfo]);
+
 
     const pub = () => {
         channel.publish({data: {roundStarted: true}});
@@ -112,7 +129,18 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
             await axios.post(postURL, payload);
 
             setRoundNumber(roundNumber + 1);
+            const nextRound = roundNumber + 1;
+            const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+            console.log('test1: unique URL = ', getUniqueImageInRound + code + "," + nextRound);
+            await axios.get(getUniqueImageInRound + code + "," + nextRound).then((res) => {
+                console.log('getUnique res: ', res);
+                // setImageSrc(res.data.image_url);
+                setImageURL(res.data.image_url);
+            })
+            console.log('test2: publishing');
             pub();
+
+
             history.push("/page");
         }
         

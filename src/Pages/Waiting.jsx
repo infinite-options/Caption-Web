@@ -6,10 +6,6 @@ import thing from "../Assets/idk.png";
 import {Button} from '../Components/Button';
 import "../Styles/Waiting.css";
 import {LandingContext} from "../App";
-// import ClipboardJS from "react-clipboard.js";
-import ClipboardJS from 'clipboard'
-
-new ClipboardJS('.btn');
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
@@ -131,8 +127,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 children="Share with other players"
                 destination="/waiting"
                 conditionalLink={true}
-                
-                data-clipboard-text={code}
+                onClick = {() => {navigator.clipboard.writeText(code)}}
             />
 
         
@@ -143,8 +138,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 className="landing"
                 children="Start Game"
                 destination="/collections"
-                conditionalLink={true}
-                onClick = {() => {navigator.clipboard.writeText(code)}}   
+                conditionalLink={true}  
             />
              : <></>}
 

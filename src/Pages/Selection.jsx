@@ -79,7 +79,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
             console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
             await axios.get(getURL + code + "," + roundNumber).then((res) => {
-                res.data.scoreboard.sort((a, b) => (b.score===a.score ? b.game_score - a.game_score : b.score - a.score));
+                console.log('selection response: ', res);
+                // res.data.scoreboard.sort((a, b) => (b.score===a.score ? b.game_score - a.game_score : b.score - a.score));
                 // if (res.data.players.length <= 1) {
                 //     console.log('Test-phase1: Publishing to host');
                 //     pub_host(0);
@@ -141,7 +142,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
             await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
                 let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
-                if(res.data.round_started_at != undefined){
+                if(res.data.round_started_at != undefined) {
                     var c = serverClock;
                     var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
                     const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
@@ -187,6 +188,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
                         console.log('test 1');
                         await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
+                            console.log('scoreboard-response = ', res.data.scoreboard);
                             res.data.scoreboard.sort((a, b) => (b.score===a.score ? b.game_score - a.game_score : b.score - a.score));
                             setScoreboardInfo(res.data.scoreboard);
                         });

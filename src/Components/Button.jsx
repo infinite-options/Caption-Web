@@ -45,12 +45,8 @@ const Button = ({
                             wordBreak: 'break-word',
                         }}
                     >
-                        {children}
+                        {copied ? 'Copied!' : children}
                         
-                    </Typography>
-
-                    <Typography style = {{display: 'inline-block', marginBottom: copied ? '60px' : '0px'}}>
-                        {copied ? 'Copied!' : ''}
                     </Typography>
                 </div>
             </button>

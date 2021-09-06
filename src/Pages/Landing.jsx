@@ -223,7 +223,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 conditionalLink={validateInputToCreateGame() && validateEmail(email) && validateZipcode(zipCode)}
             />
             <div className="middleText">OR</div>
-            <form
+            <Form
                 className="input1"
                 field="Enter Game Code"
                 onHandleChange={handleCodeChange}

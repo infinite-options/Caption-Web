@@ -40,11 +40,23 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             alias !== "");
     }
 
+    
+
     function validateInputToJoinGame() {
         return (code !== "" && validateInputToCreateGame());
     }
 
     async function createGame() {
+        const valid = validateEmail(email);
+        const validZ = validateZipcode(zipCode);
+        if (!valid) {
+            alert('Invalid email. Please re-enter.');
+            return;
+        }
+        if(!validZ){
+            alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
+            return;
+        }
         if (validateInputToCreateGame()) {
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
@@ -76,6 +88,17 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
     async function joinGame() {
         console.log("Made it in Path:", path);
+        const valid = validateEmail(email);
+        if (!valid) {
+            alert('Invalid email. Please re-enter.');
+            return;
+        }
+
+        const validZ = validateZipcode(zipCode);
+        if(!validZ){
+            alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
+            return;
+        }
         if (validateInputToJoinGame()) {
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
@@ -120,7 +143,16 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         }
 
     }
+    function validateEmail(email) {
+        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(email).toLowerCase());
+    }
 
+    function validateZipcode(zipCode) {
+        const re = /^\d{5}$/ ;
+        return re.test(zipCode);
+    }
+    
 
     useEffect(() => {
         async function subscribe(){
@@ -156,6 +188,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 className="input1"
                 field="Your Name"
                 onHandleChange={handleNameChange}
+                type="text"
             />
             <br></br>
             <Form
@@ -163,6 +196,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 field="Email Address"
                 onHandleChange={handleEmailChange}
             />
+
             <br></br>
             <Form
                 className="input1"
@@ -184,10 +218,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 className="landing"
                 destination="/waiting"
                 children="Create New Game"
-                conditionalLink={validateInputToCreateGame()}
+                conditionalLink={validateInputToCreateGame() && validateEmail(email) && validateZipcode(zipCode)}
             />
             <div className="middleText">OR</div>
-            <Form
+            <form
                 className="input1"
                 field="Enter Game Code"
                 onHandleChange={handleCodeChange}

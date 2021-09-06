@@ -158,10 +158,12 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         async function subscribe(){
             
             await channel.subscribe(something => {
-                console.log('something.data = ', something.data);
-                setRoundNumber(something.data.roundNumber);
-                console.log("made it to subscribe");
-                history.push(something.data.path);
+                if (something.data.alias === alias) {
+                    console.log('something.data = ', something.data);
+                    setRoundNumber(something.data.roundNumber);
+                    console.log("made it to subscribe");
+                    history.push(something.data.path);
+                }
             })
         }
         subscribe();

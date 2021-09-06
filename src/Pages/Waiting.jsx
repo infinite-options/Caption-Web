@@ -54,7 +54,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                         }
                         setNames(names_db);
                         console.log("made it 2");
-                        channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
+                        channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname, alias: newPlayer.data.newPlayerName}})
 
                     })
                     .catch(err => console.error('error = ', err));

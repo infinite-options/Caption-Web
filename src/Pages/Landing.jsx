@@ -134,9 +134,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             })
 
             setHost(false);
+            console.log('pubbing to host with code: ', code);
             pub(code);
             // console.log("path: ", path);
-            // history.push(path);
+            history.push('/waiting');
 
         } else {
             window.alert("To join a game, fill out the necessary information and the correct gamecode.");
@@ -155,23 +156,23 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     
 
     useEffect(() => {
-        async function subscribe(){
+        // async function subscribe(){
             
-            await channel.subscribe(something => {
-                if (something.data.alias === alias) {
-                    console.log('something.data = ', something.data);
-                    setRoundNumber(something.data.roundNumber);
-                    console.log("made it to subscribe");
-                    history.push(something.data.path);
-                }
-            })
-        }
-        subscribe();
-        console.log("code: ", code);
-        console.log("alias", alias);
-        return function cleanup(){
-            channel.unsubscribe();
-        }
+        //     await channel.subscribe(something => {
+        //         if (something.data.alias === alias) {
+        //             console.log('something.data = ', something.data);
+        //             setRoundNumber(something.data.roundNumber);
+        //             console.log("made it to subscribe");
+        //             history.push(something.data.path);
+        //         }
+        //     })
+        // }
+        // subscribe();
+        // console.log("code: ", code);
+        // console.log("alias", alias);
+        // return function cleanup(){
+        //     channel.unsubscribe();
+        // }
     }, [code]);
 
     useEffect(() => console.log('landing roundNumber = ', roundNumber), [roundNumber]);

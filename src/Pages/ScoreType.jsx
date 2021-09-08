@@ -38,7 +38,7 @@ function ScoreType({channel}) {
                 console.log(res);
             })
             console.log("Log 1: Finish Posting");
-            pub();
+            
 
             const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
             console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
@@ -47,6 +47,7 @@ function ScoreType({channel}) {
                 // setImageSrc(res.data.image_url);
                 setImageURL(res.data.image_url);
             })
+            pub();
         }
         postedPub();
   

@@ -47,6 +47,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
 
     const handleCaptionChange = (newCaption) => {
         setCaption(newCaption);
+        
     };
 
     function countdownComplete() {
@@ -211,6 +212,10 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
     }
 
     async function postSubmitCaption() {
+        if(caption === ""){
+            alert("Please enter a caption.")
+            return
+        }
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
         console.log('Posting caption');
 

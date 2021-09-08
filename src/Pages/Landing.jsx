@@ -40,7 +40,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             alias !== "");
     }
 
-    
+    console.log("email: " , email);
 
     function validateInputToJoinGame() {
         return (code !== "" && validateInputToCreateGame());
@@ -145,13 +145,17 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
     }
     function validateEmail(email) {
-        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const re = /[\w\d]{1,}@[\w\d]{1,}.[\w\d]{1,}/;
+        // /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(String(email).toLowerCase());
+        
     }
+    
 
     function validateZipcode(zipCode) {
-        const re = /^\d{5}$/ ;
-        return re.test(zipCode);
+        const reZ = /^\d{5}$/ ;
+        return reZ.test(zipCode);
+       
     }
     
 

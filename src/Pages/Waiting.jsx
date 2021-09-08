@@ -83,6 +83,8 @@ export default function Waiting({channel, channel2, channel_joining}) {
             })
         }
         
+        // console.log("")
+        
         if (code) {
             subscribe1();
             subscribe2();

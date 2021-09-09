@@ -10,7 +10,7 @@ import {useHistory} from "react-router-dom";
 function ScoreType({channel}) {
     const history = useHistory();
     const[buttonType, setbuttonType] = useState("");
-    const {code, rounds, roundDuration, host, setImageURL, roundNumber} = useContext(LandingContext);
+    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias} = useContext(LandingContext);
 
     const pub = ()=> {
         console.log('sending players to start game');
@@ -53,9 +53,10 @@ function ScoreType({channel}) {
   
     }
 
-    useEffect(() => {
+    useEffect(() => 
+    console.log('Currently in Scoretype', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
 
-    }, []);
 
 
     return (

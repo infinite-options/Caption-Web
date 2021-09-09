@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState, Component} from 'react'
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import circle from "../Assets/circle.png";
@@ -9,7 +9,7 @@ import {LandingContext} from "../App";
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host, rounds, roundNumber, setImageURL} = useContext(LandingContext);
+    const {code, host, rounds, roundNumber, setImageURL, alias} = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const history = useHistory();
     /**
@@ -105,6 +105,11 @@ export default function Waiting({channel, channel2, channel_joining}) {
             }, 10000);
         }
     }, [copied])
+
+    useEffect(() => 
+    console.log('Currently in Waiting', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
+
 
     return (
         <div

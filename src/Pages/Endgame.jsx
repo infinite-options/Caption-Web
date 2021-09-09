@@ -10,7 +10,7 @@ export default function Endgame() {
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
 
 
-    const {code, roundNumber, host, rounds} = useContext(LandingContext);
+    const {code, roundNumber, host, rounds, alias} = useContext(LandingContext);
 
 
     useEffect(() => {
@@ -49,6 +49,10 @@ export default function Endgame() {
             </div>
         );
     }
+    useEffect(() => 
+        console.log('Currently in Endgame', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
+
 
 
     return (

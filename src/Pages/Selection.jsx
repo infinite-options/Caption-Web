@@ -289,15 +289,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     }
 
     function renderCaptions() {
-        // const temp = playersArr.slice(0, playersArr.length)
-        // function shuffleArray(array) {
-        //     for (let i = array.length - 1; i > 0; i--) {
-        //         const j = Math.floor(Math.random() * (i + 1));
-        //         [array[i], array[j]] = [array[j], array[i]];
-        //     }
-        // }
-        // shuffleArray(temp);
-        // console.log("temp: ", temp)
         var captions = [];
         console.log('temp.length = ', playersArr.length);
         for (var index = 0; index < playersArr.length; index++) {
@@ -324,6 +315,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         console.log('captions = ', captions);
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
+    useEffect(() => 
+    console.log('Currently in Selection', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
 
 
     return (

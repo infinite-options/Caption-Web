@@ -93,6 +93,11 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
         channel.publish({data: {roundStarted: true}});
     }
 
+    useEffect(() => 
+    console.log('Currently in Scoreboard', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
+
+
     function renderReports() {
 
         return (

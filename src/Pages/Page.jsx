@@ -203,6 +203,11 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
         };
     }, [waitingPlayers]);
 
+     useEffect(() => 
+     console.log('Currently in Pages', "Alias:",alias, "Current Round: ", roundNumber), 
+     []);
+
+
     function determineLag(current, start) {
         if (current - start >= 0) {
             return current - start;

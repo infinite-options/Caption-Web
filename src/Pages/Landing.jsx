@@ -14,6 +14,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     const {code, name, alias, email, zipCode, host, roundNumber} = useContext(LandingContext);
     const [path, setPath] = useState('');
 
+    useState(() => setRoundNumber(1), []);
+
     const handleCodeChange = (codeInput) => {
         setCode(codeInput);
     };

@@ -97,6 +97,15 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     }
                     
                 }
+                // const temp = playersArr.slice(0, playersArr.length)
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+        shuffleArray(temp_players_arr);
+        console.log("temp: ", temp_players_arr)
 
                 setPlayersArr(temp_players_arr);
                 if (res.data.players.length <= 1)
@@ -280,9 +289,17 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     }
 
     function renderCaptions() {
-
+        // const temp = playersArr.slice(0, playersArr.length)
+        // function shuffleArray(array) {
+        //     for (let i = array.length - 1; i > 0; i--) {
+        //         const j = Math.floor(Math.random() * (i + 1));
+        //         [array[i], array[j]] = [array[j], array[i]];
+        //     }
+        // }
+        // shuffleArray(temp);
+        // console.log("temp: ", temp)
         var captions = [];
-        console.log('playersArr.length = ', playersArr.length);
+        console.log('temp.length = ', playersArr.length);
         for (var index = 0; index < playersArr.length; index++) {
             /**
              * The value of index continues to increment due to the loop,

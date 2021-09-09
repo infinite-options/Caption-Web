@@ -18,7 +18,7 @@ export default function Endgame() {
         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
         axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
             console.log(res);
-            res.data.scoreboard.sort((a, b) => (b.score - a.score));
+            res.data.scoreboard.sort((a, b) => (b.game_score===a.game_score ? b.score - a.score : b.game_score - a.game_score));
             setScoreboardInfo(res.data.scoreboard);
         })
 

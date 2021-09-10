@@ -31,13 +31,18 @@ export default function Endgame() {
 
     }, []);
 
+    let winning_score = Number.NEGATIVE_INFINITY;
+    for (const playerInfo of scoreboardInfo)
+        winning_score = playerInfo.game_score > winning_score ? playerInfo.game_score :
+            winning_score;
+
     function renderReports() {
         return (
             <div>
                 {
                     scoreboardInfo.map((item, index) => (
                         <Report
-                            isWinner={index == 0}
+                            isWinner={winning_score === item.game_score}
                             alias={item.user_alias}
                             caption={item.caption}
                             points={item.score}

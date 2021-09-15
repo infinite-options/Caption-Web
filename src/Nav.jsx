@@ -5,6 +5,7 @@ import Page1 from "./Pages/Page";
 import Collections from "./Pages/Collections";
 import Scoreboard from "./Pages/Scoreboard";
 import Landing from "./Pages/Landing";
+import HiddenPage from "./Pages/HiddenPage";
 import Selection from "./Pages/Selection";
 import Waiting from "./Pages/Waiting";
 import GameRules from "./Pages/GameRules"
@@ -93,6 +94,8 @@ export default function Nav() {
                 <Route exact path="/scoretype">
                     <ScoreType channel = {channel_rounds} />
                 </Route>
+                
+                <Route exact path="/hiddenpage" component={HiddenPage}/>
             </Switch>
         </Router>
     );

@@ -26,6 +26,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [SelectedMyCaption, setSelectedMyCaption] = useState(false);
     const [waitingOnPlayers, setwaitingOnPlayers] = useState([]);
     const [timerDuration, setTimerDuration] = useState(-1);
+    const [timeLeft, setTimeLeft] = useState(Number.POSITIVE_INFINITY);
 
     const pub_host = (playerCount) => {
         console.log('in pub_host');
@@ -256,12 +257,15 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
         if(playersArr[index].round_user_uid !== playerUID) {
             toggleArr[index] = true;
+            console.log('feshfjksef: playersArr[index] = ', playersArr[index]);
             setSelectedCaption(playersArr[index].caption);
         }
 
         console.log("Result: " + toggleArr);
         // setToggleState(index);
     }
+
+    useEffect(() => console.log('selected-Caption: ', selectedCaption), [selectedCaption]);
 
     async function postVote() {
         console.log('postVote called');
@@ -271,7 +275,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
 
         const payload = {
-            caption: selectedCaption,
+            caption: selectedCaption === '' ? null : selectedCaption,
             game_code: code.toString(),
             round_number: roundNumber.toString()
         };
@@ -287,6 +291,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             pub_host(res.data.players_count);
         });
     }
+
+    useEffect(() => timerDuration === -1 ? '' : setTimeLeft(timerDuration), [timerDuration]);
 
     function renderCaptions() {
         var captions = [];
@@ -315,10 +321,17 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         console.log('captions = ', captions);
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
-    useEffect(() => 
-    console.log('Currently in Selection', "Alias:",alias, "Current Round: ", roundNumber), 
-    []);
 
+    useEffect(() => {
+        if (timeLeft > 0 && timeLeft !== Number.POSITIVE_INFINITY)
+            setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+        else if (timeLeft === 0 && !localUserVoted)
+            postVote();
+    }, [timeLeft]);
+
+    useEffect(() => {
+        console.log('timeLeft = ', timeLeft);
+    }, [timeLeft]);
 
     return (
         <div
@@ -383,7 +396,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         width: "60px",
                     }}
                 >
-                    {timerDuration != -1 ? <CountdownCircleTimer
+                    {timerDuration != -1 ?
+                    <CountdownCircleTimer
                         background="red"
                         size={60}
                         strokeWidth={5}
@@ -391,8 +405,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         duration={timerDuration}
                         colors="#000000"
                         onComplete={() => {
-                            if (host)
-                                pub_host(0);
+                            // if (host)
+                            //     pub_host(0);
                         }}
                     >
                         {({remainingTime}) => {

@@ -30,9 +30,10 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
     
     };
 
-    function myFunction() {
-        console.log("Made it in the function.");
+    function myFunction(e) {
+        console.log("Made it in the function: ", e.target);
         alert("The form was submitted");
+        // https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/uploadImage
       }
 
     return (
@@ -56,7 +57,7 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
             <h5>svd
             </h5>
 
-            <form  onsubmit="myFunction()">
+            <form  onSubmit= {myFunction}>
                 <label for="myfile">Select files:</label>
                 <input type="file" id="myfile" name="myfile" multiple /><br></br>
                 <input type="submit" />

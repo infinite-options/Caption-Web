@@ -30,11 +30,16 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
     
     };
 
-    function myFunction(e) {
-        console.log("Made it in the function: ", e.target);
-        alert("The form was submitted");
-        // https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/uploadImage
-      }
+    // function myFunction(e) {
+    //     console.log("Made it in the function: ", e.target);
+    //     const formData = new FormData(e.target);
+    //     for (const [key, value] of formData)
+    //     {
+    //         console.log('key = ', key, ', value = ', value);
+    //     }
+    //     alert("The form was submitted");
+    //     // https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/uploadImage
+    //   }
 
     return (
         <div
@@ -57,9 +62,22 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
             <h5>svd
             </h5>
 
-            <form  onSubmit= {myFunction}>
+            <form>
                 <label for="myfile">Select files:</label>
-                <input type="file" id="myfile" name="myfile" multiple /><br></br>
+                <input
+                    type="file"
+                    id="myfile"
+                    name="myfile"
+                    multiple
+                    onChange={(e) => {
+                        console.log('here: selecting image with files = ', e.target.files);
+                        if (e.target.files[0]) {
+                          const image1 = e.target.files[0];
+                          const url = URL.createObjectURL(image1);
+                          console.log('image1 = ', image1, '\nurl = ', url);
+                        }
+                    }}
+                /><br></br>
                 <input type="submit" />
             </form>
 

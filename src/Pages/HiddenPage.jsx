@@ -14,6 +14,9 @@ import {useHistory} from "react-router-dom";
 export default function HiddenPage({setRounds, setRoundDuration, channel }) {
     const history = useHistory();
     const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias} = useContext(LandingContext);
+    const [images, setImages] = useState(null);
+    const [imagesURL, setImagesURL] = useState(null);
+
     // const id = document.getElementsByClassName("myfile")[0].value;
     // console.log("D: ", id);
 
@@ -21,13 +24,6 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
     }
     const handleRoundsChange = (roundsInput) => {
        setRounds(parseInt(roundsInput));
-    };
-
-    {/*Need some way to check that the input is an integer*/
-    }
-    const handleRoundsDurationChange = (durationInput) => {
-       setRoundDuration(durationInput);
-    
     };
 
     // function myFunction(e) {
@@ -40,6 +36,10 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
     //     alert("The form was submitted");
     //     // https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/uploadImage
     //   }
+
+    const handleSubmit = () => {
+
+    };
 
     return (
         <div
@@ -55,14 +55,11 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
             <div className="spacer"/>
 
 
-            <h4> Select your images</h4>
+            <h4>Select your images</h4>
 
             <br></br>
 
-            <h5>svd
-            </h5>
-
-            <form>
+            <form onSubmit = {handleSubmit}>
                 <label for="myfile">Select files:</label>
                 <input
                     type="file"
@@ -71,11 +68,15 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
                     multiple
                     onChange={(e) => {
                         console.log('here: selecting image with files = ', e.target.files);
-                        if (e.target.files[0]) {
-                          const image1 = e.target.files[0];
-                          const url = URL.createObjectURL(image1);
-                          console.log('image1 = ', image1, '\nurl = ', url);
+                        setImages(e.target.files);
+                        
+                        const tempURLs = [];
+                        for (const file of e.target.files)
+                        {
+                            const imageURL = URL.createObjectURL(file);
+                            tempURLs.push(imageURL);
                         }
+                        setImagesURL(tempURLs);
                     }}
                 /><br></br>
                 <input type="submit" />
@@ -86,7 +87,7 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
 
             <br></br>
 
-            <Button className="landing" conditionalLink={true} destination="/scoretype"
+            <Button className="landing" conditionalLink={true} destination="/"
                     children="Continue"/>
 
         </div>

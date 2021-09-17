@@ -38,7 +38,30 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
     //   }
 
     const handleSubmit = () => {
+        const postData = (data) => {
+            const url = 'https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/uploadImage';
+            fetch(url, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data)
+            }).then(res => console.log('images = ', res)).catch(err => console.error('image error = ', err));
+        };
 
+        for (let i = 0; i < imagesURL.length; i++)
+        {
+            const [imageURL, image] = [imagesURL[i], images[i]];
+            console.log('imageURL = ', imageURL, ', image = ', image);
+            const data = {
+                image_title: image.name,
+                image_description: '',
+                image_cost: '',
+                image_file: image,
+            };
+            postData(data);
+        }
     };
 
     return (

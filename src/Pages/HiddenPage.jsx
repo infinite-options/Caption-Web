@@ -37,31 +37,48 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
     //     // https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/uploadImage
     //   }
 
-    const handleSubmit = () => {
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        const file = images;
+        console.log('file = ', file);
         const postData = (data) => {
             const url = 'https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/uploadImage';
-            fetch(url, {
-                method: 'POST',
-                mode: 'cors',
+            console.log('data = ', data);
+            axios.post(url,data,  {
                 headers: {
-                    'Content-Type': 'application/json',
+                    'accept': 'application/json',
+                    'Accept-Language': 'en-US,en;q=0.8',
+                    'Content-Type': `multipart/form-data; boundary = ${data._boundary}`,
                 },
-                body: JSON.stringify(data)
-            }).then(res => console.log('images = ', res)).catch(err => console.error('image error = ', err));
+            }).then(res => console.log('image.response = ', res)).catch(err => console.error('image.error = ', err));
+            // fetch(url, {
+            //     method: 'POST',
+            //     mode: 'cors',
+            //     headers: {
+            //         'Content-Type': 'multipart/form-data',
+            //     },
+            //     body: JSON.stringify(data)
+            // }).then(res => console.log('images = ', res)).catch(err => console.error('image error = ', err));
         };
+        console.log('testing');
+        const formData = new FormData();
+        formData.append('image_title', file.name);
+        formData.append('image_description', 'blank');
+        formData.append('image_cost', 'blank');
+        formData.append('image_file', file);
+        postData(formData);
 
-        for (let i = 0; i < imagesURL.length; i++)
-        {
-            const [imageURL, image] = [imagesURL[i], images[i]];
-            console.log('imageURL = ', imageURL, ', image = ', image);
-            const data = {
-                image_title: image.name,
-                image_description: '',
-                image_cost: '',
-                image_file: image,
-            };
-            postData(data);
-        }
+        // for (let i = 0; i < imagesURL.length; i++)
+        // {
+        //     const [imageURL, image] = [imagesURL[i], images[i]];
+        //     console.log('imageURL = ', imageURL, ', image = ', image);
+        //     const formData = new FormData();
+        //     formData.append('image_title', image.name);
+        //     formData.append('image_description', '');
+        //     formData.append('image_cost', '');
+        //     formData.append('image_file', image);
+        //     postData(formData);
+        // }
     };
 
     return (
@@ -82,7 +99,7 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
 
             <br></br>
 
-            <form onSubmit = {handleSubmit}>
+            <form method="POST" encType="multipart/form-data" onSubmit = {handleSubmit}>
                 <label for="myfile">Select files:</label>
                 <input
                     type="file"
@@ -91,7 +108,7 @@ export default function HiddenPage({setRounds, setRoundDuration, channel }) {
                     multiple
                     onChange={(e) => {
                         console.log('here: selecting image with files = ', e.target.files);
-                        setImages(e.target.files);
+                        setImages(e.target.files[0]);
                         
                         const tempURLs = [];
                         for (const file of e.target.files)

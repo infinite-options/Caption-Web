@@ -15,6 +15,7 @@ import Endgame from "./Pages/Endgame";
 import ScoreType from "./Pages/ScoreType";
 import {LandingContext} from "./App";
 import Ably from 'ably/promises';
+import uploadPage from "./Pages/uploadPage";
 const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 // export const LandingContext = React.createContext();
@@ -79,8 +80,9 @@ export default function Nav() {
 
                 <Route exact path="/gamerules" component={GameRules}/>
                 <Route exact path="/deckinfo" component={DeckInfo}/>
-                <Route exact path="/error" component={Error}/>
+                {/*<Route exact path="/error" component={Error}/>*/}
 
+                <Route exact path="/uploadPage" component={uploadPage}/>
 
 
                 <Route exact path='/rounds'>

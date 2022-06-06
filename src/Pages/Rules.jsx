@@ -3,8 +3,6 @@ import React from "react";
 export default function Rules() {
     return <div>
         <h4>Game Rules</h4>
-
-
         <p>
             1. Pick a deck for the game 2. You can learn about the artist and their collection by clicking on Learn More
             3. Once into the game, you will see an image and will have 60 seconds to caption it. 4. Click Submit to

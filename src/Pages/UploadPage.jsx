@@ -6,65 +6,16 @@ import rectangle from '../Assets/rectangle.png';
 import "../Styles/Error.css";
 import axios from "axios";
 import ImageUploading from 'react-images-uploading';
-
-import Dropzone from 'react-dropzone'
-
-
-/*
-File to Byte Array code: https://dilshankelsen.com/convert-file-to-byte-array/
- */
+import Form from "../Components/Form.jsx";
 
 export default function UploadPage() {
     const [images,setImages] = useState();
     const [file, setFile] = useState("");
     const maxNumber = 69;
-
-    // async function handleUpload(e) {
-    //     //Just the file?
-    //     let file = e.target.files[0];
-    //     setImage(file);
-    //     console.log("Uploading " + file.name);
-    //
-    //
-    //     //Try Byte Array?
-    //     const byteFile = await getAsByteArray(file);
-    //     console.log("File converted to byteArray " + byteFile);
-    //     //setImage(byteFile);
-    // }
-    // async function getAsByteArray(file) {
-    //     return new Uint8Array(await readFile(file))
-    // }
-    //
-    // function readFile(file) {
-    //     return new Promise((resolve, reject) => {
-    //         // Create file reader
-    //         let reader = new FileReader()
-    //
-    //         // Register event listeners
-    //         reader.addEventListener("loadend", e => resolve(e.target.result))
-    //         reader.addEventListener("error", reject)
-    //
-    //         // Read file
-    //         reader.readAsArrayBuffer(file)
-    //     })
-    // }
-    // function upload() {
-    //     const payload = {
-    //         image_title: "testUpload",
-    //         image_description: "mickey's test image upload",
-    //         image_cost: "",
-    //         image_file: images[0].file
-    //     };
-    //
-    //     console.log('payload for upload = ', payload);
-    //     const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/uploadImage";
-    //     axios.post(postURL, payload).then((res) => console.log(res));
-    // }
+    const[deckName, setDeckName] = useState("");
 
     const updateData = (index) => {
-
         let formData = new FormData();
-
         console.log("File",  images[index].file)
         formData.append('image_title',  images[index].file.name);
         formData.append('image_description', "upload from app");
@@ -80,10 +31,12 @@ export default function UploadPage() {
     }
 
     const onChange = (imageList, addUpdateIndex) => {
-        // data for submit
-
-        console.log("below is the image list", imageList, addUpdateIndex);
+        console.log(imageList, addUpdateIndex);
         setImages(imageList);
+    };
+
+    const handleDeckNameChange = (deckNameInput) => {
+        setDeckName(deckNameInput);
     };
 
     return (
@@ -104,6 +57,11 @@ export default function UploadPage() {
         <div>
             <img src={rectangle} alt="" class="rectangle"/>
             <div class="message">
+                <Form
+                    field="Your Name"
+                    onHandleChange={handleDeckNameChange}
+                    type="text"
+                />
 
                 <ImageUploading
                     multiple

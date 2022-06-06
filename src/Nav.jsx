@@ -15,7 +15,7 @@ import Endgame from "./Pages/Endgame";
 import ScoreType from "./Pages/ScoreType";
 import {LandingContext} from "./App";
 import Ably from 'ably/promises';
-import uploadPage from "./Pages/uploadPage";
+import uploadPage from "./Pages/UploadPage";
 const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 // export const LandingContext = React.createContext();

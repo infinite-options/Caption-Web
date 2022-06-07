@@ -10,7 +10,7 @@ export default function Endgame() {
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
 
 
-    const {code, roundNumber, host, rounds} = useContext(LandingContext);
+    const {code, roundNumber, host, rounds, alias} = useContext(LandingContext);
 
 
     useEffect(() => {
@@ -18,7 +18,7 @@ export default function Endgame() {
         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
         axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
             console.log(res);
-            res.data.scoreboard.sort((a, b) => (b.score - a.score));
+            res.data.scoreboard.sort((a, b) => (b.game_score===a.game_score ? b.score - a.score : b.game_score - a.game_score));
             setScoreboardInfo(res.data.scoreboard);
         })
 
@@ -31,13 +31,18 @@ export default function Endgame() {
 
     }, []);
 
+    let winning_score = Number.NEGATIVE_INFINITY;
+    for (const playerInfo of scoreboardInfo)
+        winning_score = playerInfo.game_score > winning_score ? playerInfo.game_score :
+            winning_score;
+
     function renderReports() {
         return (
             <div>
                 {
                     scoreboardInfo.map((item, index) => (
                         <Report
-                            isWinner={index == 0}
+                            isWinner={winning_score === item.game_score}
                             alias={item.user_alias}
                             caption={item.caption}
                             points={item.score}
@@ -49,6 +54,10 @@ export default function Endgame() {
             </div>
         );
     }
+    useEffect(() => 
+        console.log('Currently in Endgame', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
+
 
 
     return (

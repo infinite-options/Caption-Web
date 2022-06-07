@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useState,} from "react";
 import {Row, Col, Card} from "reactstrap";
 import Deck from "../Components/Deck";
 import "../Styles/Collections.css";
@@ -43,6 +43,7 @@ function Collections() {
 
 
 
+
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks";
         axios.get(getURL).then((res) => {
@@ -51,6 +52,7 @@ function Collections() {
             console.log('deckArray: ', res.data.decks_info);
         })
     }, []);
+
 
 
     return (

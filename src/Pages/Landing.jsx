@@ -14,6 +14,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     const {code, name, alias, email, zipCode, host, roundNumber} = useContext(LandingContext);
     const [path, setPath] = useState('');
 
+    useState(() => setRoundNumber(1), []);
+
     const handleCodeChange = (codeInput) => {
         setCode(codeInput);
     };
@@ -40,7 +42,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             alias !== "");
     }
 
-    
+    console.log("email: " , email);
 
     function validateInputToJoinGame() {
         return (code !== "" && validateInputToCreateGame());
@@ -134,9 +136,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             })
 
             setHost(false);
+            console.log('pubbing to host with code: ', code);
             pub(code);
             // console.log("path: ", path);
-            // history.push(path);
+            history.push('/waiting');
 
         } else {
             window.alert("To join a game, fill out the necessary information and the correct gamecode.");
@@ -144,34 +147,38 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
     }
     function validateEmail(email) {
-        const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const re = /[\w\d]{1,}@[\w\d]{1,}.[\w\d]{1,}/;
+        // /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
         return re.test(String(email).toLowerCase());
+        
     }
+    
 
     function validateZipcode(zipCode) {
-        const re = /^\d{5}$/ ;
-        return re.test(zipCode);
+        const reZ = /^\d{5}$/ ;
+        return reZ.test(zipCode);
+       
     }
     
 
     useEffect(() => {
-        async function subscribe(){
+        // async function subscribe(){
             
-            await channel.subscribe(something => {
-                if (something.data.alias === alias) {
-                    console.log('something.data = ', something.data);
-                    setRoundNumber(something.data.roundNumber);
-                    console.log("made it to subscribe");
-                    history.push(something.data.path);
-                }
-            })
-        }
-        subscribe();
-        console.log("code: ", code);
-        console.log("alias", alias);
-        return function cleanup(){
-            channel.unsubscribe();
-        }
+        //     await channel.subscribe(something => {
+        //         if (something.data.alias === alias) {
+        //             console.log('something.data = ', something.data);
+        //             setRoundNumber(something.data.roundNumber);
+        //             console.log("made it to subscribe");
+        //             history.push(something.data.path);
+        //         }
+        //     })
+        // }
+        // subscribe();
+        // console.log("code: ", code);
+        // console.log("alias", alias);
+        // return function cleanup(){
+        //     channel.unsubscribe();
+        // }
     }, [code]);
 
     useEffect(() => console.log('landing roundNumber = ', roundNumber), [roundNumber]);

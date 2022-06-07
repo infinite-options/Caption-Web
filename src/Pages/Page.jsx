@@ -47,6 +47,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
 
     const handleCaptionChange = (newCaption) => {
         setCaption(newCaption);
+        
     };
 
     function countdownComplete() {
@@ -202,6 +203,11 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
         };
     }, [waitingPlayers]);
 
+     useEffect(() => 
+     console.log('Currently in Pages', "Alias:",alias, "Current Round: ", roundNumber), 
+     []);
+
+
     function determineLag(current, start) {
         if (current - start >= 0) {
             return current - start;
@@ -211,6 +217,10 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
     }
 
     async function postSubmitCaption() {
+        if(caption === ""){
+            alert("Please enter a caption.")
+            return
+        }
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
         console.log('Posting caption');
 

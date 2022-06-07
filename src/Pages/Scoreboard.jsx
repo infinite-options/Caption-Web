@@ -93,6 +93,16 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
         channel.publish({data: {roundStarted: true}});
     }
 
+    useEffect(() => 
+    console.log('Currently in Scoreboard', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
+
+    let winning_score = Number.NEGATIVE_INFINITY;
+    for (const playerInfo of scoreboardInfo)
+        winning_score = playerInfo.score > winning_score ? playerInfo.score :
+            winning_score;
+
+
     function renderReports() {
 
         return (
@@ -100,7 +110,7 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
                 {
                     scoreboardInfo.map((item, index) => (
                         <Report
-                            isWinner={index == 0}
+                            isWinner={winning_score === item.score}
                             alias={item.user_alias}
                             caption={item.caption}
                             points={item.score}

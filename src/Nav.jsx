@@ -5,6 +5,7 @@ import Page1 from "./Pages/Page";
 import Collections from "./Pages/Collections";
 import Scoreboard from "./Pages/Scoreboard";
 import Landing from "./Pages/Landing";
+import HiddenPage from "./Pages/HiddenPage";
 import Selection from "./Pages/Selection";
 import Waiting from "./Pages/Waiting";
 import GameRules from "./Pages/GameRules"
@@ -13,9 +14,9 @@ import Error from "./Pages/Error";
 import Rounds from "./Pages/Rounds";
 import Endgame from "./Pages/Endgame";
 import ScoreType from "./Pages/ScoreType";
+import UploadPage from "./Pages/UploadPage";
 import {LandingContext} from "./App";
 import Ably from 'ably/promises';
-import uploadPage from "./Pages/UploadPage";
 const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 // export const LandingContext = React.createContext();
@@ -80,9 +81,10 @@ export default function Nav() {
 
                 <Route exact path="/gamerules" component={GameRules}/>
                 <Route exact path="/deckinfo" component={DeckInfo}/>
-                {/*<Route exact path="/error" component={Error}/>*/}
+                <Route exact path="/error" component={Error}/>
 
-                <Route exact path="/uploadPage" component={uploadPage}/>
+                <Route exact path="/uploadPage" component={UploadPage}/>
+
 
 
                 <Route exact path='/rounds'>
@@ -95,6 +97,8 @@ export default function Nav() {
                 <Route exact path="/scoretype">
                     <ScoreType channel = {channel_rounds} />
                 </Route>
+
+                <Route exact path="/hiddenpage" component={HiddenPage}/>
             </Switch>
         </Router>
     );

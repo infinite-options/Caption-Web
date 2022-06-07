@@ -13,7 +13,7 @@ import {useHistory} from "react-router-dom";
 
 export default function Rounds({setRounds, setRoundDuration, channel }) {
     const history = useHistory();
-    const {code, rounds, roundDuration, host, setImageURL, roundNumber} = useContext(LandingContext);
+    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias} = useContext(LandingContext);
 
 
     {/*Need some way to check that the input is an integer*/
@@ -65,6 +65,11 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
     //     postedPub();
   
     // }
+
+    useEffect(() => 
+    console.log('Currently in Rounds', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
+
 
     return (
         <div

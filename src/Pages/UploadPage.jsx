@@ -7,8 +7,6 @@ import "../Styles/Error.css";
 import axios from "axios";
 import ImageUploading from 'react-images-uploading';
 
-import Dropzone from 'react-dropzone'
-
 
 /*
 File to Byte Array code: https://dilshankelsen.com/convert-file-to-byte-array/

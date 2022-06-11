@@ -48,6 +48,20 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         return (code !== "" && validateInputToCreateGame());
     }
 
+    function emailExists() {
+        // const postURL =
+        //         "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
+        //     const payload = {
+        //         user_code: temp,
+        //         user_email: email,
+        //     };
+
+        //     axios.post(postURL, payload).then((res) => {
+        //         console.log('create-res = ', res);
+        //     });
+          return false;
+    }
+
     async function createGame() {
         const valid = validateEmail(email);
         const validZ = validateZipcode(zipCode);
@@ -139,7 +153,13 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             console.log('pubbing to host with code: ', code);
             pub(code);
             // console.log("path: ", path);
-            history.push('/waiting');
+            if (emailExists) {
+                history.push('/waiting');
+            }
+            else {
+                history.push('/confirmation')
+            }
+            
 
         } else {
             window.alert("To join a game, fill out the necessary information and the correct gamecode.");
@@ -225,7 +245,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 isSelected={true}
                 onClick={createGame}
                 className="landing"
-                destination="/waiting"
+                destination={emailExists() ? "/waiting" : "/confirmation"}
                 children="Create New Game"
                 conditionalLink={validateInputToCreateGame() && validateEmail(email) && validateZipcode(zipCode)}
             />

@@ -1,0 +1,36 @@
+.header {
+    font-family: "Josefin Sans", sans-serif;
+    font-size: 20px;
+    font-weight: bold;
+    position: absolute;
+    top: 81px;
+    left: 61px;
+    
+  }
+  
+  .list {
+    font-family: "Josefin Sans", sans-serif;
+    font-weight: lighter;
+    font-size: 20px;
+    width: 375px;
+    height: 812px;
+    top: 151px;
+    bottom: 161px;
+    left: 19px;
+    right: 16px;
+    position: absolute;
+    text-align: left;
+    line-height: 24px;
+  }
+  
+  .blueText {
+    color: #3a91fb;
+  }
+  .confirmed {
+    font-size: 333;
+    font-weight: bold;
+  }
+  .try {
+        color: red;
+  }
+ 

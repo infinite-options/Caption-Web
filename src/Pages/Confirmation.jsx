@@ -5,36 +5,49 @@ import {Link} from "react-router-dom";
 import "../Styles/Confirmation.css";
 import {LandingContext} from "../App";
 import { Button } from '../Components/Button';
+import {useHistory} from "react-router-dom";
 import axios from "axios";
 export default function Confirmation(){
     const [temp, setTemp]=useState("");
-    const [isConfirmed, setIsConfirmed] = useState(false);
-    const answer = String(333)
     const {host, email} = useContext(LandingContext);
     const [input, setInput]=useState("");
     const [destination, setDestination] = useState("/waiting")
-
+    const [correct, setCorrect] = useState(false);
+    const answer = String("333")
+    const history = useHistory();
     function changeTemp(e) {
         setTemp(e);
     }
     const handleValueInput = (e) => {
         setInput(temp);
-        if (input===answer) {
-            setIsConfirmed(true)
+        check();
+        if(correct) {
+            history.push('/waiting');
         }
       };
     function check() {
-        // const postURL =
-        //         "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
-        //     const payload = {
-        //         user_code: temp,
-        //         user_email: email,
-        //     };
-
-        //     axios.post(postURL, payload).then((res) => {
-        //         console.log('create-res = ', res);
-        //     });
-          return temp===answer
+        var exists = false;
+        const postURL =
+                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidationCode";
+        const payload = {
+                email: email,
+                code: temp
+        };
+        async function confirming() {
+            await axios.post(postURL, payload).then((res) => {
+                console.log(res.data.message);
+                console.log(res);
+                console.log(temp + " " + email);
+                if (res.data.message==="Email has been verified") {
+                    console.log("email is verified")
+                    exists = true;
+                    setCorrect(true);
+                }
+            })
+        }
+        confirming(); 
+        console.log(correct);
+        return exists;
     }
 
         return (
@@ -48,13 +61,11 @@ export default function Confirmation(){
                 {(input!==answer)?<div>
                     <ReactCodeInput type='text' fields={3}  onChange={(e) => changeTemp(e)}/>
                 </div>:null}
-                <Link to={check() ? destination : "/confirmation"}>
-                    <button
-                        onClick = {e=>handleValueInput(temp)}
-                    >
-                        Submit
-                    </button>
-                </Link>
+                <button
+                    onClick = {e=>handleValueInput(temp)}
+                >
+                    Submit
+                </button>
                
                 
 

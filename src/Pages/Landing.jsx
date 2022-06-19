@@ -13,6 +13,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
     const {code, name, alias, email, zipCode, host, roundNumber} = useContext(LandingContext);
     const [path, setPath] = useState('');
+    const [emailExistance, setEmailExistance] = useState(false);
 
     useState(() => setRoundNumber(1), []);
 
@@ -49,17 +50,26 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     }
 
     function emailExists() {
-        // const postURL =
-        //         "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
-        //     const payload = {
-        //         user_code: temp,
-        //         user_email: email,
-        //     };
-
-        //     axios.post(postURL, payload).then((res) => {
-        //         console.log('create-res = ', res);
-        //     });
-          return false;
+        var exists = false;
+        const postURL =
+                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
+        const payload = {
+                name: name,
+                email: email,
+                phone_no: "4089119300",
+                message: "wassup"
+        };
+        async function confirming() {
+            await axios.post(postURL, payload).then((res) => {
+                console.log(res);
+                console.log(res.data.message);
+                if (res.data.message==="User has already been verified.") {
+                    exists = true;
+                }
+            })
+        }
+        confirming(); 
+        return exists;
     }
 
     async function createGame() {
@@ -73,6 +83,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
             return;
         }
+       
         if (validateInputToCreateGame()) {
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
@@ -93,6 +104,13 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             setHost(true);
         } else {
             window.alert("To create a game, fill out the necessary information");
+        }
+        if (emailExists()) {
+            setEmailExistance(true);
+            history.push('/waiting');
+        }
+        else {
+            history.push('/confirmation')
         }
     }
 
@@ -153,7 +171,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             console.log('pubbing to host with code: ', code);
             pub(code);
             // console.log("path: ", path);
-            if (emailExists) {
+            if (emailExists()) {
+                setEmailExistance(true);
                 history.push('/waiting');
             }
             else {
@@ -245,7 +264,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 isSelected={true}
                 onClick={createGame}
                 className="landing"
-                destination={emailExists() ? "/waiting" : "/confirmation"}
+                //destination={emailExistance ? "/waiting" : "/confirmation"}
                 children="Create New Game"
                 conditionalLink={validateInputToCreateGame() && validateEmail(email) && validateZipcode(zipCode)}
             />

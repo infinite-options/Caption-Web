@@ -11,43 +11,51 @@ export default function Confirmation(){
     const [temp, setTemp]=useState("");
     const {host, email} = useContext(LandingContext);
     const [input, setInput]=useState("");
-    const [destination, setDestination] = useState("/waiting")
+    const [destination, setDestination] = useState("/waiting");
     const [correct, setCorrect] = useState(false);
-    const answer = String("333")
+    const answer = String("333");
     const history = useHistory();
     function changeTemp(e) {
         setTemp(e);
     }
     const handleValueInput = (e) => {
+        console.log(input);
         setInput(temp);
+        console.log(input);
         check();
+        console.log(correct);
+        setCorrect(true);
+        console.log(correct);
         if(correct) {
             history.push('/waiting');
         }
       };
     function check() {
-        var exists = false;
+        //var exists = false;
         const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidationCode";
         const payload = {
                 email: email,
                 code: temp
         };
-        async function confirming() {
-            await axios.post(postURL, payload).then((res) => {
+        function confirming() {
+            axios.post(postURL, payload).then((res) => {
                 console.log(res.data.message);
                 console.log(res);
                 console.log(temp + " " + email);
                 if (res.data.message==="Email has been verified") {
                     console.log("email is verified")
-                    exists = true;
+                    //exists = true;
                     setCorrect(true);
+                    console.log("Inside confirming call" + correct)
+                    //correct = true
+                    //console.log("Inside confirming call" + correct)
                 }
             })
         }
         confirming(); 
-        console.log(correct);
-        return exists;
+        console.log("after confirming" + correct);
+        //return exists;
     }
 
         return (

@@ -108,25 +108,28 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         } else {
             window.alert("To create a game, fill out the necessary information");
         }
-        const postURL =
-                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
-        const payload = {
-                name: name,
-                email: email,
-                phone_no: "4089119300",
-                message: "wassup"
-        };
-        axios.post(postURL, payload).then((res) => {
-            console.log(res);
-            console.log(res.data.message);
-            if (res.data.message==="User has already been verified.") {
-                console.log("reached user verified")
-                history.push('/waiting');
+        if(validateInputToCreateGame()) {
+            const postURL =
+            "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
+            const payload = {
+                    name: name,
+                    email: email,
+                    phone_no: "4089119300",
+                    message: "wassup"
+            };
+            axios.post(postURL, payload).then((res) => {
+                console.log(res);
+                console.log(res.data.message);
+                if (res.data.message==="User has already been verified.") {
+                    console.log("reached user verified")
+                    history.push('/waiting');
+                    }
+                else {
+                    history.push('/confirmation')
                 }
-            else {
-                history.push('/confirmation')
-            }
-            })
+                })
+        }
+
     }
 
     const pub = (game_code) => {

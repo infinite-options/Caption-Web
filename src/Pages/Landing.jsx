@@ -50,7 +50,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     }
 
     function emailExists() {
-        var exists = false;
+        var isThere = false;
         const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
         const payload = {
@@ -59,17 +59,20 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 phone_no: "4089119300",
                 message: "wassup"
         };
-        async function confirming() {
-            await axios.post(postURL, payload).then((res) => {
-                console.log(res);
-                console.log(res.data.message);
-                if (res.data.message==="User has already been verified.") {
-                    exists = true;
+        axios.post(postURL, payload).then((res) => {
+            console.log(res);
+            console.log(res.data.message);
+            if (res.data.message==="User has already been verified.") {
+                console.log("reached user verified")
+                isThere = true;
+                return true;
                 }
+            else {
+                return false;
+            }
             })
-        }
-        confirming(); 
-        return exists;
+        return isThere;
+        
     }
 
     async function createGame() {
@@ -105,13 +108,25 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         } else {
             window.alert("To create a game, fill out the necessary information");
         }
-        if (emailExists()) {
-            setEmailExistance(true);
-            history.push('/waiting');
-        }
-        else {
-            history.push('/confirmation')
-        }
+        const postURL =
+                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
+        const payload = {
+                name: name,
+                email: email,
+                phone_no: "4089119300",
+                message: "wassup"
+        };
+        axios.post(postURL, payload).then((res) => {
+            console.log(res);
+            console.log(res.data.message);
+            if (res.data.message==="User has already been verified.") {
+                console.log("reached user verified")
+                history.push('/waiting');
+                }
+            else {
+                history.push('/confirmation')
+            }
+            })
     }
 
     const pub = (game_code) => {
@@ -134,10 +149,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             return;
         }
         if (validateInputToJoinGame()) {
-            const postURL =
+            var postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
 
-            const payload = {
+            var payload = {
                 user_name: name,
                 user_alias: alias,
                 user_email: email,
@@ -171,13 +186,25 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             console.log('pubbing to host with code: ', code);
             pub(code);
             // console.log("path: ", path);
-            if (emailExists()) {
-                setEmailExistance(true);
-                history.push('/waiting');
-            }
-            else {
-                history.push('/confirmation')
-            }
+            postURL =
+            "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
+            payload = {
+                    name: name,
+                    email: email,
+                    phone_no: "4089119300",
+                    message: "wassup"
+            };
+            axios.post(postURL, payload).then((res) => {
+                console.log(res);
+                console.log(res.data.message);
+                if (res.data.message==="User has already been verified.") {
+                    console.log("reached user verified")
+                    history.push('/waiting');
+                    }
+                else {
+                    history.push('/confirmation')
+                }
+                })
             
 
         } else {

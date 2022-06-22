@@ -1,4 +1,4 @@
-import React, {useEffect, useState,} from "react";
+import React, {useContext, useEffect, useState,} from "react";
 import {Row, Col, Card} from "reactstrap";
 import Deck from "../Components/Deck";
 import "../Styles/Collections.css";
@@ -8,6 +8,7 @@ import thing from "../Assets/idk.png";
 import {Button} from "../Components/Button";
 import {Link} from "react-router-dom";
 import axios from "axios";
+import {LandingContext} from "../App";
 
 function Collections() {
     // const deckArray = [
@@ -41,12 +42,12 @@ function Collections() {
 
     const [deckArray, setDeckArray] = useState([]);
 
-
+    const {playerUID} = useContext(LandingContext);
 
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks";
-        axios.get(getURL).then((res) => {
+        axios.get(getURL + "/" + playerUID + "," + "true").then((res) => {
             console.log(res);
             setDeckArray(res.data.decks_info);
             console.log('deckArray: ', res.data.decks_info);

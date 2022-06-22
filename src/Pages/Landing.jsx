@@ -13,6 +13,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
     const {code, name, alias, email, zipCode, host, roundNumber} = useContext(LandingContext);
     const [path, setPath] = useState('');
+    const [emailExistance, setEmailExistance] = useState(false);
 
     useState(() => setRoundNumber(1), []);
 
@@ -48,6 +49,32 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         return (code !== "" && validateInputToCreateGame());
     }
 
+    function emailExists() {
+        var isThere = false;
+        const postURL =
+                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
+        const payload = {
+                name: name,
+                email: email,
+                phone_no: "4089119300",
+                message: "wassup"
+        };
+        axios.post(postURL, payload).then((res) => {
+            console.log(res);
+            console.log(res.data.message);
+            if (res.data.message==="User has already been verified.") {
+                console.log("reached user verified")
+                isThere = true;
+                return true;
+                }
+            else {
+                return false;
+            }
+            })
+        return isThere;
+        
+    }
+
     async function createGame() {
         const valid = validateEmail(email);
         const validZ = validateZipcode(zipCode);
@@ -59,6 +86,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
             return;
         }
+       
         if (validateInputToCreateGame()) {
             const postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
@@ -80,6 +108,28 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         } else {
             window.alert("To create a game, fill out the necessary information");
         }
+        if(validateInputToCreateGame()) {
+            const postURL =
+            "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
+            const payload = {
+                    name: name,
+                    email: email,
+                    phone_no: "4089119300",
+                    message: "wassup"
+            };
+            axios.post(postURL, payload).then((res) => {
+                console.log(res);
+                console.log(res.data.message);
+                if (res.data.message==="User has already been verified.") {
+                    console.log("reached user verified")
+                    history.push('/waiting');
+                    }
+                else {
+                    history.push('/confirmation')
+                }
+                })
+        }
+
     }
 
     const pub = (game_code) => {
@@ -102,10 +152,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             return;
         }
         if (validateInputToJoinGame()) {
-            const postURL =
+            var postURL =
                 "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
 
-            const payload = {
+            var payload = {
                 user_name: name,
                 user_alias: alias,
                 user_email: email,
@@ -139,7 +189,26 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             console.log('pubbing to host with code: ', code);
             pub(code);
             // console.log("path: ", path);
-            history.push('/waiting');
+            postURL =
+            "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidated";
+            payload = {
+                    name: name,
+                    email: email,
+                    phone_no: "4089119300",
+                    message: "wassup"
+            };
+            axios.post(postURL, payload).then((res) => {
+                console.log(res);
+                console.log(res.data.message);
+                if (res.data.message==="User has already been verified.") {
+                    console.log("reached user verified")
+                    history.push('/waiting');
+                    }
+                else {
+                    history.push('/confirmation')
+                }
+                })
+            
 
         } else {
             window.alert("To join a game, fill out the necessary information and the correct gamecode.");
@@ -225,7 +294,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 isSelected={true}
                 onClick={createGame}
                 className="landing"
-                destination="/waiting"
+                //destination={emailExistance ? "/waiting" : "/confirmation"}
                 children="Create New Game"
                 conditionalLink={validateInputToCreateGame() && validateEmail(email) && validateZipcode(zipCode)}
             />

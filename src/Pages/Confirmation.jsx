@@ -1,23 +1,23 @@
 
 import React, {useState, useContext} from 'react'
 import ReactCodeInput from "react-code-input";
-import {Link} from "react-router-dom";
 import "../Styles/Confirmation.css";
 import {LandingContext} from "../App";
-import { Button } from '../Components/Button';
 import {useHistory} from "react-router-dom";
 import axios from "axios";
+
 export default function Confirmation(){
     const [temp, setTemp]=useState("");
-    const {host, email} = useContext(LandingContext);
+    const {email} = useContext(LandingContext);
     const [input, setInput]=useState("");
-    const [destination, setDestination] = useState("/waiting");
+    //var correct = true;
     const [correct, setCorrect] = useState(true);
-    const answer = String("333");
     const history = useHistory();
+
     function changeTemp(e) {
         setTemp(e);
     }
+
     const handleValueInput = (e) => {
         console.log(input);
         setInput(temp);
@@ -43,14 +43,11 @@ export default function Confirmation(){
                 history.push('/waiting');
             }
             else {
+                //correct = false;
                 setCorrect(false);
+                console.log("else: Inside confirming call" + correct);
             }
-        })
-        
-        console.log("after confirming" + correct);
-        console.log(correct);
-        setCorrect(true);
-        console.log(correct);
+        });
       };
     // function check() {
     //     //var exists = false;
@@ -85,11 +82,12 @@ export default function Confirmation(){
                 <h1>Confirmation Page</h1>
                 <h5>Please enter the code you got in the Email</h5>
                 
-                
+                {/* <h3>Var Correct: {String(correct)}</h3> */}
                 <h3 class="try">{(!correct) ? "Try Again" : null}</h3>
-                {(input!==answer)?<div>
+                {/* <h3>Var Correct: {String(correct)}</h3> */}
+                <div>
                     <ReactCodeInput type='text' fields={3}  onChange={(e) => changeTemp(e)}/>
-                </div>:null}
+                </div>
                 <button
                     onClick = {e=>handleValueInput(temp)}
                 >

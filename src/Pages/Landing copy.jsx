@@ -89,33 +89,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         setHost(true);
          
         if(validateInputToCreateGame()) {
-
-
-
-            //creating new game
-            var postURL =
-                    "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
-    
+            var postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
             var payload = {
-                            user_name: name,
-                            user_alias: alias,
-                            user_email: email,
-                            user_zip: zipCode,
-                            //game_code: code,
-                        };
-    
-            axios.post(postURL, payload).then((res) => {
-                            console.log(res);
-                            setCode(res.data.game_code);
-                            setGameUID(res.data.game_uid);
-                            //setPlayerUID(res.data.user_uid);
-                        });
-
-
-
-            //checking user
-            postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
-            payload = {
                 "user_name" : name,
                 "user_alias" :alias,
                 "user_email": email,
@@ -124,12 +99,41 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
             axios.post(postURL, payload).then((res) => {
                 console.log(res);
-
-            
-                //if user exists
                 if(res.data.email_validated==="TRUE") {
-                    console.log("user exists and Email validated")
-                    history.push('/waiting');
+                        const postURL =
+                        "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
+    
+                        const payload = {
+                            user_name: name,
+                            user_alias: alias,
+                            user_email: email,
+                            user_zip: zipCode,
+                            game_code: code,
+                        };
+    
+                        axios.post(postURL, payload).then((res) => {
+                            console.log(res);
+                            setCode(res.data.game_code);
+                            setGameUID(res.data.game_uid);
+                            setPlayerUID(res.data.user_uid);
+                            // pub(code);
+    
+    
+    
+                        try {  
+                            if (res.data.message === "Invalid game code") {
+                                console.log("Looks like an invalid game code. Time to send you to the error screen");
+    
+                                window.location.href = "/error";
+                            } else {
+                                console.log("Else within try clause: No error message. Game on!");
+                                setGameUID(res.data.game_uid);
+                            }
+                        } catch {
+                            console.log("Catch Clause: No error message. Game on!");
+                        }
+                        })
+                        history.push('/waiting');
                 }
                 else {
                     setPlayerUID(res.data.user_uid);
@@ -143,11 +147,11 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
     }
 
-    // const pub = (game_code) => {
-    //     console.log("Made it to Pub");
-    //     const channel = client.channels.get(`Captions/Waiting/${game_code}`);
-    //     channel.publish({data: {newPlayerName: alias}});
-    // };
+    const pub = (game_code) => {
+        console.log("Made it to Pub");
+        const channel = client.channels.get(`Captions/Waiting/${game_code}`);
+        channel.publish({data: {newPlayerName: alias}});
+    };
 
     async function joinGame() {
         console.log("Made it in Path:", path);
@@ -166,64 +170,60 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             
 
             setHost(false);
+            
+            // console.log("path: ", path);
 
-            var postURL =
-                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
-
+            var postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
             var payload = {
-                user_name: name,
-                user_alias: alias,
-                user_email: email,
-                user_zip: zipCode,
-                game_code: code,
-            };
-
-            axios.post(postURL, payload).then((res) => {
-                console.log(res);
-                setGameUID(res.data.game_uid);
-                setPlayerUID(res.data.user_uid);
-                // pub(code);
-                try {  
-                    console.log(res.data.warning);
-                    if (res.data.warning==="Invalid game code."||res.data.message==="Join Game Request failed") {
-                        console.log("Looks like an invalid game code. Time to send you to the error screen");
-
-                        window.location.href = "/error";
-                    } else {
-                        console.log("Else within try clause: No error message. Game on!");
-                        setGameUID(res.data.game_uid);
-                    }
-                } catch {
-                    console.log("Catch Clause: No error message. Game on!");
-                }
-            });
-
-            postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
-            payload = {
                 "user_name" : name,
                 "user_alias" :alias,
                 "user_email": email,
                 "user_zip" : zipCode
             }
+
             axios.post(postURL, payload).then((res) => {
-                console.log(res);
-                if(res.data.email_validated==="TRUE") {
-                    console.log("user exists and Email validated")
-                    history.push('/waiting');
+                if(res.data.email_validated===true) {
+                        setConfirmationCode(res.data.email_validated);
+                        const postURL =
+                        "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
+    
+                        const payload = {
+                            user_name: name,
+                            user_alias: alias,
+                            user_email: email,
+                            user_zip: zipCode,
+                            game_code: code,
+                        };
+    
+                        axios.post(postURL, payload).then((res) => {
+                            console.log(res);
+                            setGameUID(res.data.game_uid);
+                            setPlayerUID(res.data.user_uid);
+                            
+                            // pub(code);
+    
+    
+    
+                        try {  
+                            if (res.data.message === "Invalid game code") {
+                                console.log("Looks like an invalid game code. Time to send you to the error screen");
+    
+                                window.location.href = "/error";
+                            } else {
+                                console.log("Else within try clause: No error message. Game on!");
+                                setGameUID(res.data.game_uid);
+                            }
+                        } catch {
+                            console.log("Catch Clause: No error message. Game on!");
+                        }
+                        })
+                        history.push('/waiting');
                 }
                 else {
                     setPlayerUID(res.data.user_uid);
                     history.push('/confirmation');
                 }
-                
-                // pub(code);
-            })
-            
-            // console.log("path: ", path);
-
-            
-
-            
+            });
 
             
 

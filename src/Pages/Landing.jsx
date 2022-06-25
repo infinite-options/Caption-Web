@@ -177,9 +177,12 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 user_zip: zipCode,
                 game_code: code,
             };
-
-            axios.post(postURL, payload).then((res) => {
+            console.log(postURL);
+            console.log(payload);
+            console.log("prior to join game axios call");
+            await axios.post(postURL, payload).then((res) => {
                 console.log(res);
+                
                 setGameUID(res.data.game_uid);
                 setPlayerUID(res.data.user_uid);
                 // pub(code);
@@ -192,32 +195,66 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                     } else {
                         console.log("Else within try clause: No error message. Game on!");
                         setGameUID(res.data.game_uid);
+                        // const postURL1 = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
+                        // const payload1 = {
+                        //     "user_name" : name,
+                        //     "user_alias" :alias,
+                        //     "user_email": email,
+                        //     "user_zip" : zipCode
+                        // }
+                        // console.log("in create user" + postURL1 + "    " + payload1);
+                        // console.log(postURL);
+                        // console.log(payload);
+                        // console.log(postURL1);
+                        // console.log(payload1);
+                        // console.log("prior to create user axios call");
+                        // axios.post(postURL1, payload1).then((res) => {
+                        //     console.log(res);
+                        //     if(res.data.email_validated==="TRUE") {
+                        //         console.log("user exists and Email validated")
+                        //         history.push('/waiting');
+                        //     }
+                        //     else {
+                        //         setPlayerUID(res.data.user_uid);
+                        //         history.push('/confirmation');
+                        //     }
+                            
+                        //     // pub(code);
+                        // })
                     }
                 } catch {
                     console.log("Catch Clause: No error message. Game on!");
                 }
             });
 
-            postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
-            payload = {
-                "user_name" : name,
-                "user_alias" :alias,
-                "user_email": email,
-                "user_zip" : zipCode
-            }
-            axios.post(postURL, payload).then((res) => {
-                console.log(res);
-                if(res.data.email_validated==="TRUE") {
-                    console.log("user exists and Email validated")
-                    history.push('/waiting');
-                }
-                else {
-                    setPlayerUID(res.data.user_uid);
-                    history.push('/confirmation');
-                }
-                
-                // pub(code);
+            const postURL1 = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
+            const payload1 = {
+                            "user_name" : name,
+                            "user_alias" :alias,
+                            "user_email": email,
+                            "user_zip" : zipCode
+                        }
+            console.log("in create user" + postURL1 + "    " + payload1);
+            console.log(postURL);
+            console.log(payload);
+            console.log(postURL1);
+            console.log(payload1);
+            console.log("prior to create user axios call");
+            await axios.post(postURL1, payload1).then((res) => {
+                            console.log(res);
+                            if(res.data.email_validated==="TRUE") {
+                                console.log("user exists and Email validated")
+                                history.push('/waiting');
+                            }
+                            else {
+                                setPlayerUID(res.data.user_uid);
+                                history.push('/confirmation');
+                            }
+                            
+                            // pub(code);
             })
+
+            
             
             // console.log("path: ", path);
 

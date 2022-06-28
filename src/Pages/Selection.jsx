@@ -333,6 +333,107 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         console.log('timeLeft = ', timeLeft);
     }, [timeLeft]);
 
+    /***** RESET BUTTON FEATURE *******/
+
+    // useEffect(() => {
+    //     // const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
+    //     // console.log('roundNumber = ', roundNumber);
+    //     // axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
+    //     //     console.log('scoreboard res = ', res);
+    //     //     setScoreboardInfo(res.data.scoreboard);
+    //     // });
+    //     console.log('scoreboardInfo = ', scoreboardInfo);
+    //
+    //     if(!host){
+    //         setRoundNumber(roundNumber + 1);
+    //
+    //         async function subscribe()
+    //         {
+    //             await channel.subscribe(roundStarted => {
+    //                 if (roundStarted.data.roundStarted) {
+    //                     const getImage = async () => {
+    //                         const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+    //                         const nextRound = roundNumber + 1;
+    //                         console.log('[code, nextRound] = ', [code, nextRound]);
+    //                         console.log('fullURL scoreboard = ', getImageURL + code + "," + nextRound);
+    //                         await axios.get(getImageURL + code + "," + nextRound).then((res) => {
+    //                             console.log(res);
+    //                             // setImageSrc(res.data.image_url);
+    //                             setImageURL(res.data.image_url);
+    //                         })
+    //                         history.push('/page');
+    //                     };
+    //
+    //                     getImage();
+    //                 }
+    //             });
+    //         }
+    //
+    //         subscribe();
+    //
+    //         return function cleanup() {
+    //             channel.unsubscribe();
+    //         };
+    //     }
+    //
+    //     async function subscribe1()
+    //     {
+    //         await channel_waiting.subscribe(newPlayer => {
+    //             async function getPlayers () {
+    //                 console.log("Made it in getPlayers Func");
+    //                 channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
+    //             }
+    //
+    //             getPlayers();
+    //         });
+    //     }
+    //
+    //     if (host)
+    //         subscribe1();
+    //
+    //     return function cleanup() {
+    //         channel_waiting.unsubscribe();
+    //     }
+    // }, [scoreboardInfo]);
+    //
+    //
+    // const pub = () => {
+    //     channel.publish({data: {roundStarted: true}});
+    // }
+    //
+    // function startNextRound() {
+    //     if (!host)
+    //         return;
+    //
+    //     const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
+    //     console.log('starting next round');
+    //
+    //     const payload = {
+    //         game_code: code.toString(),
+    //         round_number: roundNumber.toString(),
+    //     }
+    //     async function nextPub(){
+    //         await axios.post(postURL, payload);
+    //
+    //         setRoundNumber(roundNumber + 1);
+    //         const nextRound = roundNumber + 1;
+    //         const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+    //         console.log('test1: unique URL = ', getUniqueImageInRound + code + "," + nextRound);
+    //         await axios.get(getUniqueImageInRound + code + "," + nextRound).then((res) => {
+    //             console.log('getUnique res: ', res);
+    //             // setImageSrc(res.data.image_url);
+    //             setImageURL(res.data.image_url);
+    //         })
+    //         console.log('test2: publishing');
+    //         pub();
+    //
+    //
+    //         history.push("/page");
+    //     }
+    //
+    //     nextPub();
+    // }
+
     return (
         <div
             style={{
@@ -414,6 +515,15 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             }
                         }
                     </CountdownCircleTimer> : <></>}
+                    {/*{ host ?*/}
+                    {/*    <Button*/}
+                    {/*        className="fat"*/}
+                    {/*        // destination="/page"*/}
+                    {/*        onClick={startNextRound}*/}
+                    {/*        children="Next Round"*/}
+                    {/*        conditionalLink={true}*/}
+                    {/*    /> : <></>*/}
+                    {/*}*/}
                 </div>
             </div>
         </div>

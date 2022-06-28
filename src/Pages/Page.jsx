@@ -118,25 +118,31 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
              */
             console.log("Log 2: Finish Posting");
             console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber, ` fullURL = ${getTimerURL + code + "," + roundNumber}`);
-            await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                console.log('res = ', res.data);
 
-                setRounds(res.data.total_number_of_rounds);
+            var flag = true;
+            while(flag){
+                console.log("duration = " + timerDuration);
+                await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                    console.log('res = ', res.data);
 
-                let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
-                if(res.data.round_started_at != undefined){
-                    var c = serverClock;
-                    var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                    const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                    const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
-                    var d = d_mins * 60 + d_secs;
-                    console.log("setTimerDuration: ", d - determineLag(c, s));
-                    setTimerDuration(d - determineLag(c, s));
+                    setRounds(res.data.total_number_of_rounds);
 
-                    console.log(timerDuration);
-                }
-            })
-            .catch(err => console.log("timer failed"))
+                    let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
+                    if (res.data.round_started_at != undefined) {
+                        var c = serverClock;
+                        var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                        const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                        const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+                        var d = d_mins * 60 + d_secs;
+                        console.log("setTimerDuration: ", d - determineLag(c, s));
+                        setTimerDuration(d - determineLag(c, s));
+
+                        console.log(timerDuration);
+                        flag = false;
+                    }
+                }).catch(err => console.log("timer failed"))
+            }
+
 
 
             // if (imageURL === "") {

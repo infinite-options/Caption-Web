@@ -132,9 +132,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                     history.push('/waiting');
                 }
                 else {
-                    setPlayerUID(res.data.user_uid);
+                    //setPlayerUID(res.data.user_uid);
                     history.push('/confirmation');
                 }
+                setPlayerUID(res.data.user_uid);
             });
         }
         else {
@@ -247,9 +248,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                                 history.push('/waiting');
                             }
                             else {
-                                setPlayerUID(res.data.user_uid);
+                                //setPlayerUID(res.data.user_uid);
                                 history.push('/confirmation');
                             }
+                setPlayerUID(res.data.user_uid);//mickye change
                             
                             // pub(code);
             })
@@ -351,6 +353,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 //destination={emailExistance ? "/waiting" : "/confirmation"}
                 children="Create New Game"
                 conditionalLink={validateInputToCreateGame() && validateEmail(email) && validateZipcode(zipCode)}
+                destination={"/waiting"}
             />
             <div className="middleText">OR</div>
             <Form

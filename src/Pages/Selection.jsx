@@ -150,21 +150,25 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             })
 
             const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-            await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
-                if(res.data.round_started_at != undefined) {
-                    var c = serverClock;
-                    var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                    const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                    const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
-                    var d = d_mins * 60 + d_secs;
-                    console.log("setTimerDuration: ", d - determineLag(c, s));
-                    setTimerDuration(d - determineLag(c, s));
+            var flag = true;
+            while(flag) {
+                await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                    let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
+                    if (res.data.round_started_at != undefined) {
+                        var c = serverClock;
+                        var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                        const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                        const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+                        var d = d_mins * 60 + d_secs;
+                        console.log("setTimerDuration: ", d - determineLag(c, s));
+                        setTimerDuration(d - determineLag(c, s));
 
-                    console.log(timerDuration);
-                }
-            })
-            .catch(err => console.log("timer failed"))
+                        console.log(timerDuration);
+                        flag = false;
+                    }
+                })
+                    .catch(err => console.log("timer failed"))
+            }
         }
 
         idontknow();

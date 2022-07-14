@@ -34,31 +34,13 @@ export default function Nav() {
     const channel_scoreboard = client.channels.get(`Captions/Scoreboard/${code}`);
     const channel_joining = client.channels.get(`Captions/Landing/${code}`);
 
-    useEffect(() => {
-        // async function subscribe(){
-        //     await channel_waiting.subscribe(something => {
-        //         console.log("newPlayerName", something.data.newPlayerName);
-        //         channel_joining.publish({data: {rounds: rounds, roundNumber: roundNumber, path: window.location.pathname}})
-        //     })
-        // }
-        // subscribe();
-        // return function cleanup(){
-        //     channel_joining.unsubscribe();
-        // }
-    }, []);
-
     return (
         <Router>
             <Switch>
-
                 <Route exact path='/'>
                     <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
                              setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} />
                 </Route>
-
-                {/*This way of rendering the component forces re-renders in a way that I don't want atm*/}
-                {/*<Route exact path='/' component={() => <Landing setCode={setCode} setName={setName} setEmail={setEmail}*/}
-                {/*                                                setZipCode={setZipCode} setAlias={setAlias}/>}/>*/}
 
 
                 <Route exact path="/collections" component={Collections}/>
@@ -68,39 +50,53 @@ export default function Nav() {
                     <Scoreboard setRoundNumber = {setRoundNumber} channel = {channel_scoreboard} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
                 </Route>
 
-                {/*<Route exact path="/page" component={Page1}/>*/}
+                {/*<Route exac
+                t path="/page" component={Page1}/>*/}
                 <Route exact path = "/page">
                     <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page} channel_waiting = {channel_waiting} channel_joining = {channel_joining}/>
                 </Route>
+
 
                 <Route exact path="/selection" >
                     <Selection channel_host = {channel_voted_host} channel_all = {channel_voted_all} channel_waiting = {channel_waiting} channel_joining = {channel_joining}/>
                 </Route>
 
+
                 <Route exact path='/waiting'>
                     <Waiting channel = {channel_waiting} channel2 = {channel_rounds} channel_joining= {channel_joining} />
                 </Route>
 
+
                 <Route exact path="/gamerules" component={GameRules}/>
+
+
                 <Route exact path="/deckinfo" component={DeckInfo}/>
+
+
                 <Route exact path="/error" component={Error}/>
+
+
                 <Route exact path="/confirmation" component={Confirmation}/>
 
-                <Route exact path="/uploadPage" component={UploadPage}/>
 
+                <Route exact path="/uploadPage" component={UploadPage}/>
 
 
                 <Route exact path='/rounds'>
                     <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration}  />
                 </Route>
 
+
                 <Route exact path='/endgame'>
                     <Endgame setRoundNumber = {setRoundNumber} />
                 </Route>
+
+
                 <Route exact path="/scoretype">
                     <ScoreType channel = {channel_rounds} />
                 </Route>
                 
+
                 <Route exact path="/hiddenpage" component={HiddenPage}/>
             </Switch>
         </Router>

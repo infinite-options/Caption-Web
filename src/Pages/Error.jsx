@@ -1,5 +1,3 @@
-import React from 'react'
-
 import { Button } from "../Components/Button.jsx";
 import background from "../Assets/landing.png";
 import rectangle from '../Assets/rectangle.png';

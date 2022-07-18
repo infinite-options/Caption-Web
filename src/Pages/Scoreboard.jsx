@@ -44,14 +44,13 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
                 await channel.subscribe(roundStarted => {
                     if (roundStarted.data.roundStarted) {
                         const getImage = async () => {
-                            const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+                            const getImageURL="https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782";
                             const nextRound = roundNumber + 1;
                             console.log('[code, nextRound] = ', [code, nextRound]);
-                            console.log('fullURL scoreboard = ', getImageURL + code + "," + nextRound);
-                            await axios.get(getImageURL + code + "," + nextRound).then((res) => {
+                            console.log('fullURL scoreboard = ', getImageURL);                          
+                                await axios.get(getImageURL).then((res) => {
                                 console.log(res);
-                                // setImageSrc(res.data.image_url);
-                                setImageURL(res.data.image_url);
+                                setImageURL(res.data.records.baseimageurl);
                             })
                             history.push('/page');
                         };
@@ -140,12 +139,14 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
 
             setRoundNumber(roundNumber + 1);
             const nextRound = roundNumber + 1;
-            const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+            //const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+            const getUniqueImageInRound = "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782";
             console.log('test1: unique URL = ', getUniqueImageInRound + code + "," + nextRound);
-            await axios.get(getUniqueImageInRound + code + "," + nextRound).then((res) => {
+            //await axios.get(getUniqueImageInRound + code + "," + nextRound).then((res) => {
+                await axios.get(getUniqueImageInRound).then((res) => {
                 console.log('getUnique res: ', res);
                 // setImageSrc(res.data.image_url);
-                setImageURL(res.data.image_url);
+                setImageURL(res.data.records.baseimageurl);
             })
             console.log('test2: publishing');
             pub();

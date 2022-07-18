@@ -9,55 +9,64 @@ import {useHistory} from "react-router-dom";
 
 function ScoreType({channel}) {
     const history = useHistory();
-    const[buttonType, setbuttonType] = useState("");
-    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias} = useContext(LandingContext);
-
+    const[buttonType, setbuttonType] = useState("");//useState to add action on button
+    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias, setRecords} = useContext(LandingContext);//set duration
+    const [records, setRecord] = useState([]);
+    //const getUniqueImageInRound = "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"                                                                                                        //setImageURL: to get data from image API
+   
     const pub = ()=> {
         console.log('sending players to start game');
         console.log("Log 1.5: Finish Posting");
-        channel.publish({data: {gameStarted: true}});
-        history.push("/page");
+        channel.publish({data: {gameStarted: true}}); //send data from channel sync to subcriber when game Started
+        history.push("/page"); //access to page history
     };
 
     function postRoundInfo() {
-        if (buttonType === ""){
+        if (buttonType === ""){ //if no button was seleected -> send alert  
             alert("Select A Scoring System ")
-            return
+            return              
         }
-        const payload = {
+        const payload = {  //payload -> get enter from user the number of rounf, duration, and scoring type
             number_of_rounds: rounds.toString(),
             game_code: code,
             round_duration: roundDuration,
-            scoring_scheme: buttonType=== "votes" ? "V" : "R",
+            scoring_scheme: buttonType=== "votes" ? "V" : "R",  //choosing b/t vote or ranking
         };
-        console.log("pauload: ", payload);
+        console.log("payload: ", payload);
 
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/changeRoundsAndDuration";
         async function postedPub() {
-            await axios.post(postURL, payload).then((res) => {
+            await axios.post(postURL, payload).then((res) => {  //async: request URL + get data from payload -> 
+                                                                //await until the URL was posted then response and start the game at the same time
                 console.log(res);
             })
             console.log("Log 1: Finish Posting");
-            
-
-            const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
-            console.log('URL end: ', getUniqueImageInRound + code + "," + roundNumber);
-            await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
-                console.log('getUnique res: ', res);
-                // setImageSrc(res.data.image_url);
-                setImageURL(res.data.image_url);
+            const getUniqueImageInRound = "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782";
+            console.log('URL end: ', getUniqueImageInRound);
+            await axios.get(getUniqueImageInRound).then((res) => {   //send request to get msg, image_url, image_uid        
+                console.log('getUnique res: ', res);   //log data include meg,url, uid                                         
+                const record = [];
+                   
+                        for(var i = 0; i < res.data.records.length; i++){
+                            record.push(res.data.records[i].baseimageurl)
+                        }
+                const image = record[Math.floor(Math.random()*record.length)]       
+                setImageURL(image);
+                console.log('recorddddd',image)
             })
+            
             pub();
         }
+        
         postedPub();
   
     }
-
-    useEffect(() => 
-    console.log('Currently in Scoretype', "Alias:",alias, "Current Round: ", roundNumber), 
-    []);
-
-
+  
+    useEffect(() => {
+    console.log('Currently in Scoretype', "Alias:",alias, "Current Round: ", roundNumber)
+    },[]);
+    
+   
 
     return (
         <div

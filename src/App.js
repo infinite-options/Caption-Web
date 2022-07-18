@@ -17,13 +17,14 @@ export default function App() {
     const [host, setHost] = useState("");
     const [playerUID, setPlayerUID] = useState("");
     const [roundNumber, setRoundNumber] = useState(1);
-    const [imageURL, setImageURL] = useState("");
+    const [imageURL, setImageURL] = useState({});
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
-
+    //const [records, setRecords]= useState([]);
 
     return (
         <div className="App">
             <LandingContext.Provider value={{
+                //records,
                 code,
                 name,
                 email,
@@ -36,6 +37,7 @@ export default function App() {
                 roundNumber,
                 playerUID,
                 imageURL,
+                //setRecords,
                 setCode,
                 setName,
                 setEmail,

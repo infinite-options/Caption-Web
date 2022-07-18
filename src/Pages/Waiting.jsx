@@ -68,12 +68,15 @@ export default function Waiting({channel, channel2, channel_joining}) {
             await channel2.subscribe(newGame => {
                 if(newGame.data.gameStarted) {
                     const getImage = async () => {
-                        const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+                        //const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+                        const getImageURL = "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782";
                         console.log('[code, roundNumber] = ', [code, roundNumber]);
-                        await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
+                        //await axios.get(getImageURL + code + "," + roundNumber).then((res) => {
+                            await axios.get(getImageURL).then((res) => {
                             console.log(res);
                             // setImageSrc(res.data.image_url);
-                            setImageURL(res.data.image_url);
+                            //setImageURL(res.data.image_url);
+                            setImageURL(res.data.baseimageurl)
                         })
                         history.push('/page');
                     };

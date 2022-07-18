@@ -53,6 +53,14 @@ function Collections() {
             console.log('deckArray: ', res.data.decks_info);
         })
     }, []);
+    // useEffect(() => {
+    //         const getURL = " https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782";
+    //         axios.get(getURL).then((res) => {
+    //             console.log(res);
+    //             setDeckArray(res.data.records);
+    //             console.log('deckArray: ', res.data.records);
+    //         })
+    //     }, []);
 
 
 

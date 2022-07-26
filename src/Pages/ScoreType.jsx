@@ -9,15 +9,35 @@ import {useHistory} from "react-router-dom";
 function ScoreType({channel}) {
     const history = useHistory();
     const[buttonType, setbuttonType] = useState("");
-    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias} = useContext(LandingContext);
+    const {code, rounds, roundDuration, host, imageURL, setImageURL, roundNumber, alias, photosFromAPI, setPhotosFromAPI} = useContext(LandingContext);
 
-    const pub = ()=> {
+    const pub = (apiURL)=> {
         console.log('sending players to start game');
         console.log("Log 1.5: Finish Posting");
-        channel.publish({data: {gameStarted: true}});
+        if(photosFromAPI.length > 0)
+            channel.publish({data: {
+                gameStarted: true,
+                currentImage: apiURL,
+            }});
+        else
+        channel.publish({data: {
+            gameStarted: true,
+            currentImage: "",
+        }});
+
         history.push("/page");
     };
 
+    const getUniqueAPIimage = async () => {
+        const randNum = Math.floor(Math.random() * photosFromAPI.length)
+        const imageURL = photosFromAPI[randNum]
+        setImageURL(imageURL)
+        setPhotosFromAPI(photosFromAPI.filter((url) => {
+            return url !== imageURL
+        }))
+
+        pub(imageURL)
+    }
 
     function postRoundInfo() {
         if (buttonType === ""){
@@ -39,14 +59,19 @@ function ScoreType({channel}) {
             })
             console.log("Log 1: Finish Posting");
             
+            if(photosFromAPI.length === 0){
+                const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+                console.log('GetUniqueImageInRound URL end: ', getUniqueImageInRound + code + "," + roundNumber);
+                await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
+                    console.log('GET Get Unique Image In Round', res);
+                    setImageURL(res.data.image_url);
+                })
 
-            const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
-            console.log('GetUniqueImageInRound URL end: ', getUniqueImageInRound + code + "," + roundNumber);
-            await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
-                console.log('GET Get Unique Image In Round', res);
-                setImageURL(res.data.image_url);
-            })
-            pub();
+                pub();
+            } else {
+                 getUniqueAPIimage()
+            }
+            
         }
 
 

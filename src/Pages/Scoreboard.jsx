@@ -16,12 +16,31 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
     const [timeStamp, setTimeStamp] = useState();
     const history = useHistory();
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
-    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL} = useContext(LandingContext);
+    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL, photosFromAPI, setPhotosFromAPI} = useContext(LandingContext);
 
-    const pub = () => {
-        channel.publish({data: {roundStarted: true}});
+    const pub = (apiURL) => {
+        if(photosFromAPI.length > 0)
+            channel.publish({data: {
+                roundStarted: true,
+                currentImage: apiURL,
+            }});
+        else
+        channel.publish({data: {
+            roundStarted: true,
+            currentImage: "",
+        }});
     }
 
+    const getUniqueAPIimage = async () => {
+        const randNum = Math.floor(Math.random() * photosFromAPI.length)
+        const imageURL = photosFromAPI[randNum]
+        setImageURL(imageURL)
+        setPhotosFromAPI(photosFromAPI.filter((url) => {
+            return url !== imageURL
+        }))
+
+        pub(imageURL)
+    }
 
     useEffect(() => {
         console.log('scoreboardInfo = ', scoreboardInfo);
@@ -32,23 +51,32 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
 
             async function subscribe() 
             {
+                console.log('subscribing')
                 await channel.subscribe(roundStarted => {
                     if (roundStarted.data.roundStarted) {
-                        const getImage = async () => {
-                            const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
-                            const nextRound = roundNumber + 1;
-                            console.log('[code, nextRound] = ', [code, nextRound]);
-                            console.log('fullURL scoreboard = ', getImageURL + code + "," + nextRound);
+                        console.log(roundStarted)
+                        if(roundStarted.data.currentImage === "") {
+                            const getImage = async () => {
+                                const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+                                const nextRound = roundNumber + 1;
+                                console.log('[code, nextRound] = ', [code, nextRound]);
+                                console.log('fullURL scoreboard = ', getImageURL + code + "," + nextRound);
 
-                            await axios.get(getImageURL + code + "," + nextRound).then((res) => {
-                                console.log("GET Get Image For Players",res);
-                                setImageURL(res.data.image_url);
-                            })
+                                await axios.get(getImageURL + code + "," + nextRound).then((res) => {
+                                    console.log("GET Get Image For Players",res);
+                                    setImageURL(res.data.image_url);
+                                })
 
-                            history.push('/page');
-                        };
+                                history.push('/page');
+                            };
     
-                        getImage();
+                            getImage();                        
+                        } else {
+                            console.log(roundNumber)
+                            setImageURL(roundStarted.data.currentImage)
+                            history.push('page/')
+                        }
+
                     }
                 });
             }
@@ -116,7 +144,7 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
             return;
 
         console.log('starting next round');
-
+        
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
         const payload = {
             game_code: code.toString(),
@@ -127,20 +155,24 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
             await axios.post(postURL, payload);
 
             setRoundNumber(roundNumber + 1);
-
-            
-            const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
             const nextRound = roundNumber + 1;
-            console.log('test1: unique URL = ', getUniqueImageInRound + code + "," + nextRound);
 
-            await axios.get(getUniqueImageInRound + code + "," + nextRound).then((res) => {
-                console.log('GET Get Unique Image In Round', res);
-                setImageURL(res.data.image_url);
-            })
+            if(photosFromAPI.length === 0) {
+                const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+                
+                console.log('test1: unique URL = ', getUniqueImageInRound + code + "," + nextRound);
+
+                await axios.get(getUniqueImageInRound + code + "," + nextRound).then((res) => {
+                    console.log('GET Get Unique Image In Round', res);
+                    setImageURL(res.data.image_url);
+                    pub();
+                })
+            } else {
+                getUniqueAPIimage()
+            }
+            
 
             console.log('test2: publishing');
-
-            pub();
 
             history.push("/page");
         }

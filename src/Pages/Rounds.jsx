@@ -13,20 +13,20 @@ import {useHistory} from "react-router-dom";
 
 export default function Rounds({setRounds, setRoundDuration, channel }) {
     const history = useHistory();
-    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias} = useContext(LandingContext);
+    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias, photosFromAPI} = useContext(LandingContext);
+    const [error, setError] = useState("")
 
 
     {/*Need some way to check that the input is an integer*/
     }
     const handleRoundsChange = (roundsInput) => {
-       setRounds(parseInt(roundsInput));
+        setRounds(parseInt(roundsInput));
     };
 
     {/*Need some way to check that the input is an integer*/
     }
     const handleRoundsDurationChange = (durationInput) => {
-       setRoundDuration(durationInput);
-    
+        setRoundDuration(durationInput);
     };
 
 
@@ -60,7 +60,12 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
                 onHandleChange={handleRoundsChange}
             />
             
-            <h5>This means how many images would you like to go through during your game. <br></br> (1 image = 1 round)</h5>
+            <h5>This means how many images would you like to go through during your game. <br></br> (1 image = 1 round) </h5>
+
+            {photosFromAPI.length > 0 
+                ? <h4>Max Rounds: {photosFromAPI.length}</h4>
+                : "" 
+            }
 
             <br></br>
 
@@ -76,9 +81,12 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
                 recommend 30 seconds!</h5>
 
             <br></br>
-
-            <Button className="landing" conditionalLink={true} destination="/scoretype"
+            { photosFromAPI.length > 0 && rounds > photosFromAPI.length
+                ? ""
+                : <Button className="landing" conditionalLink={true} destination="/scoretype"
                     children="Continue"/>
+            }
+
 
         </div>
     )

@@ -1,30 +1,40 @@
 import React, {useContext} from "react";
 import "../Styles/Deck.css";
+import { useHistory } from "react-router-dom";
 import {Link} from "react-router-dom";
 
 import axios from "axios";
 import {LandingContext} from "../App";
 
 export default function DeckCard(props) {
+    const history = useHistory()
+    let nextPage = "/waiting"
+    const {code, roundNumber, setDeckSelected} = useContext(LandingContext);
 
-    const {code, roundNumber} = useContext(LandingContext);
-
+    if(props.googlePhotos == true)
+        nextPage = "/googleAuth"
 
     function selectThisDeck() {
+        if(props.googlePhotos === true){
+            console.log("Switching to google photos page")
+        }
 
-        const payload = {
-            game_code: code,
-            deck_uid: props.id,
-            round_number: roundNumber.toString(),
-        };
+        else {
+            const payload = {
+                game_code: code,
+                deck_uid: props.id,
+                round_number: roundNumber.toString(),
+            };
 
-        console.log('payload for deck = ', payload);
-        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
-        axios.post(postURL, payload);
+            console.log('payload for deck = ', payload);
+            const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
+            axios.post(postURL, payload);
+            setDeckSelected(true)
+        }
     }
 
     return (
-        <Link to="/rounds" className="btn-mobile" onClick = {selectThisDeck}>
+        <Link to={nextPage} className="btn-mobile" onClick = {selectThisDeck}>
             <div className="outer">
                 <div className="imageBackground">
                     <img src={props.src} alt={props.alt} className="img1"/>

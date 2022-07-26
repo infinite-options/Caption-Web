@@ -9,7 +9,7 @@ import {LandingContext} from "../App";
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host, rounds, roundNumber, setImageURL, alias} = useContext(LandingContext);
+    const {code, host, rounds, roundNumber, setImageURL, alias, photosFromAPI, deckSelected} = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const history = useHistory();
     const [copied, setCopied] = useState(false);
@@ -62,18 +62,25 @@ export default function Waiting({channel, channel2, channel_joining}) {
         {
             await channel2.subscribe(newGame => {
                 if(newGame.data.gameStarted) {
-                    const getImage = async () => {
-                        const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
-                        await axios.get(getImageURL + code + "," + roundNumber)
-                        .then((res) => {
-                            console.log("GET Get Image For Players", res);
-                            setImageURL(res.data.image_url);
-                        })
+                    console.log("newGame data", newGame.data)
+                    if(newGame.data.currentImage.length === 0) {
+                        const getImage = async () => {
+                            const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+                            await axios.get(getImageURL + code + "," + roundNumber)
+                            .then((res) => {
+                                console.log("GET Get Image For Players", res);
+                                setImageURL(res.data.image_url);
+                            })
 
-                        history.push('/page');
-                    };
+                            history.push('/page');
+                        };
 
-                    getImage();
+                        getImage();
+                    } else {
+                        setImageURL(newGame.data.currentImage)
+                        history.push('/page')
+                    }
+                    
                 }
             })
         }
@@ -163,11 +170,19 @@ export default function Waiting({channel, channel2, channel_joining}) {
             />
             <br></br>
 
+            
+            {host && !deckSelected ? <Button
+                className="landing"
+                children="Select Deck"
+                destination="/collections"
+                conditionalLink={true}  
+            />
+             : <></>}
 
-            {host ? <Button
+            {host && deckSelected ? <Button
                 className="landing"
                 children="Start Game"
-                destination="/collections"
+                destination="/rounds"
                 conditionalLink={true}  
             />
              : <></>}

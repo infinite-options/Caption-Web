@@ -4,6 +4,7 @@ import Deck from "../Components/Deck";
 import "../Styles/Collections.css";
 import background from "../Assets/landing.png";
 import circle from "../Assets/circle.png";
+import googlePhotos from "../Assets/googlePhotosIcon.png"
 import thing from "../Assets/idk.png";
 import {Button} from "../Components/Button";
 import {Link} from "react-router-dom";
@@ -69,6 +70,14 @@ function Collections() {
                         />
                     </li>
                 ))}
+                <li>
+                    <Deck
+                        src={googlePhotos}
+                        title="Use a Shared Google Photos Album"
+                        price="free"
+                        googlePhotos={true}
+                    />
+                </li>
             </ul>
             {/* <img className="innerImage2" src={thing} /> */}
         </div>

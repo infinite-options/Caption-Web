@@ -20,6 +20,7 @@ import {LandingContext} from "./App";
 import Ably from 'ably/promises';
 import Confirmation from "./Pages/Confirmation";
 import { GoogleOAuthProvider } from "@react-oauth/google";
+
 const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 
@@ -48,7 +49,7 @@ export default function Nav() {
 
 
                 <Route exact path="/collections" component={Collections} photosFromAPI={photosFromAPI}/>
-
+              
 
                 <Route exact path='/scoreboard'>
                     <Scoreboard setRoundNumber = {setRoundNumber} channel = {channel_scoreboard} channel_waiting = {channel_waiting} channel_joining = {channel_joining} photosFromAPI={photosFromAPI}/>

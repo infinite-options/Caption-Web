@@ -11,6 +11,7 @@ import {Link} from "react-router-dom";
 import axios from "axios";
 import {LandingContext} from "../App";
 
+
 function Collections() {
     const [deckArray, setDeckArray] = useState([]);
     const {playerUID} = useContext(LandingContext);
@@ -78,6 +79,26 @@ function Collections() {
                         googlePhotos={true}
                     />
                 </li>
+                <Deck
+                        title="Cleveland Gallery"
+                        price="free"
+                        cleveland={true}
+                />
+                <Deck
+                        title="Chicago Gallery"
+                        price="free"
+                        chicago={true}
+                />
+                <Deck
+                        title="Giphy Gallery"
+                        price="free"
+                        giphy={true}
+                />
+                <Deck
+                        title="Harvard Gallery"
+                        price="free"
+                        harvard={true}
+                />
             </ul>
             {/* <img className="innerImage2" src={thing} /> */}
         </div>

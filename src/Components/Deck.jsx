@@ -35,7 +35,7 @@ export default function DeckCard(props) {
                         }
                     console.log("Cleveland Record 2",record)
                     }
-                    //Chicago
+                    //Chicago Chicago
                     else if(url == chicagoURL){
                         for(const chicagoImage of res.data.data){
                             record.push(chicagoImage.image_id)
@@ -47,7 +47,7 @@ export default function DeckCard(props) {
                           }
                             console.log("Chicago Image URL",image_url)
                     }
-                    //Giphy
+                    //Giphy Giphy
                     else if(url == giphyURL){
                         console.log("Giphy Response",res.data.data);
                         for(const giphyImage of res.data.data){

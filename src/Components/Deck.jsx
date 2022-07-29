@@ -19,7 +19,7 @@ export default function DeckCard(props) {
     const image_url=[];
     let deck_uid = "500-000009"
     const params = {
-    limit : "4"
+    limit : "12"
 }
     if(props.googlePhotos == true)
         nextPage = "/googleAuth"

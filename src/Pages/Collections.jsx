@@ -94,11 +94,11 @@ function Collections() {
                         price="free"
                         giphy={true}
                 />
-                <Deck
+                {/* <Deck
                         title="Harvard Gallery"
                         price="free"
                         harvard={true}
-                />
+                /> */}
             </ul>
             {/* <img className="innerImage2" src={thing} /> */}
         </div>

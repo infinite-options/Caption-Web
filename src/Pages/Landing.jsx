@@ -40,6 +40,11 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     }
 
 
+    const pub = (game_code) => {
+        console.log("Made it to Pub");
+        const channel = client.channels.get(`Captions/Waiting/${game_code}`);
+        channel.publish({data: {newPlayerName: alias}});
+    }
 
     async function createGame() {
         const valid = validateEmail(email);
@@ -163,6 +168,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
            
             console.log("prior to create user axios call");
             await axios.post(postURL1, payload1).then((res) => {
+                pub(code)
                 console.log("POST Create User ",res);
                 if(res.data.email_validated==="TRUE") {
                     console.log("user exists and Email validated")

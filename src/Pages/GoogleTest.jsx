@@ -33,8 +33,6 @@ const GoogleTest = () => {
                 client_id: clientID,
                 client_secret: clientSecret,
                 redirect_uri: currentHost,
-// COMMENT OUT ABOVE LINE AND UNCOMMENT BELOW IF RUNNING ON LOCAL HOST
-                // redirect_uri: "http://localhost:3000",
                 grant_type: "authorization_code"
                 
             })

@@ -9,7 +9,6 @@ import { LandingContext } from "../App";
 
 const GoogleTest = () => {
     const history = useHistory();
-
     const {code, roundNumber, photosFromAPI, setPhotosFromAPI, setDeckSelected} = useContext(LandingContext)
 
     const [tokens, setTokens] = useState({})
@@ -19,6 +18,8 @@ const GoogleTest = () => {
 
     const clientID = "336598290180-69pe1qeuqku450vnoi8v1ehhi19jhpmt.apps.googleusercontent.com"
     const clientSecret = "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"
+    const currentHost = window.location.origin
+    console.log('Current Host',currentHost)
 
     // OAuth Flow
     // https://developers.google.com/identity/oauth2/web/guides/how-user-authz-works
@@ -31,11 +32,14 @@ const GoogleTest = () => {
                 code: response.code,
                 client_id: clientID,
                 client_secret: clientSecret,
-                redirect_uri: "http://localhost:3000",
+                redirect_uri: currentHost,
+// COMMENT OUT ABOVE LINE AND UNCOMMENT BELOW IF RUNNING ON LOCAL HOST
+                // redirect_uri: "http://localhost:3000",
                 grant_type: "authorization_code"
                 
             })
-            .then(res => {                
+            .then(res => {      
+                console.log("Access + Refresh Tokens", res)          
                 setSignedIn(true)
                 setTokens(res.data)
 

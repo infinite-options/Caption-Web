@@ -21,14 +21,14 @@ export default function DeckCard(props) {
     const params = {
     limit : "12"
 }
-    if(props.googlePhotos == true)
+    if(props.googlePhotos === true)
         nextPage = "/googleAuth"
-    //Get Photos from APIs
+         //Get Photos from APIs
         function getData(url){
             
             axios.get(url,{params}).then((res)=>{
                     //Cleveland
-                    if(url == clevelandURL){
+                    if(url === clevelandURL){
                         for(const image of res.data.data){
                             record.push(image.images.web.url);
                             console.log("Cleveland record",record)
@@ -36,7 +36,7 @@ export default function DeckCard(props) {
                     console.log("Cleveland Record 2",record)
                     }
                     //Chicago Chicago
-                    else if(url == chicagoURL){
+                    else if(url === chicagoURL){
                         for(const chicagoImage of res.data.data){
                             record.push(chicagoImage.image_id)
                           }
@@ -48,7 +48,7 @@ export default function DeckCard(props) {
                             console.log("Chicago Image URL",image_url)
                     }
                     //Giphy Giphy
-                    else if(url == giphyURL){
+                    else if(url === giphyURL){
                         console.log("Giphy Response",res.data.data);
                         for(const giphyImage of res.data.data){
                             record.push(giphyImage.images.original.url);
@@ -56,9 +56,9 @@ export default function DeckCard(props) {
                             console.log("Giphy Image URL", record)
                 }
                     //Harvard
-                    else if(url == harvardURL){
+                    else if(url === harvardURL){
                         console.log("Harvard Response",res.data);
-                        console.log("Harvadf",res.data.records)
+                        console.log("Harvad",res.data.records)
                             for(const harvardImage of res.data.records){
                                 record.push(harvardImage.baseimageurl)
                             }
@@ -73,7 +73,7 @@ export default function DeckCard(props) {
             console.log("Switching to google photos page")
         }
         //Cleveland
-        else if(props.cleveland == true){
+        else if(props.cleveland === true){
             console.log("Switch to Cleveland page") 
             const payload = {
                 game_code: code,
@@ -88,7 +88,7 @@ export default function DeckCard(props) {
                 setDeckSelected(true)
         }
         //Chicago
-        else if(props.chicago == true){
+        else if(props.chicago === true){
             console.log("Switch to Chicago page") 
             const payload = {
                 game_code: code,
@@ -104,7 +104,7 @@ export default function DeckCard(props) {
                 setDeckSelected(true)
     }
         //Giphy
-        else if(props.giphy == true){
+        else if(props.giphy === true){
             console.log("Switch to Giphy page")
             const payload = {
                 game_code: code,
@@ -119,7 +119,7 @@ export default function DeckCard(props) {
                 setDeckSelected(true)
         }
         //Harvard
-        else if(props.harvard == true){
+        else if(props.harvard === true){
             console.log("Switch to Harvard page")
             const payload = {
                 game_code: code,
@@ -133,6 +133,7 @@ export default function DeckCard(props) {
                 setPhotosFromAPI(record)
                 setDeckSelected(true)
         }
+        // Decks from Database
         else {
             const payload = {
                 game_code: code,

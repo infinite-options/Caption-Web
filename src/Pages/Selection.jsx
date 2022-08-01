@@ -95,7 +95,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 {
                     async function noPlayersThenSubmit()
                     {
-                        if (res.data.players[0].round_user_uid != playerUID) {
+                        if (res.data.players[0].round_user_uid !== playerUID) {
                             console.log('default vote for user ', alias);
                             const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
                             const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
@@ -114,7 +114,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             pub_host(0);
                     }
 
-                    if (res.data.players.length == 1){
+                    if (res.data.players.length === 1){
                         noPlayersThenSubmit();
                     } else if(host){
                         pub_host(0);
@@ -122,13 +122,13 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                 }
 
-                    /**
-                     * Initialize the toggle array with the correct size and populate the array with all false values
-                     */
-                    toggleArr.length = res.data.players.length;
-                    for (var i = 0; i < toggleArr.length; i++) {
-                        toggleArr[i] = false;
-                    }
+                /**
+                 * Initialize the toggle array with the correct size and populate the array with all false values
+                 */
+                toggleArr.length = res.data.players.length;
+                for (var i = 0; i < toggleArr.length; i++) {
+                    toggleArr[i] = false;
+                }
             })
 
             const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
@@ -271,7 +271,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             pub_host(res.data.players_count);
         });
     }
-
+    
 
     function renderCaptions() {
         var captions = [];
@@ -371,20 +371,21 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         width: "60px",
                     }}
                 >
-                    {timerDuration != -1 ?
-                    <CountdownCircleTimer
-                        background="red"
-                        size={60}
-                        strokeWidth={5}
-                        isPlaying
-                        duration={timerDuration}
-                        colors="#000000"
-                    >
-                        {({remainingTime}) => {
-                                return (<div className="countdownText">{remainingTime}</div>);
+                    {timerDuration !== -1 ?
+                        <CountdownCircleTimer
+                            background="red"
+                            size={60}
+                            strokeWidth={5}
+                            isPlaying
+                            duration={timerDuration}
+                            colors="#000000"
+                        >
+                            {({remainingTime}) => {
+                                    return (<div className="countdownText">{remainingTime}</div>)
+                                }
                             }
-                        }
-                    </CountdownCircleTimer> : <></>}
+                        </CountdownCircleTimer> : <></>
+                    }
                 </div>
             </div>
         </div>

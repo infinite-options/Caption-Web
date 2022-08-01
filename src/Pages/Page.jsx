@@ -69,14 +69,14 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
 
             }
 
-            await axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
-                const totalPlayers = [];
-                for (var i = 0; i < res.data.players.length; i++) {
-                    totalPlayers.push(res.data.players[i].user_alias);
-                }
-                console.log('totalPlayers == ', totalPlayers);
-                setWaitingPlayers(totalPlayers);
-            })
+            // await axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+            //     const totalPlayers = [];
+            //     for (var i = 0; i < res.data.players.length; i++) {
+            //         totalPlayers.push(res.data.players[i].user_alias);
+            //     }
+            //     console.log('totalPlayers == ', totalPlayers);
+            //     setWaitingPlayers(totalPlayers);
+            // })
 
             /**
              * GET GameTimer

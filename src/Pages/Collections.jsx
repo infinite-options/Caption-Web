@@ -71,14 +71,12 @@ function Collections() {
                         />
                     </li>
                 ))}
-                <li>
                     <Deck
                         src={googlePhotos}
-                        title="Use a Shared Google Photos Album"
+                        title="Play with Google Photos"
                         price="free"
                         googlePhotos={true}
                     />
-                </li>
                 <Deck
                         title="Cleveland Gallery"
                         price="free"

@@ -52,7 +52,7 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
         return (
             <div class = "header">
                 <h1>Confirmation Page</h1>
-                <h5>Please enter the code you got in the Email</h5>
+                <h5>Please enter the code that was sent to {email}</h5>
                 
                 <h3 class="try">{(!correct) ? "Try Again" : null}</h3>
                 

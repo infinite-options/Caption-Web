@@ -28,14 +28,18 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [timerDuration, setTimerDuration] = useState(-1);
     const [timeLeft, setTimeLeft] = useState(Number.POSITIVE_INFINITY);
 
+    console.log('timerDuration: ', timerDuration);
+
     const pub_host = (playerCount) => {
         console.log('in pub_host');
         channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
     };
 
+
     const pub_all = () => {
         channel_all.publish({data: {everybodyVoted: true}});
     };
+
 
     function determineLag(current, start) {
         if (current - start >= 0) {
@@ -47,49 +51,25 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
-        // const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
 
         console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
 
         async function idontknow() {
             if (host) {
-                /**
-                 * Axios.Get() #1
-                 * Start the round
-                 */
+                // GET Start Playing
                 const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
                 await axios.get(startPlayingURL + code + "," + roundNumber);
             }
             
-            /**
-             * Issue:
-             * The user should not be able to select/vote for their own caption.
-             * Should be easy --> match internal state with info in the endpoint result.
-             */
-            
-            // axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
-            //     console.log("notVotedRes: " , res);
-            //     const totalPlayers = [];
-            //     for (var i = 0; i < res.data.players.length; i++) {
-            //         totalPlayers.push(res.data.players[i].user_alias);
-            //     }
-            //     console.log('totalPlayers === ', totalPlayers);
-            //     setwaitingOnPlayers(totalPlayers);
-            // })
 
             console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
             await axios.get(getURL + code + "," + roundNumber).then((res) => {
-                console.log('selection response: ', res);
-                // res.data.scoreboard.sort((a, b) => (b.score===a.score ? b.game_score - a.game_score : b.score - a.score));
-                // if (res.data.players.length <= 1) {
-                //     console.log('Test-phase1: Publishing to host');
-                //     pub_host(0);
-                // }
-                console.log('players_response = ', res.data.players);
+                console.log('GET Get All Submitted Caption', res);
                 const temp_players_arr = [];
+
                 for (let i = 0; i < res.data.players.length; i++){
-                    if (res.data.players[i].round_user_uid !== gameUID) // "this was playerUID before I changed it" - Loveleen Now it shows all captions
+                    if (res.data.players[i].round_user_uid !== gameUID)
                         temp_players_arr.push(res.data.players[i]);
                     if (res.data.players[i].round_user_uid !== playerUID){
                         console.log("Made it before disabling");
@@ -98,22 +78,24 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     }
                     
                 }
-                // const temp = playersArr.slice(0, playersArr.length)
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-        shuffleArray(temp_players_arr);
-        console.log("temp: ", temp_players_arr)
+
+                function shuffleArray(array) {
+                    for (let i = array.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [array[i], array[j]] = [array[j], array[i]];
+                    }
+                }
+
+                shuffleArray(temp_players_arr);
+                console.log("temp: ", temp_players_arr)
 
                 setPlayersArr(temp_players_arr);
+
                 if (res.data.players.length <= 1)
                 {
                     async function noPlayersThenSubmit()
                     {
-                        if (res.data.players[0].round_user_uid != playerUID) {
+                        if (res.data.players[0].round_user_uid !== playerUID) {
                             console.log('default vote for user ', alias);
                             const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
                             const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
@@ -132,9 +114,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             pub_host(0);
                     }
 
-                    if (res.data.players.length == 1){
+                    if (res.data.players.length === 1){
                         noPlayersThenSubmit();
-                    }else if(host){
+                    } else if(host){
                         pub_host(0);
                     }
 
@@ -150,21 +132,25 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             })
 
             const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-            await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
-                if(res.data.round_started_at != undefined) {
-                    var c = serverClock;
-                    var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                    const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                    const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
-                    var d = d_mins * 60 + d_secs;
-                    console.log("setTimerDuration: ", d - determineLag(c, s));
-                    setTimerDuration(d - determineLag(c, s));
+            var flag = true;
+            while(flag) {
+                await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                    let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
+                    if (res.data.round_started_at != undefined) {
+                        var c = serverClock;
+                        var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+                        const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                        const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+                        var d = d_mins * 60 + d_secs;
+                        console.log("setTimerDuration: ", d - determineLag(c, s));
+                        setTimerDuration(d - determineLag(c, s));
 
-                    console.log(timerDuration);
-                }
-            })
-            .catch(err => console.log("timer failed"))
+                        console.log(timerDuration);
+                        flag = false;
+                    }
+                })
+                    .catch(err => console.log("timer failed"))
+            }
         }
 
         idontknow();
@@ -176,7 +162,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             await channel_host.subscribe(newVote => {
                 console.log('Countdown on voting screen: PlayersLeft = ', newVote.data.playersLeft);
                 console.log('Test-phase2: playerCount = ', newVote.data.playersLeft);
-                if (newVote.data.playersLeft == 0) {
+                if (newVote.data.playersLeft === 0) {
                     const blah = async () => {
                         const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
                         if (host)
@@ -199,7 +185,11 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         console.log('test 1');
                         await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
                             console.log('scoreboard-response = ', res.data.scoreboard);
-                            res.data.scoreboard.sort((a, b) => (b.score===a.score ? b.game_score - a.game_score : b.score - a.score));
+
+                            res.data.scoreboard.sort((a, b) => (
+                                b.score === a.score ? b.game_score - a.game_score : b.score - a.score
+                            ));
+
                             setScoreboardInfo(res.data.scoreboard);
                         });
                         console.log('test 3');
@@ -208,21 +198,13 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         else
                             history.push('/scoreboard');
                     }
-                    // else {
-                    //     const newWaitingOnPlayers =[];
-                    //     for(const players of waitingOnPlayers){
-                    //         if (players !== ping.data.userWhoVoted){
-                    //             newWaitingOnPlayers.push(players);
-                                
-                    //         }
-                    //     }
-                    //     setwaitingOnPlayers(newWaitingOnPlayers);
-                    // }
                 };
+
                 getNewScoreboard();
             })
         }
 
+        
         async function subscribe1() 
         {
             await channel_waiting.subscribe(newPlayer => {
@@ -248,7 +230,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             channel_waiting.unsubscribe();
         };
     }, []);
-    console.log('timerDuration: ', timerDuration);
+
 
     function changeToggle(index) {
         console.log("Called: " + index);
@@ -262,10 +244,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
 
         console.log("Result: " + toggleArr);
-        // setToggleState(index);
     }
 
-    useEffect(() => console.log('selected-Caption: ', selectedCaption), [selectedCaption]);
 
     async function postVote() {
         console.log('postVote called');
@@ -273,17 +253,17 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         setLocalUserVoted(true);
 
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
-
         const payload = {
             caption: selectedCaption === '' ? null : selectedCaption,
             game_code: code.toString(),
             round_number: roundNumber.toString()
         };
-
         console.log('user ', alias, ' is posting vote with payload: ', payload);
+
         await axios.post(postURL, payload).then((res) => {
-            console.log(res);
+            console.log("POST Vote Caption", res);
         });
+
 
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
         await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
@@ -291,8 +271,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             pub_host(res.data.players_count);
         });
     }
-
-    useEffect(() => timerDuration === -1 ? '' : setTimeLeft(timerDuration), [timerDuration]);
+    
 
     function renderCaptions() {
         var captions = [];
@@ -322,16 +301,25 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
 
+
+    useEffect(() => console.log('selected-Caption: ', selectedCaption), [selectedCaption]);
+
+
+    useEffect(() => timerDuration === -1 ? '' : setTimeLeft(timerDuration), [timerDuration]);
+
+
     useEffect(() => {
         if (timeLeft > 0 && timeLeft !== Number.POSITIVE_INFINITY)
             setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-        else if (timeLeft === 0 && !localUserVoted)
+        else if (timeLeft === 0 && !localUserVoted)      // Check if user voted
             postVote();
     }, [timeLeft]);
+
 
     useEffect(() => {
         console.log('timeLeft = ', timeLeft);
     }, [timeLeft]);
+
 
     return (
         <div
@@ -350,7 +338,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
             <h4>Pick Your Favorite Caption</h4>
             <br></br>
-            {/*<img className="img2" src={Pic} />*/}
+
             <img style={{
                 objectFit: "cover",
                 height: "325px",
@@ -363,21 +351,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
             {renderCaptions()}
 
-
-            {/*{everybodyVoted ?*/}
-            {/*    <Button*/}
-            {/*        className="fat"*/}
-            {/*        destination="/scoreboard"*/}
-            {/*        children="Continue to Scoreboard"*/}
-            {/*        conditionalLink={true}*/}
-            {/*    />*/}
-            {/*    :  <Button*/}
-            {/*        className="fat"*/}
-            {/*        destination="/selection"*/}
-            {/*        children="Please wait for everybody to submit their votes"*/}
-            {/*        conditionalLink={true}*/}
-            {/*    />}*/}
-
             {localUserVoted ?
                 <></>
                 : selectedCaption ?
@@ -386,34 +359,33 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     : <></>
             }
 
-            <div
-                style = {{display: 'flex', justifyContent: 'center', paddingBottom: '20px', paddingTop: selectedCaption ? '20px' : '0px'}}
+            <div style = {{
+                display: 'flex', 
+                justifyContent: 'center', 
+                paddingBottom: '20px', 
+                paddingTop: selectedCaption ? '20px' : '0px'}}
             >
-                <div
-                    style={{
+                <div style={{
                         background: "yellow",
                         borderRadius: "30px",
                         width: "60px",
                     }}
                 >
-                    {timerDuration != -1 ?
-                    <CountdownCircleTimer
-                        background="red"
-                        size={60}
-                        strokeWidth={5}
-                        isPlaying
-                        duration={timerDuration}
-                        colors="#000000"
-                        onComplete={() => {
-                            // if (host)
-                            //     pub_host(0);
-                        }}
-                    >
-                        {({remainingTime}) => {
-                                return (<div className="countdownText">{remainingTime}</div>);
+                    {timerDuration !== -1 ?
+                        <CountdownCircleTimer
+                            background="red"
+                            size={60}
+                            strokeWidth={5}
+                            isPlaying
+                            duration={timerDuration}
+                            colors="#000000"
+                        >
+                            {({remainingTime}) => {
+                                    return (<div className="countdownText">{remainingTime}</div>)
+                                }
                             }
-                        }
-                    </CountdownCircleTimer> : <></>}
+                        </CountdownCircleTimer> : <></>
+                    }
                 </div>
             </div>
         </div>

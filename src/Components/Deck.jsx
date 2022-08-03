@@ -1,30 +1,129 @@
 import React, {useContext} from "react";
 import "../Styles/Deck.css";
+import { useHistory } from "react-router-dom";
 import {Link} from "react-router-dom";
 
 import axios from "axios";
 import {LandingContext} from "../App";
+import { useEffect } from "react";
 
 export default function DeckCard(props) {
+    const history = useHistory()
+    const {code, roundNumber, setDeckSelected, photosFromAPI, setPhotosFromAPI} = useContext(LandingContext);
 
-    const {code, roundNumber} = useContext(LandingContext);
+    const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
+    const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
+    const giphyURL = "https://api.giphy.com/v1/gifs/trending?api_key=Fo9QcAQLMFI8V6pdWWHWl9qmW91ZBjoK&"
+    const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782";
+    const selectDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
 
 
-    function selectThisDeck() {
+    const record = [];
+    const image_url=[];
 
-        const payload = {
-            game_code: code,
-            deck_uid: props.id,
-            round_number: roundNumber.toString(),
-        };
+    let nextPage = "/waiting"
 
-        console.log('payload for deck = ', payload);
-        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
-        axios.post(postURL, payload);
+    let api_deck_uid = "500-000009"
+    let payload =  {
+        game_code: code,
+        deck_uid: api_deck_uid,
+        round_number: roundNumber.toString(),
+    }
+    const params = {
+        limit : "12"
     }
 
+    // Change next page to 
+    if(props.googlePhotos === true)
+        nextPage = "/googleAuth"
+
+    //Get Photos from APIs (Each API has own response format)
+    async function getData(url){
+        await axios.get(url,{params}).then((res)=>{
+            //Cleveland
+            if(url === clevelandURL){
+                for(const image of res.data.data){
+                    record.push(image.images.web.url);
+                }
+                console.log("Cleveland Records After pushing",record)
+            }
+            //Chicago
+            else if(url === chicagoURL){
+                for(const chicagoImage of res.data.data){
+                    record.push(chicagoImage.image_id)
+                }
+                console.log("Chicago record", record)
+                for(var i=0;i<record.length;i++){
+                    image_url.push(res.data.config.iiif_url + "/" + record[i] + "/full/843,/0/default.jpg")
+                }
+                console.log("Chicago Image URL",image_url)
+            }
+            //Giphy
+            else if(url === giphyURL){
+                console.log("Giphy Response",res.data.data);
+                for(const giphyImage of res.data.data){
+                    record.push(giphyImage.images.original.url);
+                }
+                    console.log("Giphy Image URL", record)
+            }
+            //Harvard
+            else if(url === harvardURL){
+                console.log("Harvard Response",res.data);
+                console.log("Harvard",res.data.records)
+                for(const harvardImage of res.data.records){
+                    record.push(harvardImage.baseimageurl)
+                }
+                console.log("Harvard Image URL", record)
+            }
+        })
+    }
+    
+
+    async function selectThisDeck() {
+        if(props.googlePhotos === true){
+            console.log("Google Photos API selected. Switching to Google Sign-in Page.")
+            return
+        }
+        else if(props.cleveland){
+            console.log("Cleveland API Selected") 
+            getData(clevelandURL)
+            setPhotosFromAPI(record)
+        }
+        //Chicago
+        else if(props.chicago){
+            console.log("Chicago API Selected") 
+            getData(chicagoURL)
+            setPhotosFromAPI(image_url)
+        }
+        //Giphy
+        else if(props.giphy){
+            console.log("Giphy API selected")
+            getData(giphyURL)
+            setPhotosFromAPI(record)
+        }
+        //Harvard
+        else if(props.harvard){
+            console.log("Harvard API selected")
+            getData(harvardURL)
+            setPhotosFromAPI(record)
+        }
+        // Decks from Database
+        else {
+            payload = {
+                game_code: code,
+                deck_uid: props.id,
+                round_number: roundNumber.toString(),
+            };
+        }
+
+        console.log('payload for deck = ', payload);
+        await axios.post(selectDeckURL, payload).then(res => console.log(res))
+        setDeckSelected(true)
+    }
+  
     return (
-        <Link to="/rounds" className="btn-mobile" onClick = {selectThisDeck}>
+        <Link to={nextPage} className="btn-mobile" onClick = {selectThisDeck}>
+            
             <div className="outer">
                 <div className="imageBackground">
                     <img src={props.src} alt={props.alt} className="img1"/>

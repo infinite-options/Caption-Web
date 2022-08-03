@@ -1,0 +1,26 @@
+div {
+    justify-content: center;
+}
+
+#page-sizing {
+    max-width: 375px; 
+    height: 812px;
+    padding: 20px;
+}
+
+#google-image-wrapper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-row-gap: 10px;
+    justify-content: center;
+}
+  
+img {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+#buttons {
+    margin: 10px;
+}

@@ -19,6 +19,9 @@ export default function App() {
     const [roundNumber, setRoundNumber] = useState(1);
     const [imageURL, setImageURL] = useState("");
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
+    const [photosFromAPI, setPhotosFromAPI] = useState([])
+    const [deckSelected, setDeckSelected] = useState(false)
+
 
 
     return (
@@ -36,6 +39,9 @@ export default function App() {
                 roundNumber,
                 playerUID,
                 imageURL,
+                scoreboardInfo,
+                photosFromAPI,
+                deckSelected,
                 setCode,
                 setName,
                 setEmail,
@@ -48,8 +54,9 @@ export default function App() {
                 setRoundNumber,
                 setPlayerUID,
                 setImageURL,
-                scoreboardInfo,
                 setScoreboardInfo,
+                setPhotosFromAPI,
+                setDeckSelected
             }}>
                 <Nav/>
             </LandingContext.Provider>

@@ -9,7 +9,7 @@ import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 import Form from "../Components/Form";
 import {useHistory} from "react-router-dom";
-
+import validator from 'validator';
 
 export default function Rounds({setRounds, setRoundDuration, channel }) {
     const history = useHistory();
@@ -20,13 +20,32 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
     {/*Need some way to check that the input is an integer*/
     }
     const handleRoundsChange = (roundsInput) => {
-        setRounds(parseInt(roundsInput));
+        let num = Number(roundsInput);
+        if(validator.isFloat(roundsInput)&&(validator.isInt(roundsInput)===false)){
+            num = validator.toInt(roundsInput);
+        }
+        if(validator.isInt(roundsInput)||num >0){
+            setRounds(num);
+        }
+        else if (Number.isNaN(num)){
+            alert('please put integer');
+        }
     };
 
     {/*Need some way to check that the input is an integer*/
     }
     const handleRoundsDurationChange = (durationInput) => {
-        setRoundDuration(durationInput);
+        let num = Number(durationInput);
+        if(validator.isFloat(durationInput)&&(validator.isInt(durationInput)===false)){
+            num = validator.toInt(durationInput);
+        }
+        if(validator.isInt(durationInput)||num>0){
+            console.log((num));
+            setRoundDuration(num);
+        }
+        else if (Number.isNaN(num)){
+            alert('please put integer');
+        }
     };
 
 

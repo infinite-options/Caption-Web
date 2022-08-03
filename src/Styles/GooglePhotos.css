@@ -2,6 +2,12 @@ div {
     justify-content: center;
 }
 
+#page-sizing {
+    max-width: 375px; 
+    height: 812px;
+    padding: 20px;
+}
+
 #google-image-wrapper {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

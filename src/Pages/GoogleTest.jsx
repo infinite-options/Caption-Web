@@ -19,7 +19,8 @@ const GoogleTest = () => {
     const clientID = "336598290180-69pe1qeuqku450vnoi8v1ehhi19jhpmt.apps.googleusercontent.com"
     const clientSecret = "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"
     const currentHost = window.location.origin
-    console.log('Current Host',currentHost)
+    console.log('Current Host', currentHost)
+
 
     // OAuth Flow
     // https://developers.google.com/identity/oauth2/web/guides/how-user-authz-works
@@ -54,9 +55,10 @@ const GoogleTest = () => {
         },
         onFailure: response => console.log(response),
         scope: "https://www.googleapis.com/auth/photoslibrary.readonly"
-      })
+    })
 
 
+    // Display album choice buttons if signed in
     const chooseAlbums = () => {
         if(albums !== null) {
             return albums.map(entry => {
@@ -75,10 +77,11 @@ const GoogleTest = () => {
         }
     }
 
+    // Get photos for "entry" album
     function getPhotos(entry) {
         const body = {
-        "pageSize": "100",
-        "albumId": entry.id
+            "pageSize": "100",
+            "albumId": entry.id
         }
 
         const headers = {
@@ -87,7 +90,7 @@ const GoogleTest = () => {
         }
 
         axios.post('https://photoslibrary.googleapis.com/v1/mediaItems:search', body, {headers: headers})
-        .then( res => {
+        .then(res => {
             const imageUrls = res.data.mediaItems.map(picture => {
                 return picture.baseUrl
             })
@@ -97,15 +100,10 @@ const GoogleTest = () => {
         })
     }
     
-    useEffect(() => {
-        console.log('Tokens', tokens)
-        console.log('Albums', albums)
-        console.log('Photos Set', photosFromAPI)
-    })
-
-
+    
+    // Select dummy deck in DB and transition to waiting room
     const submitAlbum = () => {
-        console.log("move to next page")
+        console.log("move back to waiting room")
 
         const payload = {
             game_code: code,
@@ -121,8 +119,16 @@ const GoogleTest = () => {
         history.push('/waiting')
     }
 
+
+    useEffect(() => {
+        console.log('Tokens', tokens)
+        console.log('Albums', albums)
+        console.log('Photos Set', photosFromAPI)
+    })
+
+
     return (
-        <div>
+        <div id="page-sizing">
             <GoogleOAuthProvider clientId={clientID}>
                 <br></br>
                 <div>

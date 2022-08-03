@@ -162,7 +162,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             await channel_host.subscribe(newVote => {
                 console.log('Countdown on voting screen: PlayersLeft = ', newVote.data.playersLeft);
                 console.log('Test-phase2: playerCount = ', newVote.data.playersLeft);
-                if (newVote.data.playersLeft == 0) {
+                if (newVote.data.playersLeft === 0) {
                     const blah = async () => {
                         const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
                         if (host)
@@ -187,7 +187,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             console.log('scoreboard-response = ', res.data.scoreboard);
 
                             res.data.scoreboard.sort((a, b) => (
-                                b.score===a.score ? b.game_score - a.game_score : b.score - a.score
+                                b.score === a.score ? b.game_score - a.game_score : b.score - a.score
                             ));
 
                             setScoreboardInfo(res.data.scoreboard);
@@ -311,7 +311,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     useEffect(() => {
         if (timeLeft > 0 && timeLeft !== Number.POSITIVE_INFINITY)
             setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-        else if (timeLeft === 0 && !localUserVoted)
+        else if (timeLeft === 0 && !localUserVoted)      // Check if user voted
             postVote();
     }, [timeLeft]);
 

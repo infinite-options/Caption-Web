@@ -311,8 +311,12 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     useEffect(() => {
         if (timeLeft > 0 && timeLeft !== Number.POSITIVE_INFINITY)
             setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-        else if (timeLeft === 0 && !localUserVoted)      // Check if user voted
-            postVote();
+        else if (timeLeft === 0 && !localUserVoted) {
+            console.log("Time ran out and user didn't vote")
+            postVote()
+            pub_all()
+        }
+            
     }, [timeLeft]);
 
 

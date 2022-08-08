@@ -101,6 +101,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
         
                             const payload = {
+                                user_id: playerUID,
                                 caption: res.data.players[0].caption,
                                 game_code: code.toString(),
                                 round_number: roundNumber.toString()
@@ -217,6 +218,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             });
         }
 
+
         if (host) {
             subscribe1();
             subscribe_host();
@@ -254,6 +256,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
         const payload = {
+            user_id: playerUID,
             caption: selectedCaption === '' ? null : selectedCaption,
             game_code: code.toString(),
             round_number: roundNumber.toString()
@@ -311,8 +314,12 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     useEffect(() => {
         if (timeLeft > 0 && timeLeft !== Number.POSITIVE_INFINITY)
             setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-        else if (timeLeft === 0 && !localUserVoted)      // Check if user voted
-            postVote();
+        else if (timeLeft === 0 && !localUserVoted) {
+            console.log("Time ran out and user didn't vote")
+            postVote()
+            //pub_all()
+        }
+            
     }, [timeLeft]);
 
 

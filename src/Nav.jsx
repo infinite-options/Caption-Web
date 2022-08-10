@@ -79,9 +79,14 @@ export default function Nav() {
 
                 <Route exact path="/error" component={Error}/>
 
+                {/* This format below doesn't work */}
+                {/* <Route exact path="/confirmation" component={Confirmation} setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
+                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds}/> */}
 
-                <Route exact path="/confirmation" component={Confirmation} client = {client} channel= {channel_joining}/>
-
+                <Route exact path='/confirmation'>
+                    <Confirmation setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
+                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} />
+                </Route>
 
                 <Route exact path="/uploadPage" component={UploadPage}/>
 

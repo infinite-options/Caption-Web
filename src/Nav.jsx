@@ -80,7 +80,7 @@ export default function Nav() {
                 <Route exact path="/error" component={Error}/>
 
 
-                <Route exact path="/confirmation" component={Confirmation}/>
+                <Route exact path="/confirmation" component={Confirmation} client = {client} channel= {channel_joining}/>
 
 
                 <Route exact path="/uploadPage" component={UploadPage}/>

@@ -168,9 +168,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
            
             console.log("prior to create user axios call");
             await axios.post(postURL1, payload1).then((res) => {
-                pub(code)
                 console.log("POST Create User ",res);
+
                 if(res.data.email_validated==="TRUE") {
+                    pub(code)
                     console.log("user exists and Email validated")
                     history.push('/waiting');
                 }

@@ -15,6 +15,12 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
     const history = useHistory();
 
     
+    const pub = (game_code) => {
+        console.log("Made it to Pub");
+        const channel = client.channels.get(`Captions/Waiting/${game_code}`);
+        channel.publish({data: {newPlayerName: alias}});
+    }
+
     async function afterIncorrectCode() {
         setCorrect(false);
         setTimeout(() => {  console.log("Correct State: " + correct); }, 2000);
@@ -34,7 +40,8 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
             console.log("POST Check Email Validation Code", res);
             console.log(temp + " " + email);
             if (res.data.email_validated_status==="TRUE") {
-                console.log("email is verified")                
+                console.log("email is verified")     
+                pub(code)           
                 history.push('/waiting');
             }
             else {

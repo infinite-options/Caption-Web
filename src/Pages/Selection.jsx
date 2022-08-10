@@ -134,6 +134,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
             const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
             var flag = true;
+            // 
             while(flag) {
                 await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
                     let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));

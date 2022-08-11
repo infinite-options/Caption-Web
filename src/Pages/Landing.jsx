@@ -8,7 +8,7 @@ import {LandingContext} from "../App";
 import {useHistory} from "react-router-dom";
 
 export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds, setConfirmationCode}) {
-    
+    console.log('Landing client top', client)
     const history = useHistory();
 
     const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID} = useContext(LandingContext);
@@ -19,7 +19,6 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
 
     // VALIDATION FUNCTIONS
-
     function validateInputToCreateGame() {
         return alias !== ""
     }
@@ -39,12 +38,15 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         return reZ.test(zipCode);
     }
 
-
+    // Publishes new player's aliases to ably so that host will call getPlayers again
     const pub = (game_code) => {
-        console.log("Made it to Pub");
+        console.log("Made it to Pub landing");
+        console.log('Game Code', game_code)
+        console.log('client: ', client)
         const channel = client.channels.get(`Captions/Waiting/${game_code}`);
         channel.publish({data: {newPlayerName: alias}});
     }
+
 
     async function createGame() {
         const valid = validateEmail(email);
@@ -168,13 +170,15 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
            
             console.log("prior to create user axios call");
             await axios.post(postURL1, payload1).then((res) => {
-                pub(code)
                 console.log("POST Create User ",res);
+
                 if(res.data.email_validated==="TRUE") {
                     console.log("user exists and Email validated")
+                    pub(code)
                     history.push('/waiting');
                 }
                 else {
+                    console.log('user email not validated', res.data.email_validated)
                     history.push('/confirmation');
                 }
                 setPlayerUID(res.data.user_uid);//mickye change
@@ -184,7 +188,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         }
 
     }
-
+    
 
     useEffect(() => console.log('landing roundNumber = ', roundNumber), [roundNumber]);
 

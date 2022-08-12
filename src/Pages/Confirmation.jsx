@@ -21,6 +21,7 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
     async function afterIncorrectCode() {
         setCorrect(false);
         setTimeout(() => {  console.log("Correct State: " + correct); }, 2000);
+        setTimeout(() => { setCorrect(true) }, 4000);
     }
     
 
@@ -90,7 +91,12 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
     const handleValueInput = (e) => {
        emailValidation();
       };
+    
+    function rand() {
+        setTimeout(() => {
 
+        }, 3000)
+    }
 
         return (
             <div class = "header">

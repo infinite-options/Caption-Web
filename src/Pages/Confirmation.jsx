@@ -21,7 +21,10 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
     async function afterIncorrectCode() {
         setCorrect(false);
         setTimeout(() => {  console.log("Correct State: " + correct); }, 2000);
-        setTimeout(() => { setCorrect(true) }, 4000);
+<<<<<<< HEAD
+=======
+        setTimeout(() => {  setCorrect(true); }, 1500);
+>>>>>>> 1b631e9a634618f05cf71b026fcaaa2ef73cca5a
     }
     
 
@@ -103,7 +106,7 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
                 <h1>Confirmation Page</h1>
                 <h5>Please enter the code that was sent to {email}</h5>
                 
-                <h3 class="try">{(!correct) ? "Try Again" : null}</h3>
+                <h3 class="try">{(!correct) ? "Invalid Code. Try Again" : null}</h3>
                 
                 <div>
                     <ReactCodeInput type='text' fields={3}  onChange={(e) => setTemp(e)}/>

@@ -21,10 +21,8 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
     async function afterIncorrectCode() {
         setCorrect(false);
         setTimeout(() => {  console.log("Correct State: " + correct); }, 2000);
-<<<<<<< HEAD
-=======
+
         setTimeout(() => {  setCorrect(true); }, 1500);
->>>>>>> 1b631e9a634618f05cf71b026fcaaa2ef73cca5a
     }
     
 

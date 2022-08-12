@@ -46,6 +46,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         channel.publish({data: {newPlayerName: alias}});
     }
 
+<<<<<<< Updated upstream
+=======
+//Host side
+>>>>>>> Stashed changes
     async function createGame() {
         const valid = validateEmail(email);
         const validZ = validateZipcode(zipCode);
@@ -109,7 +113,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
     }
 
-
+//Joining player
     async function joinGame() {
         console.log("Made it in Path:", path);
         const valid = validateEmail(email);
@@ -156,7 +160,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 }
             });
 
-
+            //check user validated
             const postURL1 = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
             const payload1 = {
                             "user_name" : name,

@@ -60,7 +60,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
              */
 
             if (host) {
-                // GET Start Round
+                // Host logs start of new round/time started in backend
                 await axios.get(startPlayingURL + code + "," + roundNumber).then((res) => {
                     console.log(res);
                     setRoundStartTime(res.data.round_start_time);
@@ -69,17 +69,8 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
 
             }
 
-            // await axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
-            //     const totalPlayers = [];
-            //     for (var i = 0; i < res.data.players.length; i++) {
-            //         totalPlayers.push(res.data.players[i].user_alias);
-            //     }
-            //     console.log('totalPlayers == ', totalPlayers);
-            //     setWaitingPlayers(totalPlayers);
-            // })
-
             /**
-             * GET GameTimer
+             * GET GameTimer with lag calculation
              * Determine the amount of time left on the countdown timer.
              *
              * s = the second at which the round has started
@@ -89,30 +80,52 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
             console.log("Log 2: Finish Posting");
             console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber, ` fullURL = ${getTimerURL + code + "," + roundNumber}`);
 
-            var flag = true;
-            while(flag){
-                console.log("duration = " + timerDuration);
-                await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                    console.log('res = ', res.data);
+            // Loop continuosly until we receive the game timer information
+            // var flag = true;
+            // while(flag){
+            //     console.log("duration = " + timerDuration);
+            //     await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+            //         console.log('res = ', res.data);
 
-                    setRounds(res.data.total_number_of_rounds);
+            //         setRounds(res.data.total_number_of_rounds);
 
-                    let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
-                    if (res.data.round_started_at != undefined) {
-                        var c = serverClock;
-                        var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
-                        const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                        const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
-                        var d = d_mins * 60 + d_secs;
-                        console.log("setTimerDuration: ", d - determineLag(c, s));
-                        setTimerDuration(d - determineLag(c, s));
+            //         // Determine lag between round started time and current time, log the leftover duration into timerDuration
+            //         let serverClock = parseInt(res.data.current_time.substring(res.data.current_time.length - 2));
+            //         if (res.data.round_started_at != undefined) {
+            //             var c = serverClock;
+            //             var s = parseInt(res.data.round_started_at.substring(res.data.round_started_at.length - 2));
+            //             const d_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+            //             const d_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+            //             var d = d_mins * 60 + d_secs;
+            //             console.log("setTimerDuration: ", d - determineLag(c, s));
+            //             setTimerDuration(d - determineLag(c, s));
 
-                        console.log(timerDuration);
-                        flag = false;
-                    }
-                }).catch(err => console.log("timer failed"))
-            }
+            //             console.log(timerDuration);
+            //             flag = false;
+            //         }
+            //     }).catch(err => console.log("timer failed"))
+            // }
+
+            
+            // Instead of determining lag, give each user the full round duration
+            await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                console.log('GetTimerURL', res.data)
+
+                // Convert round duration format (min:sec) into seconds
+                const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+                let duration = duration_mins * 60 + duration_secs;
+
+                console.log('Duration Seconds', duration_secs)
+                console.log('Duration Minutes', duration_mins)
+                console.log('Duration Total', duration)
+
+                if(res.data.round_started_at !== undefined) {
+                    setTimerDuration(duration)
+                }
+            })
         }
+
         pageAsyc();
     }, []);
 

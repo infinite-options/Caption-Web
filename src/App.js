@@ -20,7 +20,7 @@ export default function App() {
     const [imageURL, setImageURL] = useState("");
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
     const [photosFromAPI, setPhotosFromAPI] = useState([])
-    const [deckSelected, setDeckSelected] = useState(false)
+    const [deckSelected, setDeckSelected] = useState("")
 
 
 

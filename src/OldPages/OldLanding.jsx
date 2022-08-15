@@ -8,15 +8,17 @@ import {LandingContext} from "../App";
 import {useHistory} from "react-router-dom";
 
 export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds, setConfirmationCode}) {
-    const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID} = useContext(LandingContext);
+    console.log('Landing client top', client)
     const history = useHistory();
+
+    const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID} = useContext(LandingContext);
+    const [path, setPath] = useState('');
     useState(() => setRoundNumber(1), []);
 
-    const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
-    const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
-    const checkGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame"
+    console.log("email: " , email);
 
-    // Input Validation Functinos
+
+    // VALIDATION FUNCTIONS
     function validateInputToCreateGame() {
         return alias !== ""
     }
@@ -36,23 +38,16 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         return reZ.test(zipCode);
     }
 
-
-
     // Publishes new player's aliases to ably so that host will call getPlayers again
     const pub = (game_code) => {
         console.log("Made it to Pub landing");
         console.log('Game Code', game_code)
-        console.log('client: ', client)
         const channel = client.channels.get(`Captions/Waiting/${game_code}`);
         channel.publish({data: {newPlayerName: alias}});
     }
 
 
-    // HOST: Start create game flow
-    async function createGame() {   
-        console.log("Starting createGame()")
-
-        // Validate email and zip code input
+    async function createGame() {
         const valid = validateEmail(email);
         const validZ = validateZipcode(zipCode);
         if (!valid) {
@@ -63,112 +58,130 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
             return;
         }
-
+        setHost(true);
          
-
         if(validateInputToCreateGame()) {
-            setHost(true)
-
-            // POST addUser to create a new host user
-            let payload = {
-                user_name: name,
-                user_alias: alias,
-                user_email: email,
-                user_zip: zipCode,
-            }
+            // Creating new game
+            var postURL =
+                    "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNewGame";
     
-            axios.post(addUserURL, payload).then((res) => {
-                console.log("POST addUser as host", res)
+            var payload = {
+                            user_name: name,
+                            user_alias: alias,
+                            user_email: email,
+                            user_zip: zipCode,
+                        };
+    
+            axios.post(postURL, payload).then((res) => {
+                            console.log("POST Create New Game", res);
+                            setCode(res.data.game_code);
+                            setGameUID(res.data.game_uid);
+                        });
 
-                setPlayerUID(res.data.user_uid)
 
-                console.log("res.data.")
 
-                // If email is validated transition to waiting room, else transition to confirmation page
-                if(res.data.user_code === "TRUE") {
-                    console.log("User exists and email validated. Transition to waiting.")
+            // Checking user
+            postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
+            payload = {
+                "user_name" : name,
+                "user_alias" :alias,
+                "user_email": email,
+                "user_zip" : zipCode
+            }
 
-                    history.push("/rounds")
-                } else {
-                    history.push('/confirmation')
+            axios.post(postURL, payload).then((res) => {
+                console.log("POST Create New User", res);
+
+                // if user exists, go to waiting
+                // else, go to confirmation page
+                if(res.data.email_validated==="TRUE") {
+                    console.log("user exists and Email validated")
+                    history.push('/waiting');
                 }
-            })
-        } else {
+                else {
+                    history.push('/confirmation');
+                }
+                setPlayerUID(res.data.user_uid);
+            });
+        }
+        else {
             window.alert("To create a game, fill out the necessary information");
         }
 
     }
 
-    // GUEST: Start join game flow
-    async function joinGame() {
-        console.log("Starting joinGame()");
 
-        // Validate email, zip code, and game code input
+    async function joinGame() {
+        console.log("Made it in Path:", path);
         const valid = validateEmail(email);
         if (!valid) {
             alert('Invalid email. Please re-enter.');
             return;
         }
+
         const validZ = validateZipcode(zipCode);
         if(!validZ){
             alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
             return;
         }
-        const validGame = await axios.get(checkGameURL + '/' + code).then((res) => {
-            console.log("GET checkGame", res)
-
-            if(res.data.warning !== "Invalid game code") 
-                return true
-            return false
-        })
-        if(!validGame) {
-            alert("Game code does not exist. Please enter a valid game code.")
-            return
-        }
-
-
         if (validateInputToJoinGame()) {
             setHost(false);
 
-            // POST addUser to create a new guest user
-            let payload = {
+            var postURL =
+                "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame";
+            var payload = {
                 user_name: name,
                 user_alias: alias,
                 user_email: email,
                 user_zip: zipCode,
-            }
+                game_code: code,
+            };
             
-            await axios.post(addUserURL, payload).then((res) => {
-                console.log("POST addUser as guest", res);
+            await axios.post(postURL, payload).then((res) => {
+                console.log("POST Join Game", res);
                 
-                console.log("user_uid", res.data.user_uid)
-                setPlayerUID(res.data.user_uid)
+                setGameUID(res.data.game_uid);
+                setPlayerUID(res.data.user_uid);
+                try {  
+                    console.log(res.data.warning);
+                    if (res.data.warning==="Invalid game code."||res.data.message==="Join Game Request failed") {
+                        console.log("Looks like an invalid game code. Time to send you to the error screen");
 
-
-                // If email is validated join game and transition to waiting room, else transition to confirmation page
-                console.log("user_code", res.data.user_code)
-                if(res.data.user_code === "TRUE") {
-                    //  POST joinGame to join created game using host's ID, then transition to waiting room
-                    console.log("User exists and email validated. Transition to waiting.")
-
-                   let payload = {
-                        game_code: code,
-                        user_uid: res.data.user_uid
+                        window.location.href = "/error";
+                    } else {
+                        console.log("Else within try clause: No error message. Game on!");
+                        setGameUID(res.data.game_uid);
                     }
-
-                    axios.post(joinGameURL, payload).then((res) => {
-                        console.log("POST joinGame", res)
-
-                        const channel = client.channels.get(`Captions/Waiting/${code}`)
-                        channel.publish({data: {newPlayerName: alias}})
-
-                        history.push("/waiting")
-                    })
-                } else {
-                    history.push('/confirmation')
+                } catch {
+                    console.log("Catch Clause: No error message. Game on!");
                 }
-            })
+            });
 
+
+            const postURL1 = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createUser";
+            const payload1 = {
+                            "user_name" : name,
+                            "user_alias" :alias,
+                            "user_email": email,
+                            "user_zip" : zipCode
+                        }
+            console.log("in create user" + postURL1 + "    " + payload1);
+           
+            console.log("prior to create user axios call");
+            await axios.post(postURL1, payload1).then((res) => {
+                console.log("POST Create User ",res);
+
+                if(res.data.email_validated==="TRUE") {
+                    console.log("user exists and Email validated")
+                    pub(code)
+                    history.push('/waiting');
+                }
+                else {
+                    console.log('user email not validated', res.data.email_validated)
+                    history.push('/confirmation');
+                }
+                setPlayerUID(res.data.user_uid);//mickye change
+            })
         } else {
             window.alert("To join a game, fill out the necessary information and the correct gamecode.");
         }

@@ -82,30 +82,35 @@ export default function DeckCard(props) {
     async function selectThisDeck() {
         if(props.googlePhotos === true){
             console.log("Google Photos API selected. Switching to Google Sign-in Page.")
+            setDeckSelected(api_deck_uid)
             return
         }
         else if(props.cleveland){
             console.log("Cleveland API Selected") 
             getData(clevelandURL)
             setPhotosFromAPI(record)
+            setDeckSelected(api_deck_uid)
         }
         //Chicago
         else if(props.chicago){
             console.log("Chicago API Selected") 
             getData(chicagoURL)
             setPhotosFromAPI(image_url)
+            setDeckSelected(api_deck_uid)
         }
         //Giphy
         else if(props.giphy){
             console.log("Giphy API selected")
             getData(giphyURL)
             setPhotosFromAPI(record)
+            setDeckSelected(api_deck_uid)
         }
         //Harvard
         else if(props.harvard){
             console.log("Harvard API selected")
             getData(harvardURL)
             setPhotosFromAPI(record)
+            setDeckSelected(api_deck_uid)
         }
         // Decks from Database
         else {
@@ -118,7 +123,7 @@ export default function DeckCard(props) {
 
         console.log('payload for deck = ', payload);
         await axios.post(selectDeckURL, payload).then(res => console.log(res))
-        setDeckSelected(true)
+        setDeckSelected(props.id)
     }
   
     return (

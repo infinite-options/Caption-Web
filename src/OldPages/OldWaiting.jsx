@@ -9,18 +9,12 @@ import {LandingContext} from "../App";
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host, rounds, roundNumber, setImageURL, alias, photosFromAPI, setPhotosFromAPI, deckSelected} = useContext(LandingContext);
+    const {code, host, rounds, roundNumber, setImageURL, alias, photosFromAPI, deckSelected} = useContext(LandingContext);
     const [names, setNames] = useState([]);
-    const [copied, setCopied] = useState(false);
     const history = useHistory();
+    const [copied, setCopied] = useState(false);
 
     let gameCodeText = "Game Code: " + code;
-
-
-    const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
-    const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
-
-
 
     useEffect(() => {
         console.log('roundNumber = ', roundNumber);
@@ -68,7 +62,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
         async function subscribe2() 
         {
             await channel2.subscribe(newGame => {
-                console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
                     if(newGame.data.currentImage.length === 0) {
@@ -107,92 +100,22 @@ export default function Waiting({channel, channel2, channel_joining}) {
         };
     }, [code]);
 
+
+
     useEffect(() => {
-            if (copied) {
-                setTimeout(() => {
-                    setCopied(false);
-                }, 10000);
-            }
-        }, [copied])
-
-
-        
-        useEffect(() => 
-        console.log('Currently in Waiting', "Alias:",alias, "Current Round: ", roundNumber), 
-        []);
-
-
-    const pub = (apiURL)=> {
-        console.log('sending players to start game');
-        console.log("Log 1.5: Finish Posting");
-        if(photosFromAPI.length > 0){
-            console.log('API pub block')
-            channel2.publish({data: {
-                gameStarted: true,
-                currentImage: apiURL,
-            }});
+        if (copied) {
+            setTimeout(() => {
+                setCopied(false);
+            }, 10000);
         }
-            
-        else
-        channel2.publish({data: {
-            gameStarted: true,
-            currentImage: "",
-        }});
-
-        history.push("/page");
-    };
+    }, [copied])
 
 
-    const getUniqueAPIimage = async () => {
-        // Assign Dummy Deck
-        let payload = {
-            deck_uid: "500-000009",
-            game_code: code
-        }
+    
+    useEffect(() => 
+    console.log('Currently in Waiting', "Alias:",alias, "Current Round: ", roundNumber), 
+    []);
 
-        await axios.post(postAssignDeckURL, payload).then((res) => {
-            console.log(res)
-        })
-
-        const randNum = Math.floor(Math.random() * photosFromAPI.length)
-        const imageURL = photosFromAPI[randNum]
-        setImageURL(imageURL)
-        setPhotosFromAPI(photosFromAPI.filter((url) => {
-            return url !== imageURL
-        }))
-
-        pub(imageURL)
-    }
-
-
-    async function startPlaying() {     
-        // Default decks   
-        if(photosFromAPI.length === 0){
-            console.log('getUniqueImage')
-
-            // Assign Deck
-            let payload = {
-                deck_uid: deckSelected,
-                game_code: code
-            }
-
-            await axios.post(postAssignDeckURL, payload).then((res) => {
-                console.log(res)
-            })
-
-            await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
-                console.log('GET Get Unique Image In Round', res);
-                setImageURL(res.data.image_url);
-            })
-
-            pub();
-        } 
-        // API decks
-        else {
-             getUniqueAPIimage()
-        }
-        
-    }
 
     return (
         <div
@@ -249,7 +172,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             <br></br>
 
             
-            {host && deckSelected === "" ? <Button
+            {host && !deckSelected ? <Button
                 className="landing"
                 children="Select Deck"
                 destination="/collections"
@@ -257,10 +180,10 @@ export default function Waiting({channel, channel2, channel_joining}) {
             />
              : <></>}
 
-            {host && deckSelected !== "" ? <Button
+            {host && deckSelected ? <Button
                 className="landing"
                 children="Start Game"
-                onClick={() => startPlaying()}
+                destination="/rounds"
                 conditionalLink={true}  
             />
              : <></>}

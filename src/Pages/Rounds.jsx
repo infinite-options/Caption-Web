@@ -13,35 +13,26 @@ import {useHistory} from "react-router-dom";
 
 export default function Rounds({setRounds, setRoundDuration, channel }) {
     const history = useHistory();
-    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias, photosFromAPI} = useContext(LandingContext);
+    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias} = useContext(LandingContext);
     const [error, setError] = useState("")
 
-
-    {/*Need some way to check that the input is an integer*/
-    }
+    // Needs integer typecheck
     const handleRoundsChange = (roundsInput) => {
         setRounds(parseInt(roundsInput));
     };
 
-    {/*Need some way to check that the input is an integer*/
-    }
+    // Needs integer typecheck
     const handleRoundsDurationChange = (durationInput) => {
         setRoundDuration(durationInput);
     };
 
 
-    useEffect(() => 
-    console.log('Currently in Rounds', "Alias:",alias, "Current Round: ", roundNumber), 
-    []);
-
 
     return (
-        <div
-            style={{
+        <div style={{
                 maxWidth: "375px",
                 height: "812px",
-            }}
-        >
+        }}>
 
             <img className="innerImage1" src={circle}/>
             <img className="innerImage2" src={thing}/>
@@ -62,11 +53,6 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
             
             <h5>This means how many images would you like to go through during your game. <br></br> (1 image = 1 round) </h5>
 
-            {photosFromAPI.length > 0 
-                ? <h4>Max Rounds: {photosFromAPI.length}</h4>
-                : "" 
-            }
-
             <br></br>
 
             <h4>Time for each round (seconds)</h4>
@@ -81,11 +67,9 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
                 recommend 30 seconds!</h5>
 
             <br></br>
-            { photosFromAPI.length > 0 && rounds > photosFromAPI.length
-                ? ""
-                : <Button className="landing" conditionalLink={true} destination="/scoretype"
+
+            <Button className="landing" conditionalLink={true} destination="/scoretype"
                     children="Continue"/>
-            }
 
 
         </div>

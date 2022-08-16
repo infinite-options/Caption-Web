@@ -10,11 +10,15 @@ import {Button} from "../Components/Button";
 import {Link} from "react-router-dom";
 import axios from "axios";
 import {LandingContext} from "../App";
+import "bootstrap/dist/css/bootstrap.min.css";
+import * as ReactBootStrap from 'react-bootstrap';
+
 
 
 function Collections() {
     const [deckArray, setDeckArray] = useState([]);
     const {playerUID} = useContext(LandingContext);
+    const [loading, setLoading] = useState(false);
 
 
     useEffect(() => {
@@ -22,6 +26,7 @@ function Collections() {
         axios.get(getURL + "/" + playerUID + "," + "true").then((res) => {
             console.log("GET decks", res);
             setDeckArray(res.data.decks_info);
+            setLoading(true)
             console.log('deckArray: ', res.data.decks_info);
         })
     }, []);
@@ -59,7 +64,7 @@ function Collections() {
             <br></br>
             <br></br>
 
-            <ul className="flex-container">
+            {/* <ul className="flex-container">
                 {deckArray.map((deck) => (
                     <li className="flex-item">
                         <Deck
@@ -97,7 +102,51 @@ function Collections() {
                         price="free"
                         harvard={true}
                 />
+            </ul> */}
+            {loading ? (
+            <ul className="flex-container">
+                
+                        {deckArray.map((deck) => (
+                            <li className="flex-item">
+                                <Deck
+                                    id = {deck.deck_uid}
+                                    src={deck.deck_thumbnail_url}
+                                    // alt={deck.deck_title}
+                                    title={deck.deck_title}
+                                    price= "free"
+                                />
+                            </li>
+                        ))
+                        }
+                        <Deck
+                            src={googlePhotos}
+                            title="Play with Google Photos"
+                            price="free"
+                            googlePhotos={true}
+                        />
+                        <Deck
+                                title="Cleveland Gallery"
+                                price="free"
+                                cleveland={true}
+                        />
+                        <Deck
+                                title="Chicago Gallery"
+                                price="free"
+                                chicago={true}
+                        />
+                        <Deck
+                                title="Giphy Gallery"
+                                price="free"
+                                giphy={true}
+                        />
+                        <Deck
+                                title="Harvard Gallery"
+                                price="free"
+                                harvard={true}
+                        />
+                
             </ul>
+            ):(<ReactBootStrap.Spinner animation="border" role="status"/>)}
             {/* <img className="innerImage2" src={thing} /> */}
         </div>
     );

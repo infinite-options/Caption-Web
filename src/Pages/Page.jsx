@@ -6,6 +6,8 @@ import Form from "../Components/Form";
 import {Button} from "../Components/Button";
 import "../Styles/Page.css";
 import background from "../Assets/temp.png";
+import "bootstrap/dist/css/bootstrap.min.css";
+import * as ReactBootStrap from 'react-bootstrap';
 
 //Documentation for the CountdownCircleTimer component
 //https://github.com/vydimitrov/react-countdown-circle-timer#props-for-both-reactreact-native
@@ -32,7 +34,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
     const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
     const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
-
+    const [loading, setLoading] = useState(false);
     console.log('waitingPlayers after a render: ', waitingPlayers);
 
 
@@ -251,7 +253,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                     Name of Deck
                 </h1>
                 <br></br>
-
+                
                 <img className="centerPic" src={imageURL} alt="Loading Image...."/>
 
                 <br></br>

@@ -7,8 +7,6 @@ import {Button} from '../Components/Button';
 import "../Styles/Waiting.css";
 import {LandingContext} from "../App";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import ReactSpinner from 'react-bootstrap-spinner'
-// import Spinner from 'react-bootstrap/Spinner';
 import * as ReactBootStrap from 'react-bootstrap';
 
 
@@ -201,6 +199,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
                 console.log('GET Get Unique Image In Round', res);
                 setImageURL(res.data.image_url);
+                setLoading(true)
             })
 
             pub();
@@ -280,14 +279,14 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 conditionalLink={true}  
             />
              : <></>}
-
-            {host && deckSelected !== "" ? <Button
+              {host && deckSelected !== "" ? <Button
                 className="landing"
                 children="Start Game"
                 onClick={() => startPlaying()}
                 conditionalLink={true}  
             />
              : <></>}
+            
 
         </div>
     )

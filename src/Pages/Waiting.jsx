@@ -6,6 +6,12 @@ import thing from "../Assets/idk.png";
 import {Button} from '../Components/Button';
 import "../Styles/Waiting.css";
 import {LandingContext} from "../App";
+import "bootstrap/dist/css/bootstrap.min.css";
+// import ReactSpinner from 'react-bootstrap-spinner'
+// import Spinner from 'react-bootstrap/Spinner';
+import * as ReactBootStrap from 'react-bootstrap';
+
+
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
@@ -13,7 +19,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
     const [names, setNames] = useState([]);
     const [copied, setCopied] = useState(false);
     const history = useHistory();
-
+    const [loading, setLoading] = useState(false);
     let gameCodeText = "Game Code: " + code;
 
 
@@ -24,6 +30,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
     useEffect(() => {
         console.log('roundNumber = ', roundNumber);
+        
         async function getPlayers1() {
             const names_db = [];
 
@@ -33,8 +40,11 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 for (var index = 0; index < res.data.players_list.length; index++) {
                     names_db.push(res.data.players_list[index].user_alias);
                 }
-
+                
                 setNames(names_db);
+                console.log("before loading")
+                setLoading(true);
+                console.log("After loading")
             })
             .catch(err => console.error('error = ', err));
         }
@@ -42,24 +52,32 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
         async function subscribe1() 
         {
+            
             await channel.subscribe(newPlayer => {
+               
                 async function getPlayers () {
+                    
                     const names_db = [];
-
+                    
                     const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
                     await axios.get(getURL + code)
                     .then((res) => {
                         for (var index = 0; index < res.data.players_list.length; index++) {
                             names_db.push(res.data.players_list[index].user_alias);
                         }
+                       
                         setNames(names_db);
+                       
                         console.log('Before channeljoining')
                         channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname, alias: newPlayer.data.newPlayerName}})
+                        
                         console.log('After channeljoining')
+                       
+                        
                     })
                     .catch(err => console.error('error = ', err));
                 }
-        
+               
                 getPlayers();
             });
         }
@@ -213,9 +231,12 @@ export default function Waiting({channel, channel2, channel_joining}) {
             <br></br>
 
             <h4>Waiting for all players to join</h4>
-
+            {/* Add spinner */}
+            
+            
             <ul className="flex-container">
-                {names.map((value) => (
+            {loading ? (
+                names.map((value) => (
                     <li className="flex-item">
                         {value !== "" ? <i className="fas fa-circle fa-3x" style={{
                             height: "200px",
@@ -223,9 +244,12 @@ export default function Waiting({channel, channel2, channel_joining}) {
                         }}/> : ""}
                         {value}
                     </li>
-                ))}
+                ))
+            
+            ): (<ReactBootStrap.Spinner animation="border" role="status"/>)}
             </ul>
 
+            {/* Game Code */}
             <Button
                 className="cardStyle"
                 children={gameCodeText}

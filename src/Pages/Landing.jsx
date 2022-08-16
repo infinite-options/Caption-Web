@@ -6,10 +6,13 @@ import background from "../Assets/landing.png";
 import "../Styles/Landing.css";
 import {LandingContext} from "../App";
 import {useHistory} from "react-router-dom";
+import * as ReactBootStrap from 'react-bootstrap';
+import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds, setConfirmationCode}) {
     const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID} = useContext(LandingContext);
     const history = useHistory();
+    const [loading, setLoading] = useState(false)
     useState(() => setRoundNumber(1), []);
 
     const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
@@ -45,6 +48,8 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         console.log('client: ', client)
         const channel = client.channels.get(`Captions/Waiting/${game_code}`);
         channel.publish({data: {newPlayerName: alias}});
+        
+
     }
 
 
@@ -143,7 +148,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 
                 console.log("user_uid", res.data.user_uid)
                 setPlayerUID(res.data.user_uid)
-
+                setLoading(true)
 
                 // If email is validated join game and transition to waiting room, else transition to confirmation page
                 console.log("user_code", res.data.user_code)
@@ -163,6 +168,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                         channel.publish({data: {newPlayerName: alias}})
 
                         history.push("/waiting")
+                       
                     })
                 } else {
                     history.push('/confirmation')

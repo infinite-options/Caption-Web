@@ -4,6 +4,8 @@ import "../Styles/Confirmation.css";
 import {LandingContext} from "../App";
 import {useHistory} from "react-router-dom";
 import axios from "axios";
+import * as ReactBootStrap from 'react-bootstrap';
+import "bootstrap/dist/css/bootstrap.min.css";
 //import {setTimeout} from "timers/promises";
 
 
@@ -13,7 +15,7 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
     const [input, setInput]=useState("");
     const [correct, setCorrect] = useState(true);
     const history = useHistory();
-    
+    const  [loading, setLoading] = useState(false)
     const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
     const checkEmailCodeURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidationCode";
 
@@ -42,6 +44,8 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
             if (res.data.email_validated_status==="TRUE") {
                 if(host) {
                     history.push("/rounds")
+                   
+                    
                 } else {
                     console.log('gameCode', code)
 
@@ -53,11 +57,12 @@ export default function Confirmation({setCode, setName, setAlias, setEmail, setZ
 
                     axios.post(joinGameURL, payload).then((res) => {
                         console.log("POST joinGame", res)
-
+                        setLoading(true)
                         const channel = client.channels.get(`Captions/Waiting/${code}`);
                         channel.publish({data: {newPlayerName: alias}});
-
+                        setLoading(true)
                         history.push("/waiting")
+                       
                     })
                 }
             }

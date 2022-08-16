@@ -27,7 +27,7 @@ const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 export default function Nav() {
 
-    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected} = useContext(LandingContext);
+    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected, loading, setLoading} = useContext(LandingContext);
     
     const channel_page = client.channels.get(`Captions/Page/${code}`);
     const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
@@ -68,7 +68,7 @@ export default function Nav() {
 
 
                 <Route exact path='/waiting'>
-                    <Waiting channel = {channel_waiting} channel2 = {channel_rounds} channel_joining= {channel_joining} deckSelected={deckSelected}/>
+                    <Waiting channel = {channel_waiting} channel2 = {channel_rounds} channel_joining= {channel_joining} deckSelected={deckSelected} loaing={loading} setLoading={setLoading}/>
                 </Route>
 
 
@@ -86,7 +86,7 @@ export default function Nav() {
 
                 <Route exact path='/confirmation'>
                     <Confirmation setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
-                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} />
+                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} loading={loading} setLoading={setLoading}/>
                 </Route>
 
                 <Route exact path="/uploadPage" component={UploadPage}/>

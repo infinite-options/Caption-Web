@@ -2,7 +2,7 @@ import React, {useState} from "react";
 import "./App.css";
 import Nav from "./Nav";
 import ShareExample from "./Components/Share";
-
+import 'bootstrap/dist/css/bootstrap.min.css';
 export const LandingContext = React.createContext();
 
 export default function App() {
@@ -21,7 +21,7 @@ export default function App() {
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
     const [photosFromAPI, setPhotosFromAPI] = useState([])
     const [deckSelected, setDeckSelected] = useState("")
-
+    const [loading, setLoading] = useState(false)
 
 
     return (
@@ -42,6 +42,7 @@ export default function App() {
                 scoreboardInfo,
                 photosFromAPI,
                 deckSelected,
+                loading,
                 setCode,
                 setName,
                 setEmail,
@@ -56,7 +57,8 @@ export default function App() {
                 setImageURL,
                 setScoreboardInfo,
                 setPhotosFromAPI,
-                setDeckSelected
+                setDeckSelected,
+                setLoading
             }}>
                 <Nav/>
             </LandingContext.Provider>

@@ -17,7 +17,7 @@ import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
 export default function Page({setImageURL, setRounds, channel, channel_waiting, channel_joining}) {
-    const {code, roundNumber, host, playerUID, imageURL, alias} = useContext(LandingContext);
+    const {code, roundNumber, host, playerUID, imageURL, alias, rounds} = useContext(LandingContext);
     const history = useHistory();
 
     const [caption, setCaption] = useState("");
@@ -35,6 +35,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
     const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
     const [loading, setLoading] = useState(false);
+    const[total_round, setTotalRound] = useState([])
     console.log('waitingPlayers after a render: ', waitingPlayers);
 
 
@@ -111,8 +112,17 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
             
             // Instead of determining lag, give each user the full round duration
             await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+                const total_round = [];
+                let value;
                 console.log('GetTimerURL', res.data)
-
+                for(const round in res.data){
+                    if(res.data.hasOwnProperty(round)){
+                        value = res.data.total_number_of_rounds
+                    }
+                    total_round.push(value)
+                }
+                console.log("TOTAL ROUND: ",total_round)
+                setTotalRound(total_round[0])
                 // Convert round duration format (min:sec) into seconds
                 const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
                 const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
@@ -206,6 +216,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
         });
 
         setCaptionSubmitted(true);
+        setLoading(true)
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
             caption: caption,
@@ -251,7 +262,10 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                     }}
                 >
                     Name of Deck
+                    
                 </h1>
+                <br></br>
+                <h3>Round: {roundNumber}/{total_round}</h3>
                 <br></br>
                 
                 <img className="centerPic" src={imageURL} alt="Loading Image...."/>

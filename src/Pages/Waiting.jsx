@@ -25,7 +25,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
     const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
 
 
-
     useEffect(() => {
         console.log('roundNumber = ', roundNumber);
         
@@ -103,7 +102,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                         getImage();
                     } else {
-                        setRounds(newGame.data.rounds)
                         setImageURL(newGame.data.currentImage)
                         history.push('/page')
                     }
@@ -149,7 +147,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
             channel2.publish({data: {
                 gameStarted: true,
                 currentImage: apiURL,
-                rounds: rounds
             }});
         }
             
@@ -157,7 +154,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
         channel2.publish({data: {
             gameStarted: true,
             currentImage: "",
-            rounds: rounds
         }});
 
         history.push("/page");

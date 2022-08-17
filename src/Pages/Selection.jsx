@@ -14,7 +14,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
 
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
-    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo, photosFromAPI} = useContext(LandingContext);
+    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo, photosFromAPI, roundDuration} = useContext(LandingContext);
     const history = useHistory();
     console.log('code = ', code, ', playerUID = ', playerUID);
 
@@ -433,7 +433,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             size={60}
                             strokeWidth={5}
                             isPlaying
-                            duration={timerDuration}
+                            duration={roundDuration}
                             colors="#000000"
                         >
                             {({remainingTime}) => {

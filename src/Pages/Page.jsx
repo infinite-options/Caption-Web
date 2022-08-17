@@ -17,9 +17,8 @@ import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
 export default function Page({setImageURL, setRounds, channel, channel_waiting, channel_joining}) {
-    const {code, roundNumber, host, playerUID, imageURL, alias, rounds} = useContext(LandingContext);
+    const {code, roundNumber, host, playerUID, imageURL, alias, rounds, roundDuration} = useContext(LandingContext);
     const history = useHistory();
-
     const [caption, setCaption] = useState("");
     const [captionSubmitted, setCaptionSubmitted] = useState(false);
     const [roundHasStarted, setRoundHasStarted] = useState(false);
@@ -36,7 +35,12 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
     const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
     const [loading, setLoading] = useState(false);
     const[total_round, setTotalRound] = useState([])
+
+
     console.log('waitingPlayers after a render: ', waitingPlayers);
+    console.log("round_duration",roundDuration)
+    console.log("rounds",rounds)
+
 
 
     const pub = (playerCount) => {
@@ -301,7 +305,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                                     size={60}
                                     strokeWidth={5}
                                     isPlaying
-                                    duration={timerDuration}
+                                    duration={roundDuration}
                                     colors="#000000"
                                     onComplete={toggleTimeUp}
                                 >

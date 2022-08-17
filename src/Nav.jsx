@@ -27,7 +27,7 @@ const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 export default function Nav() {
 
-    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected, loading, setLoading} = useContext(LandingContext);
+    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, roundDuration, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected, loading, setLoading} = useContext(LandingContext);
     
     const channel_page = client.channels.get(`Captions/Page/${code}`);
     const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
@@ -44,7 +44,7 @@ export default function Nav() {
             <Switch>
                 <Route exact path='/'>
                     <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
-                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} />
+                             setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} setRoundDuration={setRoundDuration}/>
                 </Route>
 
 
@@ -58,12 +58,12 @@ export default function Nav() {
                 {/*<Route exac
                 t path="/page" component={Page1}/>*/}
                 <Route exact path = "/page">
-                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
+                    <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page} channel_waiting = {channel_waiting} channel_joining = {channel_joining} roundDuration={roundDuration}/>
                 </Route>
 
 
                 <Route exact path="/selection" >
-                    <Selection channel_host = {channel_voted_host} channel_all = {channel_voted_all} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
+                    <Selection channel_host = {channel_voted_host} channel_all = {channel_voted_all} channel_waiting = {channel_waiting} channel_joining = {channel_joining} roundDuration={roundDuration}/>
                 </Route>
 
 

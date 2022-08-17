@@ -9,7 +9,7 @@ import {useHistory} from "react-router-dom";
 import * as ReactBootStrap from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
 
-export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds, setConfirmationCode}) {
+export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds, setRoundDuration, setConfirmationCode}) {
     const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID, setDeckSelected} = useContext(LandingContext);
     const history = useHistory();
     const [loading, setLoading] = useState(false)
@@ -154,6 +154,15 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
                     axios.post(joinGameURL, payload).then((res) => {
                         console.log("POST joinGame", res)
+
+                        setRounds(res.data.num_rounds)
+
+                        // Convert round duration format (min:sec) into seconds
+                        const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+                        const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+                        let duration = duration_mins * 60 + duration_secs;
+
+                        setRoundDuration(duration)
 
                         const channel = client.channels.get(`Captions/Waiting/${code}`)
                         channel.publish({data: {newPlayerName: alias}})

@@ -5,7 +5,7 @@ import {Button} from "../Components/Button";
 import axios from "axios";
 import {LandingContext} from "../App";
 
-export default function Endgame({setCode, setEmail, setName, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setPlayerUID, setPhotosFromAPI, setDeckSelected, setLoading, setRoundNumber}) {
+export default function Endgame() {
 
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
     const {code, roundNumber, host, rounds, alias} = useContext(LandingContext);
@@ -63,27 +63,6 @@ export default function Endgame({setCode, setEmail, setName, setZipCode, setAlia
         console.log('Currently in Endgame', "Alias:",alias, "Current Round: ", roundNumber), 
     []);
 
-    const resetState = () => {
-
-        // too many rerenders?
-
-        
-        // setCode("")
-        // setEmail("")
-        // setName("")
-        // setZipCode("")
-        // setAlias("")
-        // setGameUID("")
-        // setRounds("10")
-        // setRoundNumber(1)
-        //setRoundDuration("30")
-        // setHost("")
-        // setPlayerUID("")
-        // setScoreboardInfo([])
-        // setPhotosFromAPI([])
-        //setDeckSelected("")
-        // setLoading(false)
-    }
 
     return (
         <div
@@ -110,7 +89,6 @@ export default function Endgame({setCode, setEmail, setName, setZipCode, setAlia
                 children="Navigate to Landing Page"
                 destination="/"
                 conditionalLink={true}
-                onClick={resetState()}
             />
 
             <br/>

@@ -30,7 +30,7 @@ export default function DeckCard(props) {
         round_number: roundNumber.toString(),
     }
     const params = {
-        limit : "12"
+        limit : "20"
     }
 
     // Change next page to 

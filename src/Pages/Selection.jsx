@@ -13,7 +13,7 @@ import {CountdownCircleTimer} from "react-countdown-circle-timer";
 
 
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
-    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo} = useContext(LandingContext);
+    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo, photosFromAPI} = useContext(LandingContext);
     const history = useHistory();
     console.log('code = ', code, ', playerUID = ', playerUID);
 

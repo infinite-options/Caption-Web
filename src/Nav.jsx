@@ -98,7 +98,7 @@ export default function Nav() {
 
 
                 <Route exact path='/endgame'>
-                    <Endgame setRoundNumber = {setRoundNumber} />
+                    <Endgame setRoundNumber = {setRoundNumber} setCode={setCode} setEmail={setEmail} setName={setName} setZipCode={setZipCode} setAlias={setAlias} setGameUID={setGameUID} setRounds={setRounds} setRoundDuration={setRoundDuration} setHost={setHost} setPlayerUID={setPlayerUID} setPhotosFromAPI={setPhotosFromAPI} setDeckSelected={setDeckSelected} setLoading={setLoading}/>
                 </Route>
 
 

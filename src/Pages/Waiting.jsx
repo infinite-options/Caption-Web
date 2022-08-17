@@ -13,7 +13,7 @@ import * as ReactBootStrap from 'react-bootstrap';
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host, rounds, roundNumber, setImageURL, alias, photosFromAPI, setPhotosFromAPI, deckSelected} = useContext(LandingContext);
+    const {code, host, rounds, setRounds, roundNumber, setImageURL, alias, photosFromAPI, setPhotosFromAPI, deckSelected} = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const [copied, setCopied] = useState(false);
     const history = useHistory();
@@ -88,6 +88,8 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
                     if(newGame.data.currentImage.length === 0) {
+                        setRounds(newGame.data.rounds)
+
                         const getImage = async () => {
                             const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
                             await axios.get(getImageURL + code + "," + roundNumber)
@@ -101,6 +103,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                         getImage();
                     } else {
+                        setRounds(newGame.data.rounds)
                         setImageURL(newGame.data.currentImage)
                         history.push('/page')
                     }
@@ -146,6 +149,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             channel2.publish({data: {
                 gameStarted: true,
                 currentImage: apiURL,
+                rounds: rounds
             }});
         }
             
@@ -153,6 +157,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         channel2.publish({data: {
             gameStarted: true,
             currentImage: "",
+            rounds: rounds
         }});
 
         history.push("/page");

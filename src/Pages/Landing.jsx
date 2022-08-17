@@ -10,16 +10,17 @@ import * as ReactBootStrap from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
 
 export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds, setConfirmationCode}) {
-    const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID} = useContext(LandingContext);
+    const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID, setDeckSelected} = useContext(LandingContext);
     const history = useHistory();
     const [loading, setLoading] = useState(false)
     useState(() => setRoundNumber(1), []);
+
 
     const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
     const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
     const checkGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame"
 
-    // Input Validation Functinos
+    // Input Validation Functions
     function validateInputToCreateGame() {
         return alias !== ""
     }
@@ -40,17 +41,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     }
 
 
-
-    // Publishes new player's aliases to ably so that host will call getPlayers again
-    const pub = (game_code) => {
-        console.log("Made it to Pub landing");
-        console.log('Game Code', game_code)
-        console.log('client: ', client)
-        const channel = client.channels.get(`Captions/Waiting/${game_code}`);
-        channel.publish({data: {newPlayerName: alias}});
-        
-
-    }
+    setDeckSelected("")
 
 
     // HOST: Start create game flow

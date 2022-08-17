@@ -10,7 +10,8 @@ import axios from "axios";
 // import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
-
+import "bootstrap/dist/css/bootstrap.min.css";
+import * as ReactBootStrap from 'react-bootstrap';
 
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
     const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo} = useContext(LandingContext);
@@ -28,6 +29,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [timerDuration, setTimerDuration] = useState(-1);
     const [timeLeft, setTimeLeft] = useState(Number.POSITIVE_INFINITY);
 
+    const [loading, setLoading] = useState(false);
     console.log('timerDuration: ', timerDuration);
 
     const pub_host = (playerCount) => {
@@ -64,6 +66,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             
 
             console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
+
+           
             await axios.get(getURL + code + "," + roundNumber).then((res) => {
                 console.log('GET Get All Submitted Caption', res);
                 const temp_players_arr = [];
@@ -131,7 +135,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     toggleArr[i] = false;
                 }
             })
-
+            setLoading(true)
 
             const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
 
@@ -290,6 +294,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         await axios.post(postURL, payload).then((res) => {
             console.log("POST Vote Caption", res);
         });
+        
 
 
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
@@ -301,7 +306,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     
 
     function renderCaptions() {
+        
+        
         var captions = [];
+        
         console.log('temp.length = ', playersArr.length);
         for (var index = 0; index < playersArr.length; index++) {
             /**
@@ -325,6 +333,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             </div>);
         }
         console.log('captions = ', captions);
+      
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
 
@@ -380,9 +389,23 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
             <br></br>
             <br></br>
+            {/* {renderCaptions()} */}
+            {loading ? (
+                renderCaptions()
+            ):(
+                <ReactBootStrap.Spinner animation="border" role="status"/>
+            )}
 
-            {renderCaptions()}
-
+            {/* {loading ? (
+                localUserVoted ?
+                <></>
+                : selectedCaption ?
+                    <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
+                          conditionalLink={true}/>
+                    : <></>
+            ) : (
+                <ReactBootStrap.Spinner animation="border" role="status"/>
+            )} */}
             {localUserVoted ?
                 <></>
                 : selectedCaption ?
@@ -390,7 +413,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                           conditionalLink={true}/>
                     : <></>
             }
-
+            
+            
             <div style = {{
                 display: 'flex', 
                 justifyContent: 'center', 

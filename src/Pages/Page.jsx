@@ -25,7 +25,6 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
     const [timeUp, setTimeUp] = useState(false);
     const [timerDuration, setTimerDuration] = useState(-1);
     const [waitingPlayers, setWaitingPlayers] = useState([]);
-    const [moveOn, setMoveOn] = useState(false);
     const [roundStartTime, setRoundStartTime] = useState();
 
     const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";

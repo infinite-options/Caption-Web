@@ -13,7 +13,7 @@ import * as ReactBootStrap from 'react-bootstrap';
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host, rounds, setRounds, roundNumber, setImageURL, alias, photosFromAPI, setPhotosFromAPI, deckSelected} = useContext(LandingContext);
+    const {code, host, rounds, setRounds, roundNumber, setImageURL, alias, photosFromAPI, setPhotosFromAPI, deckSelected, deckTitle, setDeckTitle} = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const [copied, setCopied] = useState(false);
     const history = useHistory();
@@ -86,9 +86,9 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
-                    if(newGame.data.currentImage.length === 0) {
-                        setRounds(newGame.data.rounds)
+                    setDeckTitle(newGame.data.deckTitle)
 
+                    if(newGame.data.currentImage.length === 0) {
                         const getImage = async () => {
                             const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
                             await axios.get(getImageURL + code + "," + roundNumber)
@@ -147,14 +147,16 @@ export default function Waiting({channel, channel2, channel_joining}) {
             channel2.publish({data: {
                 gameStarted: true,
                 currentImage: apiURL,
+                deckTitle: deckTitle
             }});
         }
             
         else
-        channel2.publish({data: {
-            gameStarted: true,
-            currentImage: "",
-        }});
+            channel2.publish({data: {
+                gameStarted: true,
+                currentImage: "",
+                deckTitle: deckTitle
+            }});
 
         history.push("/page");
     };
@@ -190,7 +192,8 @@ export default function Waiting({channel, channel2, channel_joining}) {
             // Assign Deck
             let payload = {
                 deck_uid: deckSelected,
-                game_code: code
+                game_code: code,
+                // 
             }
 
             await axios.post(postAssignDeckURL, payload).then((res) => {

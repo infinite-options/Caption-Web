@@ -22,6 +22,7 @@ export default function App() {
     const [photosFromAPI, setPhotosFromAPI] = useState([])
     const [deckSelected, setDeckSelected] = useState("")
     const [loading, setLoading] = useState(false)
+    const [deckTitle, setDeckTitle] = useState("")
 
 
     return (
@@ -43,6 +44,7 @@ export default function App() {
                 photosFromAPI,
                 deckSelected,
                 loading,
+                deckTitle,
                 setCode,
                 setName,
                 setEmail,
@@ -58,7 +60,8 @@ export default function App() {
                 setScoreboardInfo,
                 setPhotosFromAPI,
                 setDeckSelected,
-                setLoading
+                setLoading,
+                setDeckTitle
             }}>
                 <Nav/>
             </LandingContext.Provider>

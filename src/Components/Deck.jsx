@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 export default function DeckCard(props) {
     const history = useHistory()
-    const {code, roundNumber, setDeckSelected, photosFromAPI, setPhotosFromAPI} = useContext(LandingContext);
+    const {code, roundNumber, setDeckSelected, photosFromAPI, setPhotosFromAPI, deckTitle, setDeckTitle} = useContext(LandingContext);
 
     const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
     const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
@@ -124,6 +124,8 @@ export default function DeckCard(props) {
         console.log('payload for deck = ', payload);
         await axios.post(selectDeckURL, payload).then(res => console.log(res))
         setDeckSelected(props.id)
+        // use props.title to get deck name on host side
+        setDeckTitle(props.title)
     }
   
     return (

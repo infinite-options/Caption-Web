@@ -16,7 +16,7 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
     const [timeStamp, setTimeStamp] = useState();
     const history = useHistory();
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
-    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL, photosFromAPI, setPhotosFromAPI} = useContext(LandingContext);
+    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL, photosFromAPI, setPhotosFromAPI, deckTitle} = useContext(LandingContext);
 
     const pub = (apiURL) => {
         if(photosFromAPI.length > 0)
@@ -197,7 +197,7 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
                 //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
             }}
         >
-            <h1>Name of Deck</h1>
+            <h1>{deckTitle}</h1>
             <br></br>
             <h3> Scoreboard</h3>
 

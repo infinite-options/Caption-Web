@@ -8,7 +8,6 @@ import "../Styles/Page.css";
 import background from "../Assets/temp.png";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
-
 //Documentation for the CountdownCircleTimer component
 //https://github.com/vydimitrov/react-countdown-circle-timer#props-for-both-reactreact-native
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
@@ -17,7 +16,7 @@ import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
 export default function Page({setImageURL, setRounds, channel, channel_waiting, channel_joining}) {
-    const {code, roundNumber, host, playerUID, imageURL, alias, rounds, roundDuration} = useContext(LandingContext);
+    const {code, roundNumber, host, playerUID, imageURL, alias, rounds, roundDuration, deckTitle} = useContext(LandingContext);
     const history = useHistory();
     const [caption, setCaption] = useState("");
     const [captionSubmitted, setCaptionSubmitted] = useState(false);
@@ -39,6 +38,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
     console.log('waitingPlayers after a render: ', waitingPlayers);
     console.log("round_duration",roundDuration)
     console.log("rounds",rounds)
+    console.log("deck title", deckTitle)
 
 
 
@@ -46,15 +46,6 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
         console.log('In pub function with playerCount == ', playerCount);
         channel.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
     };
-
-
-    function determineLag(current, start) {
-        if (current - start >= 0) {
-            return current - start;
-        } else {
-            return current + (60 - start);
-        }
-    }
 
 
     useEffect(() => {
@@ -259,16 +250,9 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
             <div style={{padding: "20px"}}>
                 <br></br>
 
-                <h1
-                    style={{
-                        fontSize: "20px",
-                    }}
-                >
-                    Name of Deck
-                    
-                </h1>
+                <h1>{deckTitle}</h1>
                 <br></br>
-                <h3>Round: {roundNumber}/{total_round}</h3>
+                <h3>Round: {roundNumber}/{rounds}</h3>
                 <br></br>
                 
                 <img className="centerPic" src={imageURL} alt="Loading Image...."/>

@@ -427,14 +427,14 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         width: "60px",
                     }}
                 >
-                    {timerDuration !== -1 ?
-                        <CountdownCircleTimer
+                    {timerDuration !== -1 ? <CountdownCircleTimer
                             background="red"
                             size={60}
                             strokeWidth={5}
                             isPlaying
                             duration={roundDuration}
                             colors="#000000"
+                            
                         >
                             {({remainingTime}) => {
                                     return (<div className="countdownText">{remainingTime}</div>)

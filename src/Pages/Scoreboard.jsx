@@ -16,7 +16,7 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
     const [timeStamp, setTimeStamp] = useState();
     const history = useHistory();
     const [grandfatherClock, setGrandfatherClock] = useState("tick");
-    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL, photosFromAPI, setPhotosFromAPI, deckTitle} = useContext(LandingContext);
+    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL, photosFromAPI, setPhotosFromAPI, deckTitle, rounds} = useContext(LandingContext);
 
     const pub = (apiURL) => {
         if(photosFromAPI.length > 0)

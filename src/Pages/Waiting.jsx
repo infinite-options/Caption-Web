@@ -8,7 +8,7 @@ import "../Styles/Waiting.css";
 import {LandingContext} from "../App";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
-
+import {Link} from "react-router-dom";
 
 
 export default function Waiting({channel, channel2, channel_joining}) {
@@ -232,7 +232,19 @@ export default function Waiting({channel, channel2, channel_joining}) {
             <br></br>
             <br></br>
             <br></br>
-
+            <Link to="/gamerules">
+                <i
+                    style={{
+                        position: "absolute",
+                        top: "100px",
+                        paddingBottom:"20px",
+                        left: "30px",
+                        color: "blue",
+                    }}
+                    className="fas fa-info-circle"
+                    children=' Game Rule'
+                />
+            </Link>
             <h4>Waiting for all players to join</h4>
             {/* Add spinner */}
             

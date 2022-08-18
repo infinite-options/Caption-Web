@@ -8,6 +8,7 @@ import {LandingContext} from "../App";
 import {useHistory} from "react-router-dom";
 import * as ReactBootStrap from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
+import {Link} from "react-router-dom";
 
 export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds, setRoundDuration, setConfirmationCode}) {
     const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID, setDeckSelected} = useContext(LandingContext);
@@ -185,15 +186,33 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     useEffect(() => console.log('landing roundNumber = ', roundNumber), [roundNumber]);
 
     return (
+        
         <div
+            
             style={{
                 maxWidth: "375px",
                 height: "812px",
                 backgroundImage: `url(${background})`,
             }}
         >
-            <div className="spacer"/>
 
+            <div className="spacer"/>
+            
+            <Link to="/gamerules">
+                <i
+                    style={{
+                        position: "absolute",
+                        top: "175px",
+                        left:'30px',
+                        paddingBottom:'20px',
+                        color: "blue",
+
+                    }}
+                    children=' Game Rules'
+                    className="fas fa-info-circle"
+                />
+            </Link>
+            <br></br>
             <Form
                 className="input1"
                 field="Your Name"

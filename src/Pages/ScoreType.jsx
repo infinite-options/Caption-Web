@@ -77,6 +77,7 @@ function ScoreType({channel}) {
                         color: "blue",
                     }}
                     className="fas fa-info-circle"
+                    children=' Game Rule'
                 />
             </Link>
 

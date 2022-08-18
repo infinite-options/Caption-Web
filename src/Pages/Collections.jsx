@@ -44,19 +44,20 @@ function Collections() {
             <br></br>
             <br></br>
 
-
             <Link to="/gamerules">
                 <i
                     style={{
                         position: "absolute",
                         top: "55px",
+                        paddingBottom:"20px",
                         left: "30px",
                         color: "blue",
                     }}
                     className="fas fa-info-circle"
+                    children=' Game Rule'
                 />
             </Link>
-
+            <br></br>
 
             <br></br>
             <h4>Select a deck</h4>

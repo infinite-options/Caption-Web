@@ -261,7 +261,8 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                 <br></br>
 
                 <div>
-                    {captionSubmitted ? <></> : 
+                    {captionSubmitted ?
+                    <></> : 
                         <Form
                             className="input2"
                             field="Enter your caption here"
@@ -275,8 +276,14 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                     }
                     <br/>
 
-                    <Row>
-                        <span style={{marginLeft: "50px"}}></span>
+                    {/* <Row> */}
+                <div 
+                    style = {{
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        paddingBottom: '20px', 
+                       }}
+                 >
                         <div style={{
                                 background: "yellow",
                                 borderRadius: "30px",
@@ -302,9 +309,9 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                             </CountdownCircleTimer> : <></>}
 
                         </div>
-
-                        <span style={{marginLeft: "60px"}}></span>
-                        <br></br>{" "}
+                </div>
+                        {/* <span style={{marginLeft: "60px"}}></span>
+                        <br></br>{" "} */}
 
                         {captionSubmitted ? <Button
                             className="fat"
@@ -322,7 +329,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
                         />
                         }
 
-                    </Row>
+                    {/* </Row> */}
                 </div>
                 {/*)}*/}
             </div>

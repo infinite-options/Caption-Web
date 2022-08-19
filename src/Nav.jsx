@@ -102,7 +102,9 @@ export default function Nav() {
                         </Route>
 
 
-                        <Route exact path="/gamerules" component={GameRules}/>
+                        <Route exact path="/gamerules" >
+                            <GameRules channel2 = {channel_rounds} ></GameRules>
+                        </Route>
 
 
                         <Route exact path="/deckinfo" component={DeckInfo}/>

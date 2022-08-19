@@ -16,7 +16,7 @@ import * as ReactBootStrap from 'react-bootstrap';
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
     const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo, photosFromAPI, roundDuration, deckTitle} = useContext(LandingContext);
     const history = useHistory();
-    console.log('code = ', code, ', playerUID = ', playerUID);
+    // console.log('code = ', code, ', playerUID = ', playerUID);
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
@@ -30,10 +30,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [timeLeft, setTimeLeft] = useState(Number.POSITIVE_INFINITY);
 
     const [loading, setLoading] = useState(false);
-    console.log('timerDuration: ', timerDuration);
+    //  console.log('timerDuration: ', timerDuration);
 
     const pub_host = (playerCount) => {
-        console.log('in pub_host');
+        // console.log('in pub_host');
         channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
     };
 
@@ -55,7 +55,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
 
-        console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
+        // console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
 
         async function idontknow() {
             if (host) {
@@ -65,20 +65,20 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             }
             
 
-            console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
+            // console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
 
            
             await axios.get(getURL + code + "," + roundNumber).then((res) => {
-                console.log('GET Get All Submitted Caption', res);
+                // console.log('GET Get All Submitted Caption', res);
                 const temp_players_arr = [];
 
                 for (let i = 0; i < res.data.players.length; i++){
                     if (res.data.players[i].round_user_uid !== gameUID)
                         temp_players_arr.push(res.data.players[i]);
                     if (res.data.players[i].round_user_uid !== playerUID){
-                        console.log("Made it before disabling");
+                        // console.log("Made it before disabling");
                         // document.getElementsByClassName("fat").disabled = true;
-                        console.log("Made it after disabling");
+                        // console.log("Made it after disabling");
                     }
                     
                 }
@@ -91,7 +91,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 }
 
                 shuffleArray(temp_players_arr);
-                console.log("temp: ", temp_players_arr)
+                // console.log("temp: ", temp_players_arr)
 
                 setPlayersArr(temp_players_arr);
 
@@ -172,9 +172,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
                 let duration = duration_mins * 60 + duration_secs;
 
-                console.log('Duration Seconds', duration_secs)
-                console.log('Duration Minutes', duration_mins)
-                console.log('Duration Total', duration)
+                // console.log('Duration Seconds', duration_secs)
+                // console.log('Duration Minutes', duration_mins)
+                // console.log('Duration Total', duration)
 
                 if(res.data.round_started_at !== undefined) {
                     setTimerDuration(duration)
@@ -189,8 +189,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         async function subscribe_host() 
         {
             await channel_host.subscribe(newVote => {
-                console.log('Countdown on voting screen: PlayersLeft = ', newVote.data.playersLeft);
-                console.log('Test-phase2: playerCount = ', newVote.data.playersLeft);
+                // console.log('Countdown on voting screen: PlayersLeft = ', newVote.data.playersLeft);
+                // console.log('Test-phase2: playerCount = ', newVote.data.playersLeft);
                 if (newVote.data.playersLeft === 0) {
                     const blah = async () => {
                         const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
@@ -211,7 +211,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     if (ping.data.everybodyVoted)
                     {
                         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
-                        console.log('test 1');
+                        // console.log('test 1');
                         await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
                             console.log('scoreboard-response = ', res.data.scoreboard);
 
@@ -221,7 +221,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                             setScoreboardInfo(res.data.scoreboard);
                         });
-                        console.log('test 3');
+                        // console.log('test 3');
                         if (rounds <= roundNumber)
                             history.push('/endgame');
                         else
@@ -238,7 +238,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         {
             await channel_waiting.subscribe(newPlayer => {
                 async function getPlayers () {
-                    console.log("Made it in getPlayers Func");
+                    // console.log("Made it in getPlayers Func");
                     channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
                 }
         
@@ -310,7 +310,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         
         var captions = [];
         
-        console.log('temp.length = ', playersArr.length);
+        // console.log('temp.length = ', playersArr.length);
         for (var index = 0; index < playersArr.length; index++) {
             /**
              * The value of index continues to increment due to the loop,
@@ -332,7 +332,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 />
             </div>);
         }
-        console.log('captions = ', captions);
+        // console.log('captions = ', captions);
       
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
@@ -358,7 +358,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
 
     useEffect(() => {
-        console.log('timeLeft = ', timeLeft);
+        // console.log('timeLeft = ', timeLeft);
     }, [timeLeft]);
 
 

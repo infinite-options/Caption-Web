@@ -1,14 +1,52 @@
-import React from 'react'
 
+import { useHistory } from "react-router-dom";
 import { Button } from "../Components/Button.jsx";
-
+import React, {useContext, useEffect, useState, Component} from 'react'
 import "../Styles/GameRules.css";
 import {useNavigate} from 'react-router-dom';
+import {LandingContext} from "../App";
+import axios from "axios";
 
 
+function GameRules({channel2}) {
+    const history = useHistory();
+    const {code, host, rounds, setRounds, roundNumber, setImageURL, alias, photosFromAPI, setPhotosFromAPI, deckSelected, deckTitle, setDeckTitle} = useContext(LandingContext);
+    useEffect(() => {
+        async function subscribe2() 
+        {
+            await channel2.subscribe(newGame => {
+                console.log("In subscribe 2")
+                if(newGame.data.gameStarted) {
+                    console.log("newGame data", newGame.data)
+                    setDeckTitle(newGame.data.deckTitle)
 
-function GameRules() {
-  
+                    if(newGame.data.currentImage.length === 0) {
+                        const getImage = async () => {
+                            const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+                            await axios.get(getImageURL + code + "," + roundNumber)
+                            .then((res) => {
+                                console.log("GET Get Image For Players", res);
+                                setImageURL(res.data.image_url);
+                            })
+
+                            history.push('/page');
+                        };
+
+                        getImage();
+                    } else {
+                        setImageURL(newGame.data.currentImage)
+                        history.push('/page')
+                    }
+                    
+                }
+            })
+        }
+        if(code){
+            subscribe2()
+        }
+        
+    },[code])
+    
     return (
         <div> 
             <div class="header">
@@ -23,14 +61,19 @@ function GameRules() {
                     <h4 ><strong><u>Game Setup Information</u></strong></h4>
                     <h5>HOST</h5>
                         <ol>
+                            <li>Enter Name, Email, Alias and Zipcode</li>
                             <li>Select "Create New Game" to get Game Code</li>
-                            <li>Selects Number of Rounds and Round Time</li>
+                            <li>Select Number of Rounds and Round Time</li>
                             <li>Share Game Code with other players</li>
-                            <li>Selects Game Deck</li>
-                            <li>Selects Start Game</li>
+                            <li>Select Game Deck</li>
+                            <li>Select Start Game</li>
                         </ol>
                         <h5>PLAYERS</h5>
-                            <p>Enter Game Code and select "Join Game"</p>
+                            <ol>
+                                <li>Enter Name, Email, Alias and Zipcode</li>
+                                <li>Enter Game Code</li>
+                                <li>Select "Join Game"</li>
+                            </ol>
                     </div>
                     <div class="googlePhotosInstructions">
                     <h4><strong><u>Google Photos Instructions</u></strong></h4>

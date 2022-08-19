@@ -39,9 +39,9 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 }
                 
                 setNames(names_db);
-                console.log("before loading")
+                // console.log("before loading")
                 setLoading(true);
-                console.log("After loading")
+                // console.log("After loading")
             })
             .catch(err => console.error('error = ', err));
         }

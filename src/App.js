@@ -1,8 +1,9 @@
 import React, {useState} from "react";
 import "./App.css";
 import Nav from "./Nav";
-import ShareExample from "./Components/Share";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { CookiesProvider, useCookies } from "react-cookie";
+
 export const LandingContext = React.createContext();
 
 export default function App() {
@@ -24,47 +25,56 @@ export default function App() {
     const [loading, setLoading] = useState(false)
     const [deckTitle, setDeckTitle] = useState("")
 
+    const [cookies, setCookie, removeCookie] = useCookies(['name', 'email', 'zipCode', 'alias', 'code', 'gameUID', 'playerUID', 'rounds', 'roundDuration', 'roundNumber', 'scoreboardInfo', 'host', 'imageURL', 'photosFromAPI', 'deckSelected', 'deckTitle'])
+
 
     return (
         <div className="App">
-            <LandingContext.Provider value={{
-                code,
-                name,
-                email,
-                zipCode,
-                alias,
-                gameUID,
-                rounds,
-                roundDuration,
-                host,
-                roundNumber,
-                playerUID,
-                imageURL,
-                scoreboardInfo,
-                photosFromAPI,
-                deckSelected,
-                loading,
-                deckTitle,
-                setCode,
-                setName,
-                setEmail,
-                setZipCode,
-                setAlias,
-                setGameUID,
-                setRounds,
-                setRoundDuration,
-                setHost,
-                setRoundNumber,
-                setPlayerUID,
-                setImageURL,
-                setScoreboardInfo,
-                setPhotosFromAPI,
-                setDeckSelected,
-                setLoading,
-                setDeckTitle
-            }}>
-                <Nav/>
-            </LandingContext.Provider>
+            <CookiesProvider>
+                <LandingContext.Provider value={{
+                    code,
+                    name,
+                    email,
+                    zipCode,
+                    alias,
+                    gameUID,
+                    rounds,
+                    roundDuration,
+                    host,
+                    roundNumber,
+                    playerUID,
+                    imageURL,
+                    scoreboardInfo,
+                    photosFromAPI,
+                    deckSelected,
+                    loading,
+                    deckTitle,
+                    setCode,
+                    setName,
+                    setEmail,
+                    setZipCode,
+                    setAlias,
+                    setGameUID,
+                    setRounds,
+                    setRoundDuration,
+                    setHost,
+                    setRoundNumber,
+                    setPlayerUID,
+                    setImageURL,
+                    setScoreboardInfo,
+                    setPhotosFromAPI,
+                    setDeckSelected,
+                    setLoading,
+                    setDeckTitle,
+
+                    cookies,
+                    setCookie,
+                    removeCookie
+                }}>
+                    <Nav/>
+                </LandingContext.Provider>
+            </CookiesProvider>
+            
             {/*  <ShareExample/>*/}
         </div>
     );

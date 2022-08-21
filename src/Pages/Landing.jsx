@@ -1,24 +1,59 @@
-import React, {useContext, useEffect, useState} from "react";
+import React, {useContext, useEffect, useState, useRef} from "react";
 import axios from "axios";
+import {useHistory} from "react-router-dom";
+import "../Styles/Landing.css";
 import Form from "../Components/Form";
 import {Button} from "../Components/Button.jsx";
 import background from "../Assets/landing.png";
-import "../Styles/Landing.css";
 import {LandingContext} from "../App";
-import {useHistory} from "react-router-dom";
-import * as ReactBootStrap from 'react-bootstrap';
-import "bootstrap/dist/css/bootstrap.min.css";
+
 
 export default function Landing({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds, setRoundDuration, setConfirmationCode}) {
-    const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID, setDeckSelected} = useContext(LandingContext);
-    const history = useHistory();
+    const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID, setDeckSelected, setImageURL, cookies, setCookie, removeCookie} = useContext(LandingContext);
     const [loading, setLoading] = useState(false)
-    useState(() => setRoundNumber(1), []);
 
+    const history = useHistory();
 
     const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
     const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
     const checkGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame"
+    
+
+    // Detect first render
+    function useFirstRender() {
+        const ref = useRef(true)
+        const firstRender = ref.current
+        ref.current = false
+        return firstRender
+    }
+
+
+    // Reset deck so user can select new deck from waiting
+    setDeckSelected("")
+
+    // Reset Cookies on first render
+    console.log("Landing Cookies", cookies)
+    if(useFirstRender()) {
+        console.log("first render")
+        removeCookie("code")
+        removeCookie("name")
+        removeCookie("email")
+        removeCookie("zipCode")
+        removeCookie("alias")
+        removeCookie("gameUID")
+        removeCookie("rounds")
+        removeCookie("roundDuration")
+        removeCookie("host")
+        removeCookie("playerUID")
+        removeCookie("roundNumber")
+        removeCookie("scoreboardInfo")
+        removeCookie("imageURL")
+        removeCookie("photosFromAPI")
+        removeCookie("deckSelected")
+        removeCookie("deckTitle")
+    }
+    
+
 
     // Input Validation Functions
     function validateInputToCreateGame() {
@@ -41,8 +76,6 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
     }
 
 
-    setDeckSelected("")
-
 
     // HOST: Start create game flow
     async function createGame() {   
@@ -64,6 +97,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
         if(validateInputToCreateGame()) {
             setHost(true)
+            setRoundNumber(1)
+
+            setUserInfoCookies(true)
+
 
             // POST addUser to create a new host user
             let payload = {
@@ -77,13 +114,11 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                 console.log("POST addUser as host", res)
 
                 setPlayerUID(res.data.user_uid)
-
-                console.log("res.data.")
+                setCookie("playerUID", res.data.user_uid)
 
                 // If email is validated transition to waiting room, else transition to confirmation page
                 if(res.data.user_code === "TRUE") {
                     console.log("User exists and email validated. Transition to waiting.")
-
                     history.push("/rounds")
                 } else {
                     history.push('/confirmation')
@@ -94,6 +129,7 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         }
 
     }
+
 
     // GUEST: Start join game flow
     async function joinGame() {
@@ -125,6 +161,9 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
 
         if (validateInputToJoinGame()) {
             setHost(false);
+            setRoundNumber(1)
+
+            setUserInfoCookies(false)
 
             // POST addUser to create a new guest user
             let payload = {
@@ -136,9 +175,10 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
             
             await axios.post(addUserURL, payload).then((res) => {
                 console.log("POST addUser as guest", res);
-                
-                console.log("user_uid", res.data.user_uid)
+
                 setPlayerUID(res.data.user_uid)
+                setCookie("playerUID", res.data.user_uid)
+
                 setLoading(true)
 
                 // If email is validated join game and transition to waiting room, else transition to confirmation page
@@ -155,14 +195,16 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
                     axios.post(joinGameURL, payload).then((res) => {
                         console.log("POST joinGame", res)
 
-                        setRounds(res.data.num_rounds)
-
                         // Convert round duration format (min:sec) into seconds
                         const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
                         const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
                         let duration = duration_mins * 60 + duration_secs;
 
+                        setRounds(res.data.num_rounds)
                         setRoundDuration(duration)
+
+                        setCookie("rounds", res.data.num_rounds)
+                        setCookie("roundDuration", duration)
 
                         const channel = client.channels.get(`Captions/Waiting/${code}`)
                         channel.publish({data: {newPlayerName: alias}})
@@ -180,10 +222,22 @@ export default function Landing({setCode, setName, setAlias, setEmail, setZipCod
         }
 
     }
+
+
+    // Set user input cookies
+    const setUserInfoCookies = (isHost) => {
+        setCookie("host", isHost)
+        setCookie("roundNumber", 1)
+        setCookie("name", name)
+        setCookie("email", email)
+        setCookie("zipCode", zipCode)
+        setCookie("alias", alias)
+    }
     
 
     useEffect(() => console.log('landing roundNumber = ', roundNumber), [roundNumber]);
 
+    
     return (
         <div
             style={{

@@ -20,7 +20,7 @@ import {LandingContext} from "./App";
 import Ably from 'ably/promises';
 import Confirmation from "./Pages/Confirmation";
 import { GoogleOAuthProvider } from "@react-oauth/google";
-import { CookiesProvider } from "react-cookie";
+import { CookiesProvider, useCookies } from "react-cookie";
 
 const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
@@ -28,7 +28,7 @@ const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 export default function Nav() {
 
-    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, roundDuration, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected, loading, setLoading, deckTitle, setDeckTitle} = useContext(LandingContext);
+    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, roundDuration, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected, loading, setLoading, deckTitle, setDeckTitle, cookies, setCookie} = useContext(LandingContext);
     
     const channel_page = client.channels.get(`Captions/Page/${code}`);
     const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
@@ -39,7 +39,6 @@ export default function Nav() {
     const channel_joining = client.channels.get(`Captions/Landing/${code}`);
 
     return (
-        <CookiesProvider>
             <GoogleOAuthProvider 
                     clientId="336598290180-69pe1qeuqku450vnoi8v1ehhi19jhpmt.apps.googleusercontent.com">
                 <Router>
@@ -118,6 +117,5 @@ export default function Nav() {
                     </Switch>
                 </Router>
             </GoogleOAuthProvider>
-        </CookiesProvider>
     );
 }

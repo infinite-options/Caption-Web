@@ -8,12 +8,18 @@ import {useHistory} from "react-router-dom";
 import { createGenerateClassName } from "@material-ui/core";
 
 function ScoreType({channel}) {
-    const {code, setCode, rounds, roundDuration, host, imageURL, setImageURL, roundNumber, alias, photosFromAPI, setPhotosFromAPI, playerUID} = useContext(LandingContext)
+    const {code, rounds, roundDuration, host, imageURL, setImageURL, roundNumber, alias, photosFromAPI, playerUID, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookie} = useContext(LandingContext)
     const[buttonType, setbuttonType] = useState("");
     const history = useHistory()
 
     const createGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createGame"
     const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
+
+
+    // Load Cookies
+    console.log("Scoretype Cookies", cookies)
+    loadCookies()
+
 
     // Creates game with game rules input and transitions to waiting room
     function createGame() {
@@ -33,8 +39,8 @@ function ScoreType({channel}) {
         axios.post(createGameURL, payload).then((res) => {
             console.log("POST createGame", res)
 
-            console.log("game_code", res.data.game_code)
             setCode(res.data.game_code)
+            setCookie("code", res.data.game_code)
 
             return res.data.game_code
         }).then((gameCode) => {
@@ -48,12 +54,48 @@ function ScoreType({channel}) {
 
             axios.post(joinGameURL, payload).then((res) => {
                 console.log("POST joinGame", res)
-
                 history.push("/waiting")
             })
         })
 
     }
+
+    // Loads cookies if defined previously
+    function loadCookies() {
+        if(cookies.code !== undefined)
+            setCode(cookies.code)
+        if(cookies.name !== undefined)
+            setName(cookies.name)
+        if(cookies.email !== undefined)
+            setEmail(cookies.email)
+        if(cookies.zipCode !== undefined)
+            setZipCode(cookies.zipCode)
+        if(cookies.alias !== undefined)
+            setAlias(cookies.alias)
+        if(cookies.gameUID !== undefined)
+            setGameUID(cookies.gameUID)
+        if(cookies.rounds !== undefined)
+            setRounds(cookies.rounds)
+        if(cookies.roundDuration !== undefined)
+            setRoundDuration(cookies.roundDuration)
+        if(cookies.host !== undefined && typeof host !== 'boolean')
+            setHost(JSON.parse(cookies.host))
+        if(cookies.roundNumber !== undefined) 
+            setRoundNumber(parseInt(cookies.roundNumber))
+        if(cookies.playerUID !== undefined)
+            setPlayerUID(cookies.playerUID)
+        if(cookies.imageURL !== undefined)
+            setImageURL(cookies.imageURL)
+        if(cookies.scoreboardInfo !== undefined)
+            setScoreboardInfo(cookies.scoreboardInfo)
+        if(cookies.photosFromAPI !== undefined)
+            setPhotosFromAPI(cookies.photosFromAPI)
+        if(cookies.deckSelected !== undefined)
+            setDeckSelected(cookies.deckSelected)
+        if(cookies.deckTitle !== undefined)
+            setDeckTitle(cookies.deckTitle)
+    }
+
 
 
     return (

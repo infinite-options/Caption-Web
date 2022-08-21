@@ -8,8 +8,11 @@ import {LandingContext} from "../App";
 export default function Endgame() {
 
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
-    const {code, roundNumber, host, rounds, alias} = useContext(LandingContext);
+    const {code, roundNumber, host, rounds, alias, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, setPhotosFromAPI, setDeckSelected, setDeckTitle, cookies, setCookie} = useContext(LandingContext);
 
+    // Load Cookies
+    console.log("Endgame Cookies", cookies)
+    //loadCookies()
 
     useEffect(() => {
         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
@@ -56,6 +59,42 @@ export default function Endgame() {
                 }
             </div>
         );
+    }
+
+    // Loads cookies if defined previously
+    function loadCookies() {
+        // if(cookies.code !== undefined)
+        //     setCode(cookies.code)
+        // if(cookies.name !== undefined)
+        //     setName(cookies.name)
+        // if(cookies.email !== undefined)
+        //     setEmail(cookies.email)
+        // if(cookies.zipCode !== undefined)
+        //     setZipCode(cookies.zipCode)
+        // if(cookies.alias !== undefined)
+        //     setAlias(cookies.alias)
+        // if(cookies.gameUID !== undefined)
+        //     setGameUID(cookies.gameUID)
+        // if(cookies.rounds !== undefined)
+        //     setRounds(cookies.rounds)
+        // if(cookies.roundDuration !== undefined)
+        //     setRoundDuration(cookies.roundDuration)
+        // if(cookies.host !== undefined)
+        //     setHost(cookies.host)
+        // if(cookies.roundNumber !== undefined)
+        //     setRoundNumber(parseInt(cookies.roundNumber))
+        // if(cookies.playerUID !== undefined)
+        //     setPlayerUID(cookies.playerUID)
+        // if(cookies.imageURL !== undefined)
+        //     setImageURL(cookies.imageURL)
+        if(cookies.scoreboardInfo !== undefined)
+            setScoreboardInfo(cookies.scoreboardInfo)
+        // if(cookies.photosFromAPI !== undefined)
+        //     setPhotosFromAPI(cookies.photosFromAPI)
+        // if(cookies.deckSelected !== undefined)
+        //     setDeckSelected(cookies.deckSelected)
+        // if(cookies.deckTitle !== undefined)
+        //     setDeckTitle(cookies.deckTitle)
     }
 
 

@@ -9,7 +9,7 @@ import { LandingContext } from "../App";
 
 const GoogleTest = () => {
     const history = useHistory();
-    const {code, roundNumber, photosFromAPI, setPhotosFromAPI, setDeckSelected} = useContext(LandingContext)
+    const {code, roundNumber, photosFromAPI, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, setScoreboardInfo, setPhotosFromAPI, setDeckSelected, setDeckTitle, cookies, setCookie} = useContext(LandingContext)
 
     const [tokens, setTokens] = useState({})
     const [albums, setAlbums] = useState([])
@@ -19,8 +19,9 @@ const GoogleTest = () => {
     const clientID = "336598290180-69pe1qeuqku450vnoi8v1ehhi19jhpmt.apps.googleusercontent.com"
     const clientSecret = "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"
     const currentHost = window.location.origin
-    console.log('Current Host', currentHost)
 
+    console.log("Google Cookies", cookies)
+    loadCookies()
 
     // OAuth Flow
     // https://developers.google.com/identity/oauth2/web/guides/how-user-authz-works
@@ -97,6 +98,7 @@ const GoogleTest = () => {
 
             console.log('Image URLS', imageUrls)
             setPhotosFromAPI(imageUrls)
+            setCookie("photosFromAPI", imageUrls)
         })
     }
     
@@ -115,7 +117,9 @@ const GoogleTest = () => {
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
         axios.post(postURL, payload);
 
-        setDeckSelected(true)
+        setDeckSelected("500-000009")
+        setCookie("deckSelected", "500-000009")
+
         history.push('/waiting')
     }
 
@@ -125,6 +129,44 @@ const GoogleTest = () => {
         console.log('Albums', albums)
         console.log('Photos Set', photosFromAPI)
     })
+
+
+    // Loads cookies if defined previously
+    function loadCookies() {
+        if(cookies.code !== undefined)
+            setCode(cookies.code)
+        if(cookies.name !== undefined)
+            setName(cookies.name)
+        if(cookies.email !== undefined)
+            setEmail(cookies.email)
+        if(cookies.zipCode !== undefined)
+            setZipCode(cookies.zipCode)
+        if(cookies.alias !== undefined)
+            setAlias(cookies.alias)
+        if(cookies.gameUID !== undefined)
+            setGameUID(cookies.gameUID)
+        if(cookies.rounds !== undefined)
+            setRounds(cookies.rounds)
+        if(cookies.roundDuration !== undefined)
+            setRoundDuration(cookies.roundDuration)
+        if(cookies.host !== undefined && typeof host !== 'boolean')
+            setHost(JSON.parse(cookies.host))
+        if(cookies.roundNumber !== undefined)
+            setRoundNumber(parseInt(cookies.roundNumber))
+        if(cookies.playerUID !== undefined)
+            setPlayerUID(cookies.playerUID)
+        if(cookies.imageURL !== undefined)
+            setImageURL(cookies.imageURL)
+        if(cookies.scoreboardInfo !== undefined)
+            setScoreboardInfo(cookies.scoreboardInfo)
+        if(cookies.photosFromAPI !== undefined)
+            setPhotosFromAPI(cookies.photosFromAPI)
+        if(cookies.deckSelected !== undefined)
+            setDeckSelected(cookies.deckSelected)
+        if(cookies.deckTitle !== undefined)
+            setDeckTitle(cookies.deckTitle)
+    }
+
 
 
     return (

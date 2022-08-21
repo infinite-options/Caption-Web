@@ -17,9 +17,12 @@ import * as ReactBootStrap from 'react-bootstrap';
 
 function Collections() {
     const [deckArray, setDeckArray] = useState([]);
-    const {playerUID} = useContext(LandingContext);
+    const {playerUID, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, setScoreboardInfo, setPhotosFromAPI, setDeckSelected, setDeckTitle, cookies} = useContext(LandingContext);
     const [loading, setLoading] = useState(false);
 
+    // Load cookies
+    console.log("Collections cookies", cookies)
+    loadCookies()
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks";
@@ -29,9 +32,46 @@ function Collections() {
             setLoading(true)
             console.log('deckArray: ', res.data.decks_info);
         })
-    }, []);
+    }, [playerUID]);
 
 
+    // Loads cookies if defined previously
+    function loadCookies() {
+        if(cookies.code !== undefined)
+            setCode(cookies.code)
+        if(cookies.name !== undefined)
+            setName(cookies.name)
+        if(cookies.email !== undefined)
+            setEmail(cookies.email)
+        if(cookies.zipCode !== undefined)
+            setZipCode(cookies.zipCode)
+        if(cookies.alias !== undefined)
+            setAlias(cookies.alias)
+        if(cookies.gameUID !== undefined)
+            setGameUID(cookies.gameUID)
+        if(cookies.rounds !== undefined)
+            setRounds(cookies.rounds)
+        if(cookies.roundDuration !== undefined)
+            setRoundDuration(cookies.roundDuration)
+        if(cookies.host !== undefined && typeof host !== 'boolean')
+            setHost(JSON.parse(cookies.host))
+        if(cookies.roundNumber !== undefined) 
+            setRoundNumber(parseInt(cookies.roundNumber))
+        if(cookies.playerUID !== undefined)
+            setPlayerUID(cookies.playerUID)
+        if(cookies.imageURL !== undefined)
+            setImageURL(cookies.imageURL)
+        if(cookies.scoreboardInfo !== undefined)
+            setScoreboardInfo(cookies.scoreboardInfo)
+        if(cookies.photosFromAPI !== undefined)
+            setPhotosFromAPI(cookies.photosFromAPI)
+        if(cookies.deckSelected !== undefined)
+            setDeckSelected(cookies.deckSelected)
+        if(cookies.deckTitle !== undefined)
+            setDeckTitle(cookies.deckTitle)
+    }
+
+        
     return (
         <div
             style={{

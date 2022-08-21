@@ -13,7 +13,7 @@ import * as ReactBootStrap from 'react-bootstrap';
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host, rounds, setRounds, roundNumber, setImageURL, alias, photosFromAPI, setPhotosFromAPI, deckSelected, deckTitle, setDeckTitle} = useContext(LandingContext);
+    const {code, host, rounds, roundNumber, setImageURL, alias, photosFromAPI, deckSelected, deckTitle, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookie} = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const [copied, setCopied] = useState(false);
     const history = useHistory();
@@ -24,6 +24,9 @@ export default function Waiting({channel, channel2, channel_joining}) {
     const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
     const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
 
+    // Load Cookies
+    console.log("Waiting Cookies", cookies)
+    loadCookies()
 
     useEffect(() => {
         console.log('roundNumber = ', roundNumber);
@@ -87,6 +90,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
                     setDeckTitle(newGame.data.deckTitle)
+                    setCookie("deckTitle", newGame.data.deckTitle)
 
                     if(newGame.data.currentImage.length === 0) {
                         const getImage = async () => {
@@ -95,6 +99,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                             .then((res) => {
                                 console.log("GET Get Image For Players", res);
                                 setImageURL(res.data.image_url);
+                                setCookie("imageURL", res.data.image_url)
                             })
 
                             history.push('/page');
@@ -174,13 +179,18 @@ export default function Waiting({channel, channel2, channel_joining}) {
         })
 
         const randNum = Math.floor(Math.random() * photosFromAPI.length)
-        const imageURL = photosFromAPI[randNum]
-        setImageURL(imageURL)
-        setPhotosFromAPI(photosFromAPI.filter((url) => {
-            return url !== imageURL
-        }))
+        const randomURL = photosFromAPI[randNum]
+        let apiPhotos = photosFromAPI.filter((url) => {
+            return url !== randomURL
+        })
 
-        pub(imageURL)
+        setImageURL(randomURL)
+        setPhotosFromAPI(apiPhotos)
+
+        setCookie("imageURL", randomURL)
+        setCookie("photosFromAPI", apiPhotos)
+
+        pub(randomURL)
     }
 
 
@@ -193,7 +203,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
             let payload = {
                 deck_uid: deckSelected,
                 game_code: code,
-                // 
             }
 
             await axios.post(postAssignDeckURL, payload).then((res) => {
@@ -203,6 +212,8 @@ export default function Waiting({channel, channel2, channel_joining}) {
             await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
                 console.log('GET Get Unique Image In Round', res);
                 setImageURL(res.data.image_url);
+
+                setCookie("imageURL", res.data.image_url)
                 setLoading(true)
             })
 
@@ -214,6 +225,43 @@ export default function Waiting({channel, channel2, channel_joining}) {
         }
         
     }
+
+    // Loads cookies if defined previously
+    function loadCookies() {
+        if(cookies.code !== undefined)
+            setCode(cookies.code)
+        if(cookies.name !== undefined)
+            setName(cookies.name)
+        if(cookies.email !== undefined)
+            setEmail(cookies.email)
+        if(cookies.zipCode !== undefined)
+            setZipCode(cookies.zipCode)
+        if(cookies.alias !== undefined)
+            setAlias(cookies.alias)
+        if(cookies.gameUID !== undefined)
+            setGameUID(cookies.gameUID)
+        if(cookies.rounds !== undefined)
+            setRounds(cookies.rounds)
+        if(cookies.roundDuration !== undefined)
+            setRoundDuration(cookies.roundDuration)
+        if(cookies.host !== undefined && typeof host !== 'boolean')
+            setHost(JSON.parse(cookies.host))
+        if(cookies.roundNumber !== undefined) 
+            setRoundNumber(parseInt(cookies.roundNumber))
+        if(cookies.playerUID !== undefined)
+            setPlayerUID(cookies.playerUID)
+        if(cookies.imageURL !== undefined)
+            setImageURL(cookies.imageURL)
+        if(cookies.scoreboardInfo !== undefined)
+            setScoreboardInfo(cookies.scoreboardInfo)
+        if(cookies.photosFromAPI !== undefined)
+            setPhotosFromAPI(cookies.photosFromAPI)
+        if(cookies.deckSelected !== undefined)
+            setDeckSelected(cookies.deckSelected)
+        if(cookies.deckTitle !== undefined)
+            setDeckTitle(cookies.deckTitle)
+    }
+
 
     return (
         <div

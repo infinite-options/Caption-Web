@@ -10,13 +10,13 @@ import axios from "axios";
 import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 
-function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining}) {
-
-    const bestCaption = "Two dudes watching the Sharknado trailer";
-    const [timeStamp, setTimeStamp] = useState();
+function Scoreboard({ channel, channel_waiting, channel_joining}) {
     const history = useHistory();
-    const [grandfatherClock, setGrandfatherClock] = useState("tick");
-    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL, photosFromAPI, setPhotosFromAPI, deckTitle} = useContext(LandingContext);
+    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL, photosFromAPI, deckTitle, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookie} = useContext(LandingContext);
+
+    // Load Cookies
+    console.log("Scoreboard Cookies", cookies)
+    loadCookies()
 
     const pub = (apiURL) => {
         if(photosFromAPI.length > 0)
@@ -33,13 +33,18 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
 
     const getUniqueAPIimage = async () => {
         const randNum = Math.floor(Math.random() * photosFromAPI.length)
-        const imageURL = photosFromAPI[randNum]
-        setImageURL(imageURL)
-        setPhotosFromAPI(photosFromAPI.filter((url) => {
+        const randURL = photosFromAPI[randNum]
+        let apiPhotos = photosFromAPI.filter((url) => {
             return url !== imageURL
-        }))
+        })
 
-        pub(imageURL)
+        setImageURL(randURL)
+        setPhotosFromAPI(apiPhotos)
+
+        setCookie("imageURL", randURL)
+        setCookie("photosFromAPI", apiPhotos)
+
+        pub(randURL)
     }
 
     useEffect(() => {
@@ -47,7 +52,7 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
 
         if(!host){
             setRoundNumber(roundNumber + 1);
-            
+            setCookie("roundNumber", roundNumber + 1)
 
             async function subscribe() 
             {
@@ -65,6 +70,8 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
                                 await axios.get(getImageURL + code + "," + nextRound).then((res) => {
                                     console.log("GET Get Image For Players",res);
                                     setImageURL(res.data.image_url);
+
+                                    setCookie("imageURL", res.data.image_url)
                                 })
 
                                 history.push('/page');
@@ -74,6 +81,8 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
                         } else {
                             console.log(roundNumber)
                             setImageURL(roundStarted.data.currentImage)
+                            setCookie("imageURL", roundStarted.data.currentImage)
+
                             history.push('page/')
                         }
 
@@ -155,6 +164,8 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
             await axios.post(postURL, payload);
 
             setRoundNumber(roundNumber + 1);
+            setCookie("roundNumber", roundNumber + 1)
+
             const nextRound = roundNumber + 1;
 
             if(photosFromAPI.length === 0) {
@@ -165,6 +176,9 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
                 await axios.get(getUniqueImageInRound + code + "," + nextRound).then((res) => {
                     console.log('GET Get Unique Image In Round', res);
                     setImageURL(res.data.image_url);
+
+                    setCookie("imageURL", res.data.image_url)
+
                     pub();
                 })
             } else {
@@ -179,6 +193,43 @@ function Scoreboard({setRoundNumber, channel, channel_waiting, channel_joining})
         
         nextPub();
     }
+
+    // Loads cookies if defined previously
+    function loadCookies() {
+        if(cookies.code !== undefined)
+            setCode(cookies.code)
+        if(cookies.name !== undefined)
+            setName(cookies.name)
+        if(cookies.email !== undefined)
+            setEmail(cookies.email)
+        if(cookies.zipCode !== undefined)
+            setZipCode(cookies.zipCode)
+        if(cookies.alias !== undefined)
+            setAlias(cookies.alias)
+        if(cookies.gameUID !== undefined)
+            setGameUID(cookies.gameUID)
+        if(cookies.rounds !== undefined)
+            setRounds(cookies.rounds)
+        if(cookies.roundDuration !== undefined)
+            setRoundDuration(cookies.roundDuration)
+        if(cookies.host !== undefined && typeof host !== 'boolean')
+            setHost(JSON.parse(cookies.host))
+        if(cookies.roundNumber !== undefined) 
+            setRoundNumber(parseInt(cookies.roundNumber))
+        if(cookies.playerUID !== undefined)
+            setPlayerUID(cookies.playerUID)
+        if(cookies.imageURL !== undefined)
+            setImageURL(cookies.imageURL)
+        if(cookies.scoreboardInfo !== undefined)
+            setScoreboardInfo(cookies.scoreboardInfo)
+        if(cookies.photosFromAPI !== undefined)
+            setPhotosFromAPI(cookies.photosFromAPI)
+        if(cookies.deckSelected !== undefined)
+            setDeckSelected(cookies.deckSelected)
+        if(cookies.deckTitle !== undefined)
+            setDeckTitle(cookies.deckTitle)
+    }
+
 
 
     useEffect(() => 

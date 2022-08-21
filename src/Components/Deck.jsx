@@ -9,7 +9,7 @@ import { useEffect } from "react";
 
 export default function DeckCard(props) {
     const history = useHistory()
-    const {code, roundNumber, setDeckSelected, photosFromAPI, setPhotosFromAPI, deckTitle, setDeckTitle} = useContext(LandingContext);
+    const {code, roundNumber, setDeckSelected, photosFromAPI, setPhotosFromAPI, deckTitle, setDeckTitle, cookies, setCookie} = useContext(LandingContext);
 
     const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
     const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
@@ -83,34 +83,56 @@ export default function DeckCard(props) {
         if(props.googlePhotos === true){
             console.log("Google Photos API selected. Switching to Google Sign-in Page.")
             setDeckSelected(api_deck_uid)
+            setCookie("deckSelected", api_deck_uid)
             return
         }
         else if(props.cleveland){
             console.log("Cleveland API Selected") 
-            getData(clevelandURL)
-            setPhotosFromAPI(record)
-            setDeckSelected(api_deck_uid)
+            getData(clevelandURL).then(() => {
+                setPhotosFromAPI(record)
+                setDeckSelected(api_deck_uid)
+
+                setCookie("photosFromAPI", record)
+                setCookie("deckSelected", api_deck_uid)
+            })
+            
         }
         //Chicago
         else if(props.chicago){
             console.log("Chicago API Selected") 
-            getData(chicagoURL)
-            setPhotosFromAPI(image_url)
-            setDeckSelected(api_deck_uid)
+            getData(chicagoURL).then(() => {
+                setPhotosFromAPI(image_url)
+                setDeckSelected(api_deck_uid)
+
+                setCookie("photosFromAPI", image_url)
+                setCookie("deckSelected", api_deck_uid)
+            })
+            
         }
         //Giphy
         else if(props.giphy){
             console.log("Giphy API selected")
-            getData(giphyURL)
-            setPhotosFromAPI(record)
-            setDeckSelected(api_deck_uid)
+            getData(giphyURL).then(() => {
+                setPhotosFromAPI(record)
+                setDeckSelected(api_deck_uid)
+
+                console.log("RECORD", record)
+                setCookie("photosFromAPI", record)
+                setCookie("deckSelected", api_deck_uid)
+            })
+            
         }
         //Harvard
         else if(props.harvard){
             console.log("Harvard API selected")
-            getData(harvardURL)
-            setPhotosFromAPI(record)
-            setDeckSelected(api_deck_uid)
+            getData(harvardURL).then(() => {
+                setPhotosFromAPI(record)
+                setDeckSelected(api_deck_uid)
+
+                setCookie("photosFromAPI", record)
+                setCookie("deckSelected", api_deck_uid)
+            })
+            
         }
         // Decks from Database
         else {
@@ -119,13 +141,15 @@ export default function DeckCard(props) {
                 deck_uid: props.id,
                 round_number: roundNumber.toString(),
             };
+
+            setDeckTitle(props.title)
+            setCookie("deckSelected", props.id)
         }
 
         console.log('payload for deck = ', payload);
         await axios.post(selectDeckURL, payload).then(res => console.log(res))
-        setDeckSelected(props.id)
-        // use props.title to get deck name on host side
-        setDeckTitle(props.title)
+
+        setCookie("deckTitle", props.title)
     }
   
     return (

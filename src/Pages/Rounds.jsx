@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState} from 'react'
+import React, {useContext, useEffect, useState, useRef} from 'react'
 import axios from "axios";
 import circle from "../Assets/circle.png";
 import thing from "../Assets/idk.png";
@@ -11,10 +11,13 @@ import Form from "../Components/Form";
 import {useHistory} from "react-router-dom";
 import validator from 'validator';
 
-export default function Rounds({setRounds, setRoundDuration, channel }) {
+export default function Rounds({ channel }) {
     const history = useHistory();
-    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias} = useContext(LandingContext);
-    const [error, setError] = useState("")
+    const {code, rounds, roundDuration, host, setImageURL, roundNumber, alias, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookie} = useContext(LandingContext);
+
+    // Load Cookies
+    console.log("Rounds Cookies", cookies)
+    loadCookies()
 
     // Needs integer typecheck
     const handleRoundsChange = (roundsInput) => {
@@ -22,7 +25,8 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
          if(validator.isFloat(roundsInput)&&(validator.isInt(roundsInput)===false)){
              num = validator.toInt(roundsInput);
          }
-         if(validator.isInt(roundsInput)||num >0){
+         if(validator.isInt(roundsInput)||num > 0){
+            console.log("set rounds")
              setRounds(num);
          }
          else if (Number.isNaN(num)){
@@ -34,10 +38,11 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
     const handleRoundsDurationChange = (durationInput) => {
         let num = Number(durationInput);
          if(validator.isFloat(durationInput)&&(validator.isInt(durationInput)===false)){
-             num = validator.toInt(durationInput);
+            console.log("first")
+            num = validator.toInt(durationInput);
          }
          if(validator.isInt(durationInput)||num>0){
-             console.log((num));
+             console.log("setDuration");
              setRoundDuration(num);
          }
          else if (Number.isNaN(num)){
@@ -46,15 +51,65 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
     };
 
 
+    function handleSubmit() {
+        setCookie("rounds", rounds)
+        setCookie("roundDuration", roundDuration)
+        history.push("/scoretype")
+    }
+
+    // Loads cookies if defined previously
+    function loadCookies() {
+        if(cookies.code !== undefined)
+            setCode(cookies.code)
+        if(cookies.name !== undefined)
+            setName(cookies.name)
+        if(cookies.email !== undefined)
+            setEmail(cookies.email)
+        if(cookies.zipCode !== undefined)
+            setZipCode(cookies.zipCode)
+        if(cookies.alias !== undefined)
+            setAlias(cookies.alias)
+        if(cookies.gameUID !== undefined)
+            setGameUID(cookies.gameUID)
+        if(cookies.rounds !== undefined)
+            setRounds(cookies.rounds)
+        if(cookies.roundDuration !== undefined)
+            setRoundDuration(cookies.roundDuration)
+        if(cookies.host !== undefined && typeof host !== 'boolean')
+            setHost(JSON.parse(cookies.host))
+        if(cookies.roundNumber !== undefined) 
+            setRoundNumber(parseInt(cookies.roundNumber))
+        if(cookies.playerUID !== undefined)
+            setPlayerUID(cookies.playerUID)
+        if(cookies.imageURL !== undefined)
+            setImageURL(cookies.imageURL)
+        if(cookies.scoreboardInfo !== undefined)
+            setScoreboardInfo(cookies.scoreboardInfo)
+        if(cookies.photosFromAPI !== undefined)
+            setPhotosFromAPI(cookies.photosFromAPI)
+        if(cookies.deckSelected !== undefined)
+            setDeckSelected(cookies.deckSelected)
+        if(cookies.deckTitle !== undefined)
+            setDeckTitle(cookies.deckTitle)
+    }
+
 
     return (
-        <div style={{
+        <div 
+            style={{
                 maxWidth: "375px",
                 height: "812px",
-        }}>
+                }}
+        >
 
-            <img className="innerImage1" src={circle}/>
-            <img className="innerImage2" src={thing}/>
+            <img 
+                className="innerImage1" 
+                src={circle}
+            />
+            <img 
+                className="innerImage2" 
+                src={thing}
+            />
 
             <div className="spacer"/>
 
@@ -87,8 +142,13 @@ export default function Rounds({setRounds, setRoundDuration, channel }) {
 
             <br></br>
 
-            <Button className="landing" conditionalLink={true} destination="/scoretype"
-                    children="Continue"/>
+            <Button 
+                className="landing" 
+                conditionalLink={true} 
+                // destination="/scoretype"
+                children="Continue"
+                onClick={() => handleSubmit()}
+            />
 
 
         </div>

@@ -14,23 +14,22 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
 
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
-    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, setScoreboardInfo, photosFromAPI, roundDuration, deckTitle} = useContext(LandingContext);
-    const history = useHistory();
-    console.log('code = ', code, ', playerUID = ', playerUID);
-
+    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, photosFromAPI, roundDuration, deckTitle, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setImageURL, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookiecookies, setCookie} = useContext(LandingContext);
+    
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
     const [selectedCaption, setSelectedCaption] = useState("");
-
     const [localUserVoted, setLocalUserVoted] = useState(false);
-    const [everybodyVoted, setEverybodyVoted] = useState(false);
-    const [SelectedMyCaption, setSelectedMyCaption] = useState(false);
-    const [waitingOnPlayers, setwaitingOnPlayers] = useState([]);
     const [timerDuration, setTimerDuration] = useState(-1);
     const [timeLeft, setTimeLeft] = useState(Number.POSITIVE_INFINITY);
-
     const [loading, setLoading] = useState(false);
-    console.log('timerDuration: ', timerDuration);
+
+    const history = useHistory();
+
+
+    // Load Cookies
+    console.log("Selection Cookies", cookies)
+    loadCookies()
 
     const pub_host = (playerCount) => {
         console.log('in pub_host');
@@ -43,13 +42,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     };
 
 
-    function determineLag(current, start) {
-        if (current - start >= 0) {
-            return current - start;
-        } else {
-            return current + (60 - start);
-        }
-    }
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
@@ -164,22 +156,22 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             // }
 
             // Instead of determining lag, give each user the full round duration
-            await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                console.log('GetTimerURL', res.data)
+            // await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+            //     console.log('GetTimerURL', res.data)
 
-                // Convert round duration format (min:sec) into seconds
-                const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
-                let duration = duration_mins * 60 + duration_secs;
+            //     // Convert round duration format (min:sec) into seconds
+            //     const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+            //     const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+            //     let duration = duration_mins * 60 + duration_secs;
 
-                console.log('Duration Seconds', duration_secs)
-                console.log('Duration Minutes', duration_mins)
-                console.log('Duration Total', duration)
+            //     console.log('Duration Seconds', duration_secs)
+            //     console.log('Duration Minutes', duration_mins)
+            //     console.log('Duration Total', duration)
 
-                if(res.data.round_started_at !== undefined) {
-                    setTimerDuration(duration)
-                }
-            })
+            //     if(res.data.round_started_at !== undefined) {
+            //         setTimerDuration(duration)
+            //     }
+            // })
         }
 
         idontknow();
@@ -211,17 +203,16 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     if (ping.data.everybodyVoted)
                     {
                         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
-                        console.log('test 1');
                         await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
-                            console.log('scoreboard-response = ', res.data.scoreboard);
+                            console.log('GET score board ', res);
 
                             res.data.scoreboard.sort((a, b) => (
                                 b.score === a.score ? b.game_score - a.game_score : b.score - a.score
                             ));
 
                             setScoreboardInfo(res.data.scoreboard);
+                            setCookie("scoreboardInfo", res.data.scoreboard)
                         });
-                        console.log('test 3');
                         if (rounds <= roundNumber)
                             history.push('/endgame');
                         else
@@ -336,6 +327,43 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
       
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
+
+    // Loads cookies if defined previously
+     function loadCookies() {
+        if(cookies.code !== undefined)
+            setCode(cookies.code)
+        if(cookies.name !== undefined)
+            setName(cookies.name)
+        if(cookies.email !== undefined)
+            setEmail(cookies.email)
+        if(cookies.zipCode !== undefined)
+            setZipCode(cookies.zipCode)
+        if(cookies.alias !== undefined)
+            setAlias(cookies.alias)
+        if(cookies.gameUID !== undefined)
+            setGameUID(cookies.gameUID)
+        if(cookies.rounds !== undefined)
+            setRounds(cookies.rounds)
+        if(cookies.roundDuration !== undefined)
+            setRoundDuration(cookies.roundDuration)
+        if(cookies.host !== undefined && typeof host !== 'boolean')
+            setHost(JSON.parse(cookies.host))
+        if(cookies.roundNumber !== undefined) 
+            setRoundNumber(parseInt(cookies.roundNumber))
+        if(cookies.playerUID !== undefined)
+            setPlayerUID(cookies.playerUID)
+        if(cookies.imageURL !== undefined)
+            setImageURL(cookies.imageURL)
+        if(cookies.scoreboardInfo !== undefined)
+            setScoreboardInfo(cookies.scoreboardInfo)
+        if(cookies.photosFromAPI !== undefined)
+            setPhotosFromAPI(cookies.photosFromAPI)
+        if(cookies.deckSelected !== undefined)
+            setDeckSelected(cookies.deckSelected)
+        if(cookies.deckTitle !== undefined)
+            setDeckTitle(cookies.deckTitle)
+    }
+
 
 
     useEffect(() => console.log('selected-Caption: ', selectedCaption), [selectedCaption]);

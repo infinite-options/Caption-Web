@@ -15,8 +15,8 @@ import axios from "axios";
 import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
-export default function Page({setImageURL, setRounds, channel, channel_waiting, channel_joining}) {
-    const {code, roundNumber, host, playerUID, imageURL, alias, rounds, roundDuration, deckTitle} = useContext(LandingContext);
+export default function Page({setImageURL, channel, channel_waiting, channel_joining}) {
+    const {code, roundNumber, host, playerUID, imageURL, alias, rounds, roundDuration, deckTitle, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookiecookies, setCookie} = useContext(LandingContext);
     const history = useHistory();
     const [caption, setCaption] = useState("");
     const [captionSubmitted, setCaptionSubmitted] = useState(false);
@@ -33,13 +33,12 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
     const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
     const [loading, setLoading] = useState(false);
     const[total_round, setTotalRound] = useState([])
+    let cookiesDone = false
 
 
-    console.log('waitingPlayers after a render: ', waitingPlayers);
-    console.log("round_duration",roundDuration)
-    console.log("rounds",rounds)
-    console.log("deck title", deckTitle)
-
+    // Load Cookies
+    console.log("Page Cookies", cookies)
+    loadCookies()
 
 
     const pub = (playerCount) => {
@@ -183,7 +182,7 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
             channel.unsubscribe();
             channel_waiting.unsubscribe();
         };
-    }, [waitingPlayers]);
+    }, [waitingPlayers, code, cookiesDone]);
 
 
 
@@ -239,6 +238,45 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
         setTimeUp(true);
     }
 
+
+        // Loads cookies if defined previously
+        function loadCookies() {
+            if(cookies.code !== undefined)
+                setCode(cookies.code)
+            if(cookies.name !== undefined)
+                setName(cookies.name)
+            if(cookies.email !== undefined)
+                setEmail(cookies.email)
+            if(cookies.zipCode !== undefined)
+                setZipCode(cookies.zipCode)
+            if(cookies.alias !== undefined)
+                setAlias(cookies.alias)
+            if(cookies.gameUID !== undefined)
+                setGameUID(cookies.gameUID)
+            if(cookies.rounds !== undefined)
+                setRounds(cookies.rounds)
+            if(cookies.roundDuration !== undefined)
+                setRoundDuration(cookies.roundDuration)
+            if(cookies.host !== undefined && typeof host !== 'boolean')
+                setHost(JSON.parse(cookies.host))
+            if(cookies.roundNumber !== undefined) 
+                setRoundNumber(parseInt(cookies.roundNumber))
+            if(cookies.playerUID !== undefined)
+                setPlayerUID(cookies.playerUID)
+            if(cookies.imageURL !== undefined)
+                setImageURL(cookies.imageURL)
+            if(cookies.scoreboardInfo !== undefined)
+                setScoreboardInfo(cookies.scoreboardInfo)
+            if(cookies.photosFromAPI !== undefined)
+                setPhotosFromAPI(cookies.photosFromAPI)
+            if(cookies.deckSelected !== undefined)
+                setDeckSelected(cookies.deckSelected)
+            if(cookies.deckTitle !== undefined)
+                setDeckTitle(cookies.deckTitle)
+            cookiesDone = true
+        }
+    
+
     return (
         <div
             style={{
@@ -250,7 +288,9 @@ export default function Page({setImageURL, setRounds, channel, channel_waiting, 
             <div style={{padding: "20px"}}>
                 <br></br>
 
-                <h1>{deckTitle}</h1>
+                <h1>
+                    {deckTitle}
+                </h1>
                 <br></br>
                 <h3>Round: {roundNumber}/{rounds}</h3>
                 <br></br>

@@ -10,17 +10,21 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 
 export default function Confirmation({setCode, setName, setAlias, setEmail, setZipCode, setGameUID, setHost, setPlayerUID, client, channel, setRoundNumber, setRounds}){
-    const {code, name, alias, email, zipCode, host, playerUID} = useContext(LandingContext);
-    const [temp, setTemp]=useState("");
-    const [input, setInput]=useState("");
+    const {code, name, alias, email, zipCode, host, playerUID, cookies, setCookie} = useContext(LandingContext);
+    const [temp, setTemp] = useState("");
+    const [input, setInput] = useState("");
     const [correct, setCorrect] = useState(true);
-    const history = useHistory();
     const  [loading, setLoading] = useState(false)
+    const history = useHistory();
+
+
     const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
     const checkEmailCodeURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidationCode";
 
+    // Load Cookies
+    console.log("Landing Cookies", cookies)
 
-
+    
     async function afterIncorrectCode() {
         setCorrect(false);
         setTimeout(() => {  setCorrect(true) }, 1500);

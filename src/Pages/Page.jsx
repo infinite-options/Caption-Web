@@ -105,17 +105,17 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
             
             // Instead of determining lag, give each user the full round duration
             await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                const total_round = [];
-                let value;
-                console.log('GetTimerURL', res.data)
-                for(const round in res.data){
-                    if(res.data.hasOwnProperty(round)){
-                        value = res.data.total_number_of_rounds
-                    }
-                    total_round.push(value)
-                }
-                console.log("TOTAL ROUND: ",total_round)
-                setTotalRound(total_round[0])
+                // const total_round = [];
+                // let value;
+                // console.log('GetTimerURL', res.data)
+                // for(const round in res.data){
+                //     if(res.data.hasOwnProperty(round)){
+                //         value = res.data.total_number_of_rounds
+                //     }
+                //     total_round.push(value)
+                // }
+                // console.log("TOTAL ROUND: ",total_round)
+                // setTotalRound(total_round[0])
                 // Convert round duration format (min:sec) into seconds
                 const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
                 const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
@@ -301,7 +301,8 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
                 <br></br>
 
                 <div>
-                    {captionSubmitted ? <></> : 
+                    {captionSubmitted ?
+                    <></> : 
                         <Form
                             className="input2"
                             field="Enter your caption here"
@@ -315,8 +316,14 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
                     }
                     <br/>
 
-                    <Row>
-                        <span style={{marginLeft: "50px"}}></span>
+                    {/* <Row> */}
+                <div 
+                    style = {{
+                        display: 'flex', 
+                        justifyContent: 'center', 
+                        paddingBottom: '20px', 
+                       }}
+                 >
                         <div style={{
                                 background: "yellow",
                                 borderRadius: "30px",
@@ -342,9 +349,9 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
                             </CountdownCircleTimer> : <></>}
 
                         </div>
-
-                        <span style={{marginLeft: "60px"}}></span>
-                        <br></br>{" "}
+                </div>
+                        {/* <span style={{marginLeft: "60px"}}></span>
+                        <br></br>{" "} */}
 
                         {captionSubmitted ? <Button
                             className="fat"
@@ -362,7 +369,7 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
                         />
                         }
 
-                    </Row>
+                    {/* </Row> */}
                 </div>
                 {/*)}*/}
             </div>

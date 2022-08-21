@@ -45,7 +45,7 @@ export default function DeckCard(props) {
                 for(const image of res.data.data){
                     record.push(image.images.web.url);
                 }
-                console.log("Cleveland Records After pushing",record)
+                // console.log("Cleveland Records After pushing",record)
             }
             //Chicago
             else if(url === chicagoURL){
@@ -56,7 +56,7 @@ export default function DeckCard(props) {
                 for(var i=0;i<record.length;i++){
                     image_url.push(res.data.config.iiif_url + "/" + record[i] + "/full/843,/0/default.jpg")
                 }
-                console.log("Chicago Image URL",image_url)
+                // console.log("Chicago Image URL",image_url)
             }
             //Giphy
             else if(url === giphyURL){
@@ -64,7 +64,7 @@ export default function DeckCard(props) {
                 for(const giphyImage of res.data.data){
                     record.push(giphyImage.images.original.url);
                 }
-                    console.log("Giphy Image URL", record)
+                    // console.log("Giphy Image URL", record)
             }
             //Harvard
             else if(url === harvardURL){
@@ -73,7 +73,7 @@ export default function DeckCard(props) {
                 for(const harvardImage of res.data.records){
                     record.push(harvardImage.baseimageurl)
                 }
-                console.log("Harvard Image URL", record)
+                // console.log("Harvard Image URL", record)
             }
         })
     }

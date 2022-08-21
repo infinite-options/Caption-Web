@@ -10,6 +10,7 @@ import {LandingContext} from "../App";
 import Form from "../Components/Form";
 import {useHistory} from "react-router-dom";
 import validator from 'validator';
+import {Link} from "react-router-dom";
 
 export default function Rounds({ channel }) {
     const history = useHistory();
@@ -112,6 +113,20 @@ export default function Rounds({ channel }) {
             />
 
             <div className="spacer"/>
+
+            <Link to="/gamerules">
+                <i
+                    style={{
+                        position: "absolute",
+                        top: "150px",
+                        left: "30px",
+                        paddingBottom:'20px',
+                        color: "blue",
+                    }}
+                    className="fas fa-info-circle"
+                    children=' Game Rule'
+                />
+            </Link>
 
             <h4> Enter the number of rounds and time for each round</h4>
 

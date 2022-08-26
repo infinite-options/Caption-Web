@@ -16,6 +16,7 @@ const GoogleTest = () => {
     const [signedIn, setSignedIn] = useState(false)
     const [selectedAlbum, setSelectedAlbum] = useState("")
 
+
     const clientID = "336598290180-69pe1qeuqku450vnoi8v1ehhi19jhpmt.apps.googleusercontent.com"
     const clientSecret = "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"
     const currentHost = window.location.origin
@@ -32,6 +33,7 @@ const GoogleTest = () => {
             for(let i = 0; i < propsToLoad.length; i++) {
                 let propName = propsToLoad[i]
                 let propValue = localCookies[propName]
+                
                 cookieLoad[propName] = propValue
             }
 
@@ -47,7 +49,7 @@ const GoogleTest = () => {
         }
 
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "photosFromAPI"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected"])
     }, [])
 
 
@@ -80,9 +82,23 @@ const GoogleTest = () => {
             }
         }
 
-    
+        
         console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
+        console.log("photosFromAPI", userData.photosFromAPI)
+
+        //hardcode
+        setCookie("userData", {
+            ...localCookies,
+            //photosFromAPI: ["1", "2", "3"]
+            photosFromAPI: ['https://lh3.googleusercontent.com/lr/AFz2ejRAKojRd…j29wuf4sK7i9_Gn8-HeIlpw82oQ_bhp6CnLCJky-RxdjQxjiY', 'https://lh3.googleusercontent.com/lr/AFz2ejSNZUUan…Qapb4GptGjsViFI5tjYIV66yZjOZZ5ZsS-mUiCMYGwHUWv-mA', 'https://lh3.googleusercontent.com/lr/AFz2ejSBUlRL3…0FZPrOVj2wJATo5_cboiX2mOZNaZblX7tVCpa9m18Aiz75sgI', 'https://lh3.googleusercontent.com/lr/AFz2ejR2U1p7v…i4TBE58I6EZ3wUunxFvVbC9QO3SvuxwCThP3r8On1Vbyv6duA', 'https://lh3.googleusercontent.com/lr/AFz2ejT4eTnvU…7qaQcGy9tc_vTfb3cUitJhWQoCjEW55ZoDOc2gr3KM9-Pt3Nc', 'https://lh3.googleusercontent.com/lr/AFz2ejRWKqEXP…Pedk1GPufg7bj5iHdSfnV3MV42ZW2G8Xwa87YZJ13wg9L1Hvk', 'https://lh3.googleusercontent.com/lr/AFz2ejTDKoteW…KDgWs5-8-RevMS2xGR8C_o8T8rpP0WRcDxbbdYkr9PxZbW2TA', 'https://lh3.googleusercontent.com/lr/AFz2ejRAu9eMo…81dp7VZVZZFzzrfNhrgoVqN54iqvTg5iwlaxPFif8UHam8U0g']
+            //photosFromAPI: userData.photosFromAPI
+        })
+        // setCookie("userData", localCookies)
+        //console.log("local cookies end", localCookies)
+        //  setCookie("userData", {
+        //     ...localCookies
+        // })
+
     }
 
     // OAuth Flow
@@ -121,6 +137,7 @@ const GoogleTest = () => {
     })
 
 
+
     // Display album choice buttons if signed in
     const chooseAlbums = () => {
         if(albums !== null) {
@@ -140,7 +157,8 @@ const GoogleTest = () => {
         }
     }
 
-    // Get photos for "entry" album
+
+    // Get photos for "entry" album, called when clicking on an album
     function getPhotos(entry) {
         const body = {
             "pageSize": "100",
@@ -158,35 +176,26 @@ const GoogleTest = () => {
                 return picture.baseUrl
             })
 
-            console.log('Image URLS', imageUrls)
-
-
             setUserData({
                 ...userData,
                 photosFromAPI: imageUrls
             })
 
-            putCookies(
-                ["photosFromAPI"],
-                {"photosFromAPI": imageUrls}
-            )
+            // console.log("imageUrls", imageUrls)
+
+            // putCookies(
+            //     ["photosFromAPI"],
+            //     {"photosFromAPI": imageUrls}
+            // )
+
         })
     }
     
     
+
     // Select dummy deck in DB and transition to waiting room
     const submitAlbum = () => {
         console.log("move back to waiting room")
-
-        const payload = {
-            game_code: userData.code,
-            deck_uid: "500-000009",
-            round_number: userData.roundNumber.toString(),
-        };
-
-        console.log('payload for deck = ', payload);
-        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
-        axios.post(postURL, payload);
 
 
         setUserData({
@@ -198,13 +207,34 @@ const GoogleTest = () => {
             ["deckSelected"],
             {"deckSelected": "500-000009"}
         )
-        history.push('/waiting')
+
+        console.log("photosFromAPI before putCookies", userData.photosFromAPI)
+
+        putCookies(
+            ["photosFromAPI"],
+            {"photosFromAPI": userData.photosFromAPI}
+        )
+        
+        console.log("after putCookies photosAPI")
+
+        const payload = {
+            game_code: userData.code,
+            deck_uid: "500-000009",
+            round_number: userData.roundNumber.toString(),
+        };
+
+        console.log('payload for deck = ', payload);
+        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
+        axios.post(postURL, payload);
+        
+
+       // history.push('/waiting')
     }
 
 
     useEffect(() => {
-        console.log('Tokens', tokens)
-        console.log('Albums', albums)
+        //console.log('Tokens', tokens)
+        //console.log('Albums', albums)
         console.log('Photos Set', userData.photosFromAPI)
     })
 
@@ -241,7 +271,7 @@ const GoogleTest = () => {
                 <br></br>
                 { selectedAlbum === ""
                     ? ""
-                    : <button id="buttons" onClick={() => submitAlbum()}>Play with {selectedAlbum}</button>
+                    : <button id="buttons" onClick={submitAlbum}>Play with {selectedAlbum}</button>
                 }
 
             </GoogleOAuthProvider>

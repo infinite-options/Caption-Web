@@ -33,10 +33,12 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
     const [loading, setLoading] = useState(false);
     const[total_round, setTotalRound] = useState([])
+    const [updateComplete, setUpdateComplete] = useState(false)
     let cookiesDone = false
 
 
     console.log("Page Cookies", cookies)
+    console.log("Round Duration", userData.roundDuration)
     
 
     // Load cookies into userData state on first render
@@ -48,7 +50,12 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
             for(let i = 0; i < propsToLoad.length; i++) {
                 let propName = propsToLoad[i]
                 let propValue = localCookies[propName]
+
+                console.log("propName", propName)
+                console.log("propValue from cookies", propValue)
                 cookieLoad[propName] = propValue
+                //cookieLoad[propName] = localCookies[propName]
+                
             }
 
             console.log("cookieLoad", cookieLoad)
@@ -60,42 +67,17 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
             console.log("newUserData", newUserData)
 
             setUserData(newUserData)
+
+            setUpdateComplete(true)
         }
 
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "photosFromAPI"])
+        //getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "photosFromAPI"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "code", "roundDuration", "deckTitle", "deckSelected", "imageURL", "photosFromAPI"])
+
+        // roundtime = userData.roundDuration
     }, [])
 
-
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
-    }
 
 
     const pub = (playerCount) => {
@@ -130,7 +112,6 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
              * c = the second at which the clock is currently on
              * d = the seconds for the duration of the round
              */
-            console.log("Log 2: Finish Posting");
             console.log('In Page.jsx: code = ', userData.code, ' roundNumber = ', userData.roundNumber, ` fullURL = ${getTimerURL + userData.code + "," + userData.roundNumber}`);
 
             // Loop continuosly until we receive the game timer information
@@ -250,7 +231,7 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
 
     
     async function postSubmitCaption() {
-        if(caption === ""){
+        if(caption === "" && !timeUp){
             alert("Please enter a caption.")
             return
         }
@@ -313,6 +294,8 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
                 </h1>
                 <br></br>
                 <h3>Round: {userData.roundNumber}/{userData.rounds}</h3>
+                <p>URL: {userData.imageURL}</p>
+                <p>RoundDuration: {userData.roundDuration}</p>
                 <br></br>
                 
                 <img className="centerPic" src={userData.imageURL} alt="Loading Image...."/>
@@ -350,14 +333,20 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
                                 width: "60px",
                             }}
                         >
-                            {userData.roundDuration !== "" ? <CountdownCircleTimer
-                                    background="red"
+                            {/* TO DO: prevent users from refreshing to get new 30 sec*/}
+                            {userData.roundDuration !== undefined ?
+                             <CountdownCircleTimer
+                                    background="blue"
                                     size={60}
                                     strokeWidth={5}
                                     isPlaying
                                     duration={userData.roundDuration}
+                                    // duration={userData.roundDuration}
                                     colors="#000000"
-                                    onComplete={postSubmitCaption}
+                                    onComplete={() => {
+                                        toggleTimeUp()
+                                        //postSubmitCaption()
+                                    }}
                                 >
                                     {({remainingTime}) => {
 
@@ -368,6 +357,28 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
                                     }
                             </CountdownCircleTimer> : <></>}
 
+                            
+                            
+                            {/* {updateComplete !== "" ? <CountdownCircleTimer
+                                    background="red"
+                                    size={60}
+                                    strokeWidth={5}
+                                    isPlaying
+                                    duration={userData.roundDuration}
+                                    colors="#000000"
+                                    onComplete={() => {
+                                        toggleTimeUp()
+                                        //postSubmitCaption()
+                                    }}
+                                >
+                                    {({remainingTime}) => {
+
+                                            if (remainingTime === 0)
+                                                pub(0);
+                                            return (<div className="countdownText">{remainingTime}</div>);
+                                        }
+                                    }
+                            </CountdownCircleTimer> : <></>} */}
                         </div>
                 </div>
                         {/* <span style={{marginLeft: "60px"}}></span>

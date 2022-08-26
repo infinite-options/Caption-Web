@@ -354,6 +354,7 @@ export default function Landing({client}) {
             <Form
                 className="input1"
                 field="Your Name"
+                variable={userData["name"]}
                 onHandleChange={nameInput => setUserData({
                     ...userData, 
                     name: nameInput
@@ -364,6 +365,7 @@ export default function Landing({client}) {
             <Form
                 className="input1"
                 field="Email Address"
+                variable={userData["email"]}
                 onHandleChange={emailInput => setUserData({
                     ...userData, 
                     email: emailInput
@@ -374,6 +376,7 @@ export default function Landing({client}) {
             <Form
                 className="input1"
                 field="Zip Code"
+                variable={userData["zipCode"]}
                 onHandleChange={zipCodeInput => setUserData({
                     ...userData, 
                     zipCode: zipCodeInput
@@ -383,6 +386,7 @@ export default function Landing({client}) {
             <Form
                 className="input1"
                 field="Alias (screen name)"
+                variable={userData["alias"]}
                 onHandleChange={aliasInput => setUserData({
                     ...userData, 
                     alias: aliasInput

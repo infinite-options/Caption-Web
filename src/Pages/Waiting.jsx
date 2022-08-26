@@ -289,15 +289,18 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                 setUserData({
                     ...userData,
-                    imageURL: res.data.imageURL
+                    imageURL: res.data.image_url
                 })
         
-                putCookies(["imageURL"], {"imageURL": res.data.imageURL})
+                putCookies(["imageURL"], {"imageURL": res.data.image_url})
 
                 setLoading(true)
+                console.log("done with set")
+
+                pub();
             })
 
-            pub();
+            // pub();
         } 
         // API decks
         else {

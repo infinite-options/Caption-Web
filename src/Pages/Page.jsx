@@ -15,8 +15,8 @@ import axios from "axios";
 import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
 
-export default function Page({setImageURL, channel, channel_waiting, channel_joining}) {
-    const {code, roundNumber, host, playerUID, imageURL, alias, rounds, roundDuration, deckTitle, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookiecookies, setCookie} = useContext(LandingContext);
+export default function Page({ channel, channel_waiting, channel_joining}) {
+    const { cookies, setCookie, userData, setUserData } = useContext(LandingContext);
     const history = useHistory();
     const [caption, setCaption] = useState("");
     const [captionSubmitted, setCaptionSubmitted] = useState(false);
@@ -36,14 +36,71 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
     let cookiesDone = false
 
 
-    // Load Cookies
     console.log("Page Cookies", cookies)
-    loadCookies()
+    
+
+    // Load cookies into userData state on first render
+    useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+            console.log("cookieLoad", cookieLoad)
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+            console.log("newUserData", newUserData)
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "photosFromAPI"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+        //console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
 
 
     const pub = (playerCount) => {
         console.log('In pub function with playerCount == ', playerCount);
-        channel.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
+        channel.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
     };
 
 
@@ -55,9 +112,9 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
              * By arranging the endpoint calls in this fashion, I am able to create a 'magical' delay that works in my favor.
              */
 
-            if (host) {
+            if (userData.host) {
                 // Host logs start of new round/time started in backend
-                await axios.get(startPlayingURL + code + "," + roundNumber).then((res) => {
+                await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber).then((res) => {
                     console.log(res);
                     setRoundStartTime(res.data.round_start_time);
                     setRoundHasStarted(true);
@@ -74,7 +131,7 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
              * d = the seconds for the duration of the round
              */
             console.log("Log 2: Finish Posting");
-            console.log('In Page.jsx: code = ', code, ' roundNumber = ', roundNumber, ` fullURL = ${getTimerURL + code + "," + roundNumber}`);
+            console.log('In Page.jsx: code = ', userData.code, ' roundNumber = ', userData.roundNumber, ` fullURL = ${getTimerURL + userData.code + "," + userData.roundNumber}`);
 
             // Loop continuosly until we receive the game timer information
             // var flag = true;
@@ -104,31 +161,31 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
 
             
             // Instead of determining lag, give each user the full round duration
-            await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
-                // const total_round = [];
-                // let value;
-                // console.log('GetTimerURL', res.data)
-                // for(const round in res.data){
-                //     if(res.data.hasOwnProperty(round)){
-                //         value = res.data.total_number_of_rounds
-                //     }
-                //     total_round.push(value)
-                // }
-                // console.log("TOTAL ROUND: ",total_round)
-                // setTotalRound(total_round[0])
-                // Convert round duration format (min:sec) into seconds
-                const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
-                const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
-                let duration = duration_mins * 60 + duration_secs;
+            // await axios.get(getTimerURL + code + "," + roundNumber).then((res) => {
+            //     // const total_round = [];
+            //     // let value;
+            //     // console.log('GetTimerURL', res.data)
+            //     // for(const round in res.data){
+            //     //     if(res.data.hasOwnProperty(round)){
+            //     //         value = res.data.total_number_of_rounds
+            //     //     }
+            //     //     total_round.push(value)
+            //     // }
+            //     // console.log("TOTAL ROUND: ",total_round)
+            //     // setTotalRound(total_round[0])
+            //     // Convert round duration format (min:sec) into seconds
+            //     const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
+            //     const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
+            //     let duration = duration_mins * 60 + duration_secs;
 
-                console.log('Duration Seconds', duration_secs)
-                console.log('Duration Minutes', duration_mins)
-                console.log('Duration Total', duration)
+            //     console.log('Duration Seconds', duration_secs)
+            //     console.log('Duration Minutes', duration_mins)
+            //     console.log('Duration Total', duration)
 
-                if(res.data.round_started_at !== undefined) {
-                    setTimerDuration(duration)
-                }
-            })
+            //     if(res.data.round_started_at !== undefined) {
+            //         setTimerDuration(duration)
+            //     }
+            // })
         }
 
         pageAsyc();
@@ -162,8 +219,8 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
             await channel_waiting.subscribe(newPlayer => {
                 async function getPlayers () {
                     console.log("Made it in getPlayers Func");
-                    if (host)
-                        channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}});
+                    if (userData.host)
+                        channel_joining.publish({data: {roundNumber: userData.roundNumber, path: window.location.pathname}});
                     const temp = [newPlayer.data.newPlayerName];
                     for (const name of waitingPlayers) {
                         temp.push(name);
@@ -182,12 +239,12 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
             channel.unsubscribe();
             channel_waiting.unsubscribe();
         };
-    }, [waitingPlayers, code, cookiesDone]);
+    }, [waitingPlayers, userData.code, cookiesDone]);
 
 
 
      useEffect(() => 
-     console.log('Currently in Pages', "Alias:",alias, "Current Round: ", roundNumber), 
+     console.log('Currently in Pages', "Alias:", userData.alias, "Current Round: ", userData.roundNumber), 
      []);
 
 
@@ -204,7 +261,7 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
          * The user should not be able to select/vote for their own caption.
          * Should be easy --> match internal state with info in the endpoint result.
          */
-        await axios.get(getURL + code + "," + roundNumber).then((res) => {
+        await axios.get(getURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('page_get_res before post = ', res);
         });
 
@@ -213,22 +270,22 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
             caption: caption,
-            game_code: code.toString(),
-            round_number: roundNumber.toString(),
-            user_uid: playerUID.toString()
+            game_code: userData.code.toString(),
+            round_number: userData.roundNumber.toString(),
+            user_uid: userData.playerUID.toString()
         }
 
         await axios.post(postURL, payload).then((res) => {
             console.log('POST Submit Caption', res);
         });
 
-        await axios.get(getURL + code + "," + roundNumber).then((res) => {
+        await axios.get(getURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('page_get_res after = ', res);
         });
 
         console.log('payload = ', payload);
 
-        await axios.get(getPlayersURL + code + "," + roundNumber).then((res) => {
+        await axios.get(getPlayersURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('res.data.players = ', res.data.players);
             pub(res.data.players.length);
         })
@@ -238,43 +295,6 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
         setTimeUp(true);
     }
 
-
-        // Loads cookies if defined previously
-        function loadCookies() {
-            if(cookies.code !== undefined)
-                setCode(cookies.code)
-            if(cookies.name !== undefined)
-                setName(cookies.name)
-            if(cookies.email !== undefined)
-                setEmail(cookies.email)
-            if(cookies.zipCode !== undefined)
-                setZipCode(cookies.zipCode)
-            if(cookies.alias !== undefined)
-                setAlias(cookies.alias)
-            if(cookies.gameUID !== undefined)
-                setGameUID(cookies.gameUID)
-            if(cookies.rounds !== undefined)
-                setRounds(cookies.rounds)
-            if(cookies.roundDuration !== undefined)
-                setRoundDuration(cookies.roundDuration)
-            if(cookies.host !== undefined && typeof host !== 'boolean')
-                setHost(JSON.parse(cookies.host))
-            if(cookies.roundNumber !== undefined) 
-                setRoundNumber(parseInt(cookies.roundNumber))
-            if(cookies.playerUID !== undefined)
-                setPlayerUID(cookies.playerUID)
-            if(cookies.imageURL !== undefined)
-                setImageURL(cookies.imageURL)
-            if(cookies.scoreboardInfo !== undefined)
-                setScoreboardInfo(cookies.scoreboardInfo)
-            if(cookies.photosFromAPI !== undefined)
-                setPhotosFromAPI(cookies.photosFromAPI)
-            if(cookies.deckSelected !== undefined)
-                setDeckSelected(cookies.deckSelected)
-            if(cookies.deckTitle !== undefined)
-                setDeckTitle(cookies.deckTitle)
-            cookiesDone = true
-        }
     
 
     return (
@@ -289,13 +309,13 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
                 <br></br>
 
                 <h1>
-                    {deckTitle}
+                    {userData.deckTitle}
                 </h1>
                 <br></br>
-                <h3>Round: {roundNumber}/{rounds}</h3>
+                <h3>Round: {userData.roundNumber}/{userData.rounds}</h3>
                 <br></br>
                 
-                <img className="centerPic" src={imageURL} alt="Loading Image...."/>
+                <img className="centerPic" src={userData.imageURL} alt="Loading Image...."/>
 
                 <br></br>
                 <br></br>
@@ -330,14 +350,14 @@ export default function Page({setImageURL, channel, channel_waiting, channel_joi
                                 width: "60px",
                             }}
                         >
-                            {timerDuration !== -1 ? <CountdownCircleTimer
+                            {userData.roundDuration !== "" ? <CountdownCircleTimer
                                     background="red"
                                     size={60}
                                     strokeWidth={5}
                                     isPlaying
-                                    duration={roundDuration}
+                                    duration={userData.roundDuration}
                                     colors="#000000"
-                                    onComplete={toggleTimeUp}
+                                    onComplete={postSubmitCaption}
                                 >
                                     {({remainingTime}) => {
 

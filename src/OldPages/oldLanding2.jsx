@@ -22,94 +22,27 @@ export default function Landing({client}) {
     const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
     const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
     const checkGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame"
+    
 
-
-    // Load cookies into userData state on first render
-    useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-                cookieLoad[propName] = propValue
-            }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-            console.log("newUserData", newUserData)
-
-            setUserData(newUserData)
-        }
-
-
-        getCookies(["name", "email", "zipCode", "alias"])
-        putCookies(
-            [   "code",
-                "gameUID",
-                "rounds",
-                "roundDuration",
-                "host",
-                "playerUID",
-                "roundNumber",
-                "imageURL",
-                "scoreboardInfo",
-                "photosFromAPI",
-                "deckSelected",
-                "deckTitle" ], 
-            {   code: "",
-                gameUID: "",
-                rounds: "10",
-                roundDuration: "30",
-                host: "",
-                playerUID: "",
-                roundNumber: "",
-                imageURL: "",
-                scoreboardInfo: [],
-                photosFromAPI: [],
-                deckSelected: "",
-                deckTitle: ""}
-        )
-    }, [])
-
-
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
+    // Detect first render
+    function useFirstRender() {
+        const ref = useRef(true)
+        const firstRender = ref.current
+        ref.current = false
+        return firstRender
     }
 
+
+
+    // Reset Cookies on first render
+    console.log("Landing Cookies", cookies)
+    if(useFirstRender()) {
+        console.log("first render")
+        removeCookie("userData")
+    }
     
-    
+
+
     // Input Validation Functions
     function validateInputToCreateGame() {
         return userData["alias"] !== ""
@@ -132,7 +65,6 @@ export default function Landing({client}) {
 
 
 
-
     // HOST: Start create game flow
     async function createGame() {   
         console.log("Starting createGame()")
@@ -150,6 +82,7 @@ export default function Landing({client}) {
         }
 
          
+
         if(validateInputToCreateGame()) {
             setUserData({
                 ...userData, 
@@ -158,35 +91,19 @@ export default function Landing({client}) {
             })
             
 
-            putCookies(
-                ["host", "roundNumber", "name", "alias", "email", "zipCode"], 
-                {"host": true, "roundNumber": 1}
-            )
-            
-
             // POST addUser to create a new host user
             let payload = {
                 user_name: userData["name"],
-                user_alias: userData["alias"],
-                user_email: userData["email"],
-                user_zip: userData["zipCode"],
+                user_alias: userData[],
+                user_email: email,
+                user_zip: zipCode,
             }
     
             axios.post(addUserURL, payload).then((res) => {
                 console.log("POST addUser as host", res)
-                let pUID = res.data.user_uid
 
-                setUserData({
-                    ...userData, 
-                    playerUID: pUID
-                })
-
-                // set Cookie for playerUID
-                putCookies(
-                    ["playerUID"],
-                    {"playerUID": pUID}
-                )
-                
+                setPlayerUID(res.data.user_uid)
+                setCookie("playerUID", res.data.user_uid)
 
                 // If email is validated transition to waiting room, else transition to confirmation page
                 if(res.data.user_code === "TRUE") {
@@ -208,17 +125,17 @@ export default function Landing({client}) {
         console.log("Starting joinGame()");
 
         // Validate email, zip code, and game code input
-        const valid = validateEmail(userData["email"]);
+        const valid = validateEmail(email);
         if (!valid) {
             alert('Invalid email. Please re-enter.');
             return;
         }
-        const validZ = validateZipcode(userData["zipCode"]);
+        const validZ = validateZipcode(zipCode);
         if(!validZ){
             alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
             return;
         }
-        const validGame = await axios.get(checkGameURL + '/' + userData["code"]).then((res) => {
+        const validGame = await axios.get(checkGameURL + '/' + code).then((res) => {
             console.log("GET checkGame", res)
 
             if(res.data.warning !== "Invalid game code") 
@@ -232,41 +149,24 @@ export default function Landing({client}) {
 
 
         if (validateInputToJoinGame()) {
-            setUserData({
-                ...userData, 
-                host: false,
-                roundNumber: 1
-            })
+            setHost(false);
+            setRoundNumber(1)
 
-            // set cookies 
-            putCookies(
-                ["host", "roundNumber", "name", "alias", "email", "zipCode", "code"], 
-                {"host": false, "roundNumber": 1})
+            setUserInfoCookies(false)
 
             // POST addUser to create a new guest user
             let payload = {
-                user_name: userData.name,
-                user_alias: userData.alias,
-                user_email: userData.email,
-                user_zip: userData.zipCode,
+                user_name: name,
+                user_alias: alias,
+                user_email: email,
+                user_zip: zipCode,
             }
             
             await axios.post(addUserURL, payload).then((res) => {
                 console.log("POST addUser as guest", res);
-                let pUID = res.data.user_uid
 
-                setUserData({
-                    ...userData, 
-                    playerUID: pUID
-                })
-                
-
-
-                putCookies(["playerUID"], {"playerUID": pUID})
-                
-                
-                // set playerUID cookie replace below
-                // setCookie("playerUID", res.data.user_uid)
+                setPlayerUID(res.data.user_uid)
+                setCookie("playerUID", res.data.user_uid)
 
                 setLoading(true)
 
@@ -277,7 +177,7 @@ export default function Landing({client}) {
                     console.log("User exists and email validated. Transition to waiting.")
 
                    let payload = {
-                        game_code: userData.code,
+                        game_code: code,
                         user_uid: res.data.user_uid
                     }
 
@@ -289,24 +189,14 @@ export default function Landing({client}) {
                         const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
                         let duration = duration_mins * 60 + duration_secs;
 
-                        setUserData({
-                            ...userData, 
-                            rounds: res.data.num_rounds,
-                            roundDuration: duration
-                        })
-                        
-                        // set cookies for below replace
-                        putCookies(
-                            ["rounds", "roundDuration"], 
-                            {"rounds": res.data.num_round, "roundDuration": duration}
-                        )
+                        setRounds(res.data.num_rounds)
+                        setRoundDuration(duration)
 
-                        //setCookie("rounds", res.data.num_rounds)
-                        // setCookie("roundDuration", duration)
-                        
-                        console.log("Publishing to waiting/", userData.code)
-                        const channel = client.channels.get(`Captions/Waiting/${userData.code}`)
-                        channel.publish({data: {newPlayerName: userData.alias}})
+                        setCookie("rounds", res.data.num_rounds)
+                        setCookie("roundDuration", duration)
+
+                        const channel = client.channels.get(`Captions/Waiting/${code}`)
+                        channel.publish({data: {newPlayerName: alias}})
 
                         history.push("/waiting")
                        
@@ -321,7 +211,26 @@ export default function Landing({client}) {
         }
 
     }
+
+
+    const getCookies = (propsToLoad) => {
+        // propsToLoad: ["name", "email", "code", etc...]
+        let localCookies = cookies.userData
+        let cookieLoad = {}
+
+
+        // property should be string
+        for(let property in propsToLoad) {
+            cookieLoad = {...cookieLoad, property: localCookies[property]}
+        }
+
+        // update existing userData object with loaded cookie values
+        setUserData(...userData, cookieLoad)
+    }
     
+
+    useEffect(() => console.log('landing roundNumber = ', roundNumber), [roundNumber]);
+
     
     return (
         
@@ -354,39 +263,27 @@ export default function Landing({client}) {
             <Form
                 className="input1"
                 field="Your Name"
-                onHandleChange={nameInput => setUserData({
-                    ...userData, 
-                    name: nameInput
-                })}
+                onHandleChange={nameInput => setName(nameInput)}
                 type="text"
             />
             <br></br>
             <Form
                 className="input1"
                 field="Email Address"
-                onHandleChange={emailInput => setUserData({
-                    ...userData, 
-                    email: emailInput
-                })}
+                onHandleChange={emailInput => setEmail(emailInput)}
             />
 
             <br></br>
             <Form
                 className="input1"
                 field="Zip Code"
-                onHandleChange={zipCodeInput => setUserData({
-                    ...userData, 
-                    zipCode: zipCodeInput
-                })}
+                onHandleChange={zipCodeInput => setZipCode(zipCodeInput)}
             />
             <br></br>
             <Form
                 className="input1"
                 field="Alias (screen name)"
-                onHandleChange={aliasInput => setUserData({
-                    ...userData, 
-                    alias: aliasInput
-                })}
+                onHandleChange={aliasInput => setAlias(aliasInput)}
             />
             <br></br>
             <br></br>
@@ -396,16 +293,13 @@ export default function Landing({client}) {
                 onClick={createGame}
                 className="landing"
                 children="Create New Game"
-                conditionalLink={validateInputToCreateGame() && validateEmail(userData["email"]) && validateZipcode(userData["zipCode"])}
+                conditionalLink={validateInputToCreateGame() && validateEmail(email) && validateZipcode(zipCode)}
             />
             <div className="middleText">OR</div>
             <Form
                 className="input1"
                 field="Enter Game Code"
-                onHandleChange={codeInput => setUserData({
-                    ...userData, 
-                    code: codeInput
-                })}
+                onHandleChange={codeInput => setCode(codeInput)}
             />
             <br></br>
             <Button

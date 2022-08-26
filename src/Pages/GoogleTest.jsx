@@ -9,7 +9,7 @@ import { LandingContext } from "../App";
 
 const GoogleTest = () => {
     const history = useHistory();
-    const {code, roundNumber, photosFromAPI, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, setScoreboardInfo, setPhotosFromAPI, setDeckSelected, setDeckTitle, cookies, setCookie} = useContext(LandingContext)
+    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext)
 
     const [tokens, setTokens] = useState({})
     const [albums, setAlbums] = useState([])
@@ -21,7 +21,69 @@ const GoogleTest = () => {
     const currentHost = window.location.origin
 
     console.log("Google Cookies", cookies)
-    loadCookies()
+
+
+    // Load cookies into userData state on first render
+    useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+            console.log("cookieLoad", cookieLoad)
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+            console.log("newUserData", newUserData)
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "photosFromAPI"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                console.log("propName: ", propName)
+                console.log("localCookies: ", localCookies[propName])
+                console.log("instantUpdate: ", instantUpdate[propName])
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+    
+        console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
 
     // OAuth Flow
     // https://developers.google.com/identity/oauth2/web/guides/how-user-authz-works
@@ -97,8 +159,17 @@ const GoogleTest = () => {
             })
 
             console.log('Image URLS', imageUrls)
-            setPhotosFromAPI(imageUrls)
-            setCookie("photosFromAPI", imageUrls)
+
+
+            setUserData({
+                ...userData,
+                photosFromAPI: imageUrls
+            })
+
+            putCookies(
+                ["photosFromAPI"],
+                {"photosFromAPI": imageUrls}
+            )
         })
     }
     
@@ -108,18 +179,25 @@ const GoogleTest = () => {
         console.log("move back to waiting room")
 
         const payload = {
-            game_code: code,
+            game_code: userData.code,
             deck_uid: "500-000009",
-            round_number: roundNumber.toString(),
+            round_number: userData.roundNumber.toString(),
         };
 
         console.log('payload for deck = ', payload);
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
         axios.post(postURL, payload);
 
-        setDeckSelected("500-000009")
-        setCookie("deckSelected", "500-000009")
 
+        setUserData({
+            ...userData,
+            deckSelected: "500-000009"
+        })
+
+        putCookies(
+            ["deckSelected"],
+            {"deckSelected": "500-000009"}
+        )
         history.push('/waiting')
     }
 
@@ -127,45 +205,11 @@ const GoogleTest = () => {
     useEffect(() => {
         console.log('Tokens', tokens)
         console.log('Albums', albums)
-        console.log('Photos Set', photosFromAPI)
+        console.log('Photos Set', userData.photosFromAPI)
     })
 
 
-    // Loads cookies if defined previously
-    function loadCookies() {
-        if(cookies.code !== undefined)
-            setCode(cookies.code)
-        if(cookies.name !== undefined)
-            setName(cookies.name)
-        if(cookies.email !== undefined)
-            setEmail(cookies.email)
-        if(cookies.zipCode !== undefined)
-            setZipCode(cookies.zipCode)
-        if(cookies.alias !== undefined)
-            setAlias(cookies.alias)
-        if(cookies.gameUID !== undefined)
-            setGameUID(cookies.gameUID)
-        if(cookies.rounds !== undefined)
-            setRounds(cookies.rounds)
-        if(cookies.roundDuration !== undefined)
-            setRoundDuration(cookies.roundDuration)
-        if(cookies.host !== undefined && typeof host !== 'boolean')
-            setHost(JSON.parse(cookies.host))
-        if(cookies.roundNumber !== undefined)
-            setRoundNumber(parseInt(cookies.roundNumber))
-        if(cookies.playerUID !== undefined)
-            setPlayerUID(cookies.playerUID)
-        if(cookies.imageURL !== undefined)
-            setImageURL(cookies.imageURL)
-        if(cookies.scoreboardInfo !== undefined)
-            setScoreboardInfo(cookies.scoreboardInfo)
-        if(cookies.photosFromAPI !== undefined)
-            setPhotosFromAPI(cookies.photosFromAPI)
-        if(cookies.deckSelected !== undefined)
-            setDeckSelected(cookies.deckSelected)
-        if(cookies.deckTitle !== undefined)
-            setDeckTitle(cookies.deckTitle)
-    }
+    
 
 
 
@@ -189,7 +233,7 @@ const GoogleTest = () => {
                 
                 <br></br>
                 <div id="google-image-wrapper">
-                    {photosFromAPI.map(url => {
+                    {userData.photosFromAPI.map(url => {
                         return <img id="google-image" src={url}></img>
                     })}
                 </div>

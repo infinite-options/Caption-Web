@@ -12,14 +12,72 @@ import {LandingContext} from "../App";
 
 function Scoreboard({ channel, channel_waiting, channel_joining}) {
     const history = useHistory();
-    const {code, roundNumber, host, imageURL, alias, scoreboardInfo, setImageURL, photosFromAPI, deckTitle, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookie} = useContext(LandingContext);
+    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
 
     // Load Cookies
     console.log("Scoreboard Cookies", cookies)
-    loadCookies()
+    
+     // Load cookies into userData state on first render
+     useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+            console.log("cookieLoad", cookieLoad)
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+            console.log("newUserData", newUserData)
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "photosFromAPI", "scoreboardInfo"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+        //console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
+
 
     const pub = (apiURL) => {
-        if(photosFromAPI.length > 0)
+        if(userData.photosFromAPI.length > 0)
             channel.publish({data: {
                 roundStarted: true,
                 currentImage: apiURL,
@@ -31,28 +89,42 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         }});
     }
 
+
     const getUniqueAPIimage = async () => {
-        const randNum = Math.floor(Math.random() * photosFromAPI.length)
-        const randURL = photosFromAPI[randNum]
-        let apiPhotos = photosFromAPI.filter((url) => {
-            return url !== imageURL
+        const randNum = Math.floor(Math.random() * userData.photosFromAPI.length)
+        const randURL = userData.photosFromAPI[randNum]
+        let apiPhotos = userData.photosFromAPI.filter((url) => {
+            return url !== userData.imageURL
         })
 
-        setImageURL(randURL)
-        setPhotosFromAPI(apiPhotos)
 
-        setCookie("imageURL", randURL)
-        setCookie("photosFromAPI", apiPhotos)
+        setUserData({
+            ...userData,
+            imageURL: randURL,
+            photosFromAPI: apiPhotos
+        })
+
+        putCookies(
+            ["imageURL", "photosFromAPI"],
+            {"imageURL": randURL, "photosFromAPI": apiPhotos}
+        )
 
         pub(randURL)
     }
 
     useEffect(() => {
-        console.log('scoreboardInfo = ', scoreboardInfo);
+        console.log('scoreboardInfo = ', userData.scoreboardInfo);
 
-        if(!host){
-            setRoundNumber(roundNumber + 1);
-            setCookie("roundNumber", roundNumber + 1)
+        if(!userData.host){
+            setUserData({
+                ...userData,
+                roundNumber: userData.roundNumber + 1,
+            })
+
+            putCookies(
+                ["roundNumber"],
+                {"roundNumber": userData.roundNumber + 1}
+            )
 
             async function subscribe() 
             {
@@ -63,15 +135,22 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                         if(roundStarted.data.currentImage === "") {
                             const getImage = async () => {
                                 const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
-                                const nextRound = roundNumber + 1;
-                                console.log('[code, nextRound] = ', [code, nextRound]);
-                                console.log('fullURL scoreboard = ', getImageURL + code + "," + nextRound);
+                                const nextRound = userData.roundNumber + 1;
+                                console.log('[code, nextRound] = ', [userData.code, nextRound]);
+                                console.log('fullURL scoreboard = ', getImageURL + userData.code + "," + nextRound);
 
-                                await axios.get(getImageURL + code + "," + nextRound).then((res) => {
+                                await axios.get(getImageURL + userData.code + "," + nextRound).then((res) => {
                                     console.log("GET Get Image For Players",res);
-                                    setImageURL(res.data.image_url);
 
-                                    setCookie("imageURL", res.data.image_url)
+                                    setUserData({
+                                        ...userData,
+                                        imageURL: res.data.image_url
+                                    })
+
+                                    putCookies(
+                                        ["imageURL"],
+                                        {"imageURL": res.data.image_url}
+                                    )
                                 })
 
                                 history.push('/page');
@@ -79,9 +158,17 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     
                             getImage();                        
                         } else {
-                            console.log(roundNumber)
-                            setImageURL(roundStarted.data.currentImage)
-                            setCookie("imageURL", roundStarted.data.currentImage)
+                            console.log(userData.roundNumber)
+
+                            setUserData({
+                                ...userData,
+                                imageURL: roundStarted.data.currentImage
+                            })
+
+                            putCookies(
+                                ["imageURL"],
+                                {"imageURL": roundStarted.data.currentImage}
+                            )
 
                             history.push('page/')
                         }
@@ -104,7 +191,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                 async function getPlayers () {
                     console.log("Made it in getPlayers Func");
                     channel_joining.publish({data: {
-                        roundNumber: roundNumber, 
+                        roundNumber: userData.roundNumber, 
                         path: window.location.pathname
                     }})
                 }
@@ -113,17 +200,17 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             });
         }
 
-        if (host)
+        if (userData.host)
             subscribe1();
 
         return function cleanup() {
             channel_waiting.unsubscribe();
         }
-    }, [scoreboardInfo]);
+    }, [userData.scoreboardInfo]);
 
 
     let winning_score = Number.NEGATIVE_INFINITY;
-    for (const playerInfo of scoreboardInfo)
+    for (const playerInfo of userData.scoreboardInfo)
         winning_score = playerInfo.score > winning_score ? playerInfo.score :
             winning_score;
 
@@ -132,7 +219,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         return (
             <div>
                 {
-                    scoreboardInfo.map((item, index) => (
+                    userData.scoreboardInfo.map((item, index) => (
                         <Report
                             isWinner={winning_score === item.score}
                             alias={item.user_alias}
@@ -149,35 +236,49 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
 
 
     function startNextRound() {
-        if (!host)
+        if (!userData.host)
             return;
 
         console.log('starting next round');
         
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
         const payload = {
-            game_code: code.toString(),
-            round_number: roundNumber.toString(),
+            game_code: userData.code.toString(),
+            round_number: userData.roundNumber.toString(),
         }
 
         async function nextPub(){
             await axios.post(postURL, payload);
 
-            setRoundNumber(roundNumber + 1);
-            setCookie("roundNumber", roundNumber + 1)
+            setUserData({
+                ...userData,
+                roundNumber: userData.roundNumber + 1,
+            })
 
-            const nextRound = roundNumber + 1;
+            putCookies(
+                ["roundNumber"],
+                {"roundNumber": userData.roundNumber + 1}
+            )
 
-            if(photosFromAPI.length === 0) {
+
+            const nextRound = userData.roundNumber + 1;
+
+            if(userData.photosFromAPI.length === 0) {
                 const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
                 
-                console.log('test1: unique URL = ', getUniqueImageInRound + code + "," + nextRound);
+                console.log('test1: unique URL = ', getUniqueImageInRound + userData.code + "," + nextRound);
 
-                await axios.get(getUniqueImageInRound + code + "," + nextRound).then((res) => {
+                await axios.get(getUniqueImageInRound + userData.code + "," + nextRound).then((res) => {
                     console.log('GET Get Unique Image In Round', res);
-                    setImageURL(res.data.image_url);
+                    setUserData({
+                        ...userData,
+                        imageURL: res.data.image_url
+                    })
 
-                    setCookie("imageURL", res.data.image_url)
+                    putCookies(
+                        ["imageURL"],
+                        {"imageURL": res.data.image_url}
+                    )
 
                     pub();
                 })
@@ -194,46 +295,10 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         nextPub();
     }
 
-    // Loads cookies if defined previously
-    function loadCookies() {
-        if(cookies.code !== undefined)
-            setCode(cookies.code)
-        if(cookies.name !== undefined)
-            setName(cookies.name)
-        if(cookies.email !== undefined)
-            setEmail(cookies.email)
-        if(cookies.zipCode !== undefined)
-            setZipCode(cookies.zipCode)
-        if(cookies.alias !== undefined)
-            setAlias(cookies.alias)
-        if(cookies.gameUID !== undefined)
-            setGameUID(cookies.gameUID)
-        if(cookies.rounds !== undefined)
-            setRounds(cookies.rounds)
-        if(cookies.roundDuration !== undefined)
-            setRoundDuration(cookies.roundDuration)
-        if(cookies.host !== undefined && typeof host !== 'boolean')
-            setHost(JSON.parse(cookies.host))
-        if(cookies.roundNumber !== undefined) 
-            setRoundNumber(parseInt(cookies.roundNumber))
-        if(cookies.playerUID !== undefined)
-            setPlayerUID(cookies.playerUID)
-        if(cookies.imageURL !== undefined)
-            setImageURL(cookies.imageURL)
-        if(cookies.scoreboardInfo !== undefined)
-            setScoreboardInfo(cookies.scoreboardInfo)
-        if(cookies.photosFromAPI !== undefined)
-            setPhotosFromAPI(cookies.photosFromAPI)
-        if(cookies.deckSelected !== undefined)
-            setDeckSelected(cookies.deckSelected)
-        if(cookies.deckTitle !== undefined)
-            setDeckTitle(cookies.deckTitle)
-    }
-
 
 
     useEffect(() => 
-        console.log('Currently in Scoreboard', "Alias:",alias, "Current Round: ", roundNumber), 
+        console.log('Currently in Scoreboard', "Alias:", userData.alias, "Current Round: ", userData.roundNumber), 
         []);
 
 
@@ -248,7 +313,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                 //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
             }}
         >
-            <h1>{deckTitle}</h1>
+            <h1>{userData.deckTitle}</h1>
             <br></br>
             <h3> Scoreboard</h3>
 
@@ -257,7 +322,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                 height: "255px",
                 width: "255px",
             }}
-                 src={imageURL}/>
+                 src={userData.imageURL}/>
             <br/>
 
 
@@ -265,7 +330,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
 
             <br></br>
 
-            { host ?
+            { userData.host ?
                 <Button
                     className="fat"
                     // destination="/page"

@@ -14,7 +14,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
 
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
-    const {code, roundNumber, imageURL, rounds, host, playerUID, gameUID, alias, photosFromAPI, roundDuration, deckTitle, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setImageURL, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookiecookies, setCookie} = useContext(LandingContext);
+    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
     
 
     const [toggleArr, setToggleArr] = useState([]);
@@ -28,13 +28,69 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const history = useHistory();
 
 
-    // Load Cookies
     console.log("Selection Cookies", cookies)
-    loadCookies()
+
+    // Load cookies into userData state on first render
+    useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+            console.log("cookieLoad", cookieLoad)
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+            console.log("newUserData", newUserData)
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "photosFromAPI"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+        //console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
 
     const pub_host = (playerCount) => {
         // console.log('in pub_host');
-        channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: alias}});
+        channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
     };
 
 
@@ -51,24 +107,24 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         // console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
 
         async function idontknow() {
-            if (host) {
+            if (userData.host) {
                 // Host logs start of new round/start time started in backend
                 const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
-                await axios.get(startPlayingURL + code + "," + roundNumber);
+                await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber);
             }
             
 
             // console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
 
            
-            await axios.get(getURL + code + "," + roundNumber).then((res) => {
+            await axios.get(getURL + userData.code + "," + userData.roundNumber).then((res) => {
                 // console.log('GET Get All Submitted Caption', res);
                 const temp_players_arr = [];
 
                 for (let i = 0; i < res.data.players.length; i++){
-                    if (res.data.players[i].round_user_uid !== gameUID)
+                    if (res.data.players[i].round_user_uid !== userData.gameUID)
                         temp_players_arr.push(res.data.players[i]);
-                    if (res.data.players[i].round_user_uid !== playerUID){
+                    if (res.data.players[i].round_user_uid !== userData.playerUID){
                         // console.log("Made it before disabling");
                         // document.getElementsByClassName("fat").disabled = true;
                         // console.log("Made it after disabling");
@@ -92,29 +148,29 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 {
                     async function noPlayersThenSubmit()
                     {
-                        if (res.data.players[0].round_user_uid !== playerUID) {
-                            console.log('default vote for user ', alias);
+                        if (res.data.players[0].round_user_uid !== userData.playerUID) {
+                            console.log('default vote for user ', userData.alias);
                             const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
                             const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
         
                             const payload = {
-                                user_id: playerUID,
+                                user_id: userData.playerUID,
                                 caption: res.data.players[0].caption,
-                                game_code: code.toString(),
-                                round_number: roundNumber.toString()
+                                game_code: userData.code.toString(),
+                                round_number: userData.roundNumber.toString()
                             };
 
                             await axios.post(postURL, payload).then((res) => {
                                 console.log(res);
                             });
-                            await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then(res => console.log('pwhv response = ', res.data));
+                            await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => console.log('pwhv response = ', res.data));
                         } else
                             pub_host(0);
                     }
 
                     if (res.data.players.length === 1){
                         noPlayersThenSubmit();
-                    } else if(host){
+                    } else if(userData.host){
                         pub_host(0);
                     }
 
@@ -188,8 +244,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 if (newVote.data.playersLeft === 0) {
                     const blah = async () => {
                         const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
-                        if (host)
-                            await axios.get(getUpdateScoresURL + code + "," + roundNumber);
+                        if (userData.host)
+                            await axios.get(getUpdateScoresURL + userData.code + "," + userData.roundNumber);
                         pub_all();
                     }
 
@@ -206,18 +262,25 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     {
                         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
 
-                        await axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
+                        await axios.get(getScoreBoardURL + userData.code + "," + userData.roundNumber).then((res) => {
                             console.log('GET score board ', res);
 
                             res.data.scoreboard.sort((a, b) => (
                                 b.score === a.score ? b.game_score - a.game_score : b.score - a.score
                             ));
-
-                            setScoreboardInfo(res.data.scoreboard);
-                            setCookie("scoreboardInfo", res.data.scoreboard)
+                            
+                            setUserData({
+                                ...userData,
+                                scoreboardInfo: res.data.scoreboard
+                            })
+                            
+                            putCookies(
+                                ["scoreboardInfo"], 
+                                {"scoreboardInfo": res.data.scoreboard}
+                            )
                         });
 
-                        if (rounds <= roundNumber)
+                        if (userData.rounds <= userData.roundNumber)
                             history.push('/endgame');
                         else
                             history.push('/scoreboard');
@@ -234,7 +297,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             await channel_waiting.subscribe(newPlayer => {
                 async function getPlayers () {
                     // console.log("Made it in getPlayers Func");
-                    channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname}})
+                    channel_joining.publish({data: {roundNumber: userData.roundNumber, path: window.location.pathname}})
                 }
         
                 getPlayers();
@@ -242,7 +305,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
 
 
-        if (host) {
+        if (userData.host) {
             subscribe1();
             subscribe_host();
         }
@@ -262,7 +325,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         for (var i = 0; i < toggleArr.length; i++) {
             toggleArr[i] = false;
         }
-        if(playersArr[index].round_user_uid !== playerUID) {
+        if(playersArr[index].round_user_uid !== userData.playerUID) {
             toggleArr[index] = true;
             console.log('feshfjksef: playersArr[index] = ', playersArr[index]);
             setSelectedCaption(playersArr[index].caption);
@@ -279,12 +342,12 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
         const payload = {
-            user_id: playerUID,
+            user_id: userData.playerUID,
             caption: selectedCaption === '' ? null : selectedCaption,
-            game_code: code.toString(),
-            round_number: roundNumber.toString()
+            game_code: userData.code.toString(),
+            round_number: userData.roundNumber.toString()
         };
-        console.log('user ', alias, ' is posting vote with payload: ', payload);
+        console.log('user ', userData.alias, ' is posting vote with payload: ', payload);
 
         await axios.post(postURL, payload).then((res) => {
             console.log("POST Vote Caption", res);
@@ -293,7 +356,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
 
         const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-        await axios.get(getPlayersWhoHaventVotedURL + code + "," + roundNumber).then((res) => {
+        await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('publishing with res.data.players_count = ', res.data.players_count);
             pub_host(res.data.players_count);
         });
@@ -313,7 +376,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
              * @type {number}
              */
             let localIndex = index;
-            let isMyButton = playersArr[index].round_user_uid === playerUID;
+            let isMyButton = playersArr[index].round_user_uid === userData.playerUID;
 
 
             captions.push(<div>
@@ -330,42 +393,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         // console.log('captions = ', captions);
       
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
-    }
-
-    // Loads cookies if defined previously
-     function loadCookies() {
-        if(cookies.code !== undefined)
-            setCode(cookies.code)
-        if(cookies.name !== undefined)
-            setName(cookies.name)
-        if(cookies.email !== undefined)
-            setEmail(cookies.email)
-        if(cookies.zipCode !== undefined)
-            setZipCode(cookies.zipCode)
-        if(cookies.alias !== undefined)
-            setAlias(cookies.alias)
-        if(cookies.gameUID !== undefined)
-            setGameUID(cookies.gameUID)
-        if(cookies.rounds !== undefined)
-            setRounds(cookies.rounds)
-        if(cookies.roundDuration !== undefined)
-            setRoundDuration(cookies.roundDuration)
-        if(cookies.host !== undefined && typeof host !== 'boolean')
-            setHost(JSON.parse(cookies.host))
-        if(cookies.roundNumber !== undefined) 
-            setRoundNumber(parseInt(cookies.roundNumber))
-        if(cookies.playerUID !== undefined)
-            setPlayerUID(cookies.playerUID)
-        if(cookies.imageURL !== undefined)
-            setImageURL(cookies.imageURL)
-        if(cookies.scoreboardInfo !== undefined)
-            setScoreboardInfo(cookies.scoreboardInfo)
-        if(cookies.photosFromAPI !== undefined)
-            setPhotosFromAPI(cookies.photosFromAPI)
-        if(cookies.deckSelected !== undefined)
-            setDeckSelected(cookies.deckSelected)
-        if(cookies.deckTitle !== undefined)
-            setDeckTitle(cookies.deckTitle)
     }
 
 
@@ -406,7 +433,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             }}
         >
             <br></br>
-            <h1>{deckTitle}</h1>
+            <h1>{userData.deckTitle}</h1>
             <br></br>
 
             <h4>Pick Your Favorite Caption</h4>
@@ -417,7 +444,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 height: "325px",
                 width: "325px",
                 borderRadius: "50px",
-            }} src={imageURL}/>
+            }} src={userData.imageURL}/>
 
             <br></br>
             <br></br>
@@ -459,12 +486,12 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         width: "60px",
                     }}
                 >
-                    {timerDuration !== -1 ? <CountdownCircleTimer
+                    {userData.roundDuration !== ""  ? <CountdownCircleTimer
                             background="red"
                             size={60}
                             strokeWidth={5}
                             isPlaying
-                            duration={roundDuration}
+                            duration={userData.roundDuration}
                             colors="#000000"
                             
                         >

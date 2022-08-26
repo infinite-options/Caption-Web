@@ -8,15 +8,71 @@ import {LandingContext} from "../App";
 export default function Endgame() {
 
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
-    const {code, roundNumber, host, rounds, alias, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, setPhotosFromAPI, setDeckSelected, setDeckTitle, cookies, setCookie} = useContext(LandingContext);
+    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
 
-    // Load Cookies
     console.log("Endgame Cookies", cookies)
-    //loadCookies()
+
+    // Load cookies into userData state on first render
+    useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+            console.log("cookieLoad", cookieLoad)
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+            console.log("newUserData", newUserData)
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "photosFromAPI", "scoreboardInfo"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+        //console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
 
     useEffect(() => {
         const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
-        axios.get(getScoreBoardURL + code + "," + roundNumber).then((res) => {
+        axios.get(getScoreBoardURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log("GET Get Scoreboard",res);
 
             res.data.scoreboard.sort((a, b) => (
@@ -27,9 +83,9 @@ export default function Endgame() {
             setScoreboardInfo(res.data.scoreboard);
         })
 
-        if(host) {
+        if(userData.host) {
             const endgameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/endGame/";
-            axios.get(endgameURL + code).then((res) => {
+            axios.get(endgameURL + userData.code).then((res) => {
                 console.log("GET EndGame",res);
             })
         }
@@ -61,45 +117,11 @@ export default function Endgame() {
         );
     }
 
-    // Loads cookies if defined previously
-    function loadCookies() {
-        // if(cookies.code !== undefined)
-        //     setCode(cookies.code)
-        // if(cookies.name !== undefined)
-        //     setName(cookies.name)
-        // if(cookies.email !== undefined)
-        //     setEmail(cookies.email)
-        // if(cookies.zipCode !== undefined)
-        //     setZipCode(cookies.zipCode)
-        // if(cookies.alias !== undefined)
-        //     setAlias(cookies.alias)
-        // if(cookies.gameUID !== undefined)
-        //     setGameUID(cookies.gameUID)
-        // if(cookies.rounds !== undefined)
-        //     setRounds(cookies.rounds)
-        // if(cookies.roundDuration !== undefined)
-        //     setRoundDuration(cookies.roundDuration)
-        // if(cookies.host !== undefined)
-        //     setHost(cookies.host)
-        // if(cookies.roundNumber !== undefined)
-        //     setRoundNumber(parseInt(cookies.roundNumber))
-        // if(cookies.playerUID !== undefined)
-        //     setPlayerUID(cookies.playerUID)
-        // if(cookies.imageURL !== undefined)
-        //     setImageURL(cookies.imageURL)
-        if(cookies.scoreboardInfo !== undefined)
-            setScoreboardInfo(cookies.scoreboardInfo)
-        // if(cookies.photosFromAPI !== undefined)
-        //     setPhotosFromAPI(cookies.photosFromAPI)
-        // if(cookies.deckSelected !== undefined)
-        //     setDeckSelected(cookies.deckSelected)
-        // if(cookies.deckTitle !== undefined)
-        //     setDeckTitle(cookies.deckTitle)
-    }
+    
 
 
     useEffect(() => 
-        console.log('Currently in Endgame', "Alias:",alias, "Current Round: ", roundNumber), 
+        console.log('Currently in Endgame', "Alias:", userData.alias, "Current Round: ", userData.roundNumber), 
     []);
 
 

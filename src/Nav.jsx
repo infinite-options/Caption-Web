@@ -28,15 +28,15 @@ const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 export default function Nav() {
 
-    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, roundDuration, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected, loading, setLoading, deckTitle, setDeckTitle, cookies, setCookie} = useContext(LandingContext);
+    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, roundDuration, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected, loading, setLoading, deckTitle, setDeckTitle, userData, setUserData, cookies, setCookie} = useContext(LandingContext);
     
-    const channel_page = client.channels.get(`Captions/Page/${code}`);
-    const channel_waiting = client.channels.get(`Captions/Waiting/${code}`);
-    const channel_rounds = client.channels.get(`Captions/Rounds/${code}`);
-    const channel_voted_host = client.channels.get(`Captions/Vote/Host/${code}`);
-    const channel_voted_all = client.channels.get(`Captions/Vote/All/${code}`);
-    const channel_scoreboard = client.channels.get(`Captions/Scoreboard/${code}`);
-    const channel_joining = client.channels.get(`Captions/Landing/${code}`);
+    const channel_page = client.channels.get(`Captions/Page/${userData.code}`);
+    const channel_waiting = client.channels.get(`Captions/Waiting/${userData.code}`);
+    const channel_rounds = client.channels.get(`Captions/Rounds/${userData.code}`);
+    const channel_voted_host = client.channels.get(`Captions/Vote/Host/${userData.code}`);
+    const channel_voted_all = client.channels.get(`Captions/Vote/All/${userData.code}`);
+    const channel_scoreboard = client.channels.get(`Captions/Scoreboard/${userData.code}`);
+    const channel_joining = client.channels.get(`Captions/Landing/${userData.code}`);
 
     return (
             <GoogleOAuthProvider 

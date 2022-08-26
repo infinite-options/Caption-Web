@@ -17,59 +17,81 @@ import * as ReactBootStrap from 'react-bootstrap';
 
 function Collections() {
     const [deckArray, setDeckArray] = useState([]);
-    const {playerUID, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, setScoreboardInfo, setPhotosFromAPI, setDeckSelected, setDeckTitle, cookies} = useContext(LandingContext);
+    const { userData, setUserData, cookies, setCookie} = useContext(LandingContext);
     const [loading, setLoading] = useState(false);
 
     // Load cookies
     console.log("Collections cookies", cookies)
-    loadCookies()
+    // Load cookies into userData state on first render
+    useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+            console.log("cookieLoad", cookieLoad)
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+            console.log("newUserData", newUserData)
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+        //console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
+
 
     useEffect(() => {
         const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks";
-        axios.get(getURL + "/" + playerUID + "," + "true").then((res) => {
+        axios.get(getURL + "/" + userData.playerUID + "," + "true").then((res) => {
             console.log("GET decks", res);
             setDeckArray(res.data.decks_info);
             setLoading(true)
             console.log('deckArray: ', res.data.decks_info);
         })
-    }, [playerUID]);
+    }, [userData.playerUID]);
 
 
-    // Loads cookies if defined previously
-    function loadCookies() {
-        if(cookies.code !== undefined)
-            setCode(cookies.code)
-        if(cookies.name !== undefined)
-            setName(cookies.name)
-        if(cookies.email !== undefined)
-            setEmail(cookies.email)
-        if(cookies.zipCode !== undefined)
-            setZipCode(cookies.zipCode)
-        if(cookies.alias !== undefined)
-            setAlias(cookies.alias)
-        if(cookies.gameUID !== undefined)
-            setGameUID(cookies.gameUID)
-        if(cookies.rounds !== undefined)
-            setRounds(cookies.rounds)
-        if(cookies.roundDuration !== undefined)
-            setRoundDuration(cookies.roundDuration)
-        if(cookies.host !== undefined && typeof host !== 'boolean')
-            setHost(JSON.parse(cookies.host))
-        if(cookies.roundNumber !== undefined) 
-            setRoundNumber(parseInt(cookies.roundNumber))
-        if(cookies.playerUID !== undefined)
-            setPlayerUID(cookies.playerUID)
-        if(cookies.imageURL !== undefined)
-            setImageURL(cookies.imageURL)
-        if(cookies.scoreboardInfo !== undefined)
-            setScoreboardInfo(cookies.scoreboardInfo)
-        if(cookies.photosFromAPI !== undefined)
-            setPhotosFromAPI(cookies.photosFromAPI)
-        if(cookies.deckSelected !== undefined)
-            setDeckSelected(cookies.deckSelected)
-        if(cookies.deckTitle !== undefined)
-            setDeckTitle(cookies.deckTitle)
-    }
 
         
     return (

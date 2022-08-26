@@ -8,8 +8,7 @@ import {LandingContext} from "../App";
 import { useEffect } from "react";
 
 export default function DeckCard(props) {
-    const history = useHistory()
-    const {code, roundNumber, setDeckSelected, photosFromAPI, setPhotosFromAPI, deckTitle, setDeckTitle, cookies, setCookie} = useContext(LandingContext);
+    const { userData, setUserData, cookies, setCookie} = useContext(LandingContext);
 
     const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
     const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
@@ -25,9 +24,9 @@ export default function DeckCard(props) {
 
     let api_deck_uid = "500-000009"
     let payload =  {
-        game_code: code,
+        game_code: userData.code,
         deck_uid: api_deck_uid,
-        round_number: roundNumber.toString(),
+        round_number: userData.roundNumber.toString(),
     }
     const params = {
         limit : "20"
@@ -37,13 +36,75 @@ export default function DeckCard(props) {
     if(props.googlePhotos === true)
         nextPage = "/googleAuth"
 
+
+    // Load cookies into userData state on first render
+    useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+        //console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
+
+
+
     //Get Photos from APIs (Each API has own response format)
     async function getData(url){
         await axios.get(url,{params}).then((res)=>{
+            console.log("res", res)
             //Cleveland
             if(url === clevelandURL){
                 for(const image of res.data.data){
-                    record.push(image.images.web.url);
+                    console.log(image)
+                    if(image.images !== null && image.images.web !== null)
+                        record.push(image.images.web.url);
                 }
                 // console.log("Cleveland Records After pushing",record)
             }
@@ -82,18 +143,33 @@ export default function DeckCard(props) {
     async function selectThisDeck() {
         if(props.googlePhotos === true){
             console.log("Google Photos API selected. Switching to Google Sign-in Page.")
-            setDeckSelected(api_deck_uid)
-            setCookie("deckSelected", api_deck_uid)
+
+            setUserData({
+                ...userData,
+                deckSelected: api_deck_uid
+            })
+
+            putCookies(
+                ["deckSelected"], 
+                {"deckSelected": api_deck_uid}
+            )
             return
         }
         else if(props.cleveland){
             console.log("Cleveland API Selected") 
             getData(clevelandURL).then(() => {
-                setPhotosFromAPI(record)
-                setDeckSelected(api_deck_uid)
+                setUserData({
+                    ...userData,
+                    deckSelected: api_deck_uid,
+                    photosFromAPI: record
+                })
 
-                setCookie("photosFromAPI", record)
-                setCookie("deckSelected", api_deck_uid)
+                console.log('record', record)
+    
+                putCookies(
+                    ["deckSelected", "photosFromAPI"], 
+                    {"deckSelected": api_deck_uid, "photosFromAPI": record}
+                )
             })
             
         }
@@ -101,11 +177,18 @@ export default function DeckCard(props) {
         else if(props.chicago){
             console.log("Chicago API Selected") 
             getData(chicagoURL).then(() => {
-                setPhotosFromAPI(image_url)
-                setDeckSelected(api_deck_uid)
+                setUserData({
+                    ...userData,
+                    deckSelected: api_deck_uid,
+                    photosFromAPI: image_url
+                })
 
-                setCookie("photosFromAPI", image_url)
-                setCookie("deckSelected", api_deck_uid)
+                console.log("imageurl", image_url)
+    
+                putCookies(
+                    ["deckSelected", "photosFromAPI"], 
+                    {"deckSelected": api_deck_uid, "photosFromAPI": image_url}
+                )
             })
             
         }
@@ -113,12 +196,18 @@ export default function DeckCard(props) {
         else if(props.giphy){
             console.log("Giphy API selected")
             getData(giphyURL).then(() => {
-                setPhotosFromAPI(record)
-                setDeckSelected(api_deck_uid)
+                setUserData({
+                    ...userData,
+                    deckSelected: api_deck_uid,
+                    photosFromAPI: record
+                })
 
-                console.log("RECORD", record)
-                setCookie("photosFromAPI", record)
-                setCookie("deckSelected", api_deck_uid)
+                console.log('record', record)
+    
+                putCookies(
+                    ["deckSelected", "photosFromAPI"], 
+                    {"deckSelected": api_deck_uid, "photosFromAPI": record}
+                )
             })
             
         }
@@ -126,30 +215,46 @@ export default function DeckCard(props) {
         else if(props.harvard){
             console.log("Harvard API selected")
             getData(harvardURL).then(() => {
-                setPhotosFromAPI(record)
-                setDeckSelected(api_deck_uid)
 
-                setCookie("photosFromAPI", record)
-                setCookie("deckSelected", api_deck_uid)
+                setUserData({
+                    ...userData,
+                    photosFromAPI: record,
+                    deckSelected: api_deck_uid
+                })
+
+                putCookies(
+                    ["photosFromAPI", "deckSelected"], 
+                    {"photosFromAPI": record, "deckSelected": api_deck_uid}
+                )
             })
             
         }
         // Decks from Database
         else {
             payload = {
-                game_code: code,
+                game_code: userData.code,
                 deck_uid: props.id,
-                round_number: roundNumber.toString(),
+                round_number: userData.roundNumber.toString(),
             };
 
-            setDeckTitle(props.title)
-            setCookie("deckSelected", props.id)
+            setUserData({
+                ...userData,
+                deckSelected: props.id,
+                deckTitle: props.title
+            })
+
+            putCookies(
+                ["deckSelected"],
+                {"deckSelected": props.id}
+            )
         }
 
-        console.log('payload for deck = ', payload);
         await axios.post(selectDeckURL, payload).then(res => console.log(res))
 
-        setCookie("deckTitle", props.title)
+        putCookies(
+            ["deckTitle"],
+            {"deckTitle": props.title}
+        )
     }
   
     return (

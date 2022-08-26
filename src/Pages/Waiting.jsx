@@ -13,29 +13,84 @@ import {Link} from "react-router-dom";
 
 export default function Waiting({channel, channel2, channel_joining}) {
 
-    const {code, host, rounds, roundNumber, setImageURL, alias, photosFromAPI, deckSelected, deckTitle, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookie} = useContext(LandingContext);
+    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
     const [names, setNames] = useState([]);
     const [copied, setCopied] = useState(false);
     const history = useHistory();
     const [loading, setLoading] = useState(false);
-    let gameCodeText = "Game Code: " + code;
+    let gameCodeText = "Game Code: " + userData.code;
 
 
     const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
     const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
 
-    // Load Cookies
     console.log("Waiting Cookies", cookies)
-    loadCookies()
+
+    // Load cookies into userData state on first render
+    useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "photosFromAPI"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+        //console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
+
 
     useEffect(() => {
-        console.log('roundNumber = ', roundNumber);
+        console.log('roundNumber = ', userData.roundNumber);
         
         async function getPlayers1() {
             const names_db = [];
 
             const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
-            await axios.get(getURL + code)
+            await axios.get(getURL + userData.code)
             .then((res) => {
                 for (var index = 0; index < res.data.players_list.length; index++) {
                     names_db.push(res.data.players_list[index].user_alias);
@@ -60,7 +115,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                     const names_db = [];
                     
                     const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
-                    await axios.get(getURL + code)
+                    await axios.get(getURL + userData.code)
                     .then((res) => {
                         for (var index = 0; index < res.data.players_list.length; index++) {
                             names_db.push(res.data.players_list[index].user_alias);
@@ -69,7 +124,13 @@ export default function Waiting({channel, channel2, channel_joining}) {
                         setNames(names_db);
                        
                         console.log('Before channeljoining')
-                        channel_joining.publish({data: {roundNumber: roundNumber, path: window.location.pathname, alias: newPlayer.data.newPlayerName}})
+                        channel_joining.publish({
+                            data: {
+                                roundNumber: userData.roundNumber, 
+                                path: window.location.pathname, 
+                                alias: newPlayer.data.newPlayerName
+                            }
+                        })
                         
                         console.log('After channeljoining')
                        
@@ -89,17 +150,25 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
-                    setDeckTitle(newGame.data.deckTitle)
-                    setCookie("deckTitle", newGame.data.deckTitle)
+
+                    setUserData({
+                        ...userData,
+                        deckTitle: newGame.data.deckTitle
+                    })
+                    putCookies(["deckTitle"], {"deckTitle": newGame.data.deckTitle})
+            
 
                     if(newGame.data.currentImage.length === 0) {
                         const getImage = async () => {
                             const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
-                            await axios.get(getImageURL + code + "," + roundNumber)
+                            await axios.get(getImageURL + userData.code + "," + userData.roundNumber)
                             .then((res) => {
                                 console.log("GET Get Image For Players", res);
-                                setImageURL(res.data.image_url);
-                                setCookie("imageURL", res.data.image_url)
+                                setUserData({
+                                    ...userData,
+                                    imageURL: res.data.image_url
+                                })
+                                putCookies(["imageURL"], {"imageURL": res.data.image_url})
                             })
 
                             history.push('/page');
@@ -107,7 +176,11 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                         getImage();
                     } else {
-                        setImageURL(newGame.data.currentImage)
+                        setUserData({
+                            ...userData,
+                            imageURL: newGame.data.currentImage
+                        })
+                        putCookies(["imageURL"], {"imageURL": newGame.data.currentImage})
                         history.push('/page')
                     }
                     
@@ -116,7 +189,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         }
         
 
-        if (code) {
+        if (userData.code) {
             subscribe1();
             subscribe2();
             getPlayers1()
@@ -127,7 +200,8 @@ export default function Waiting({channel, channel2, channel_joining}) {
             channel.unsubscribe();
             channel2.unsubscribe();
         };
-    }, [code]);
+    }, [userData.code]);
+
 
     useEffect(() => {
             if (copied) {
@@ -139,20 +213,20 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
 
         
-        useEffect(() => 
-        console.log('Currently in Waiting', "Alias:",alias, "Current Round: ", roundNumber), 
-        []);
+    useEffect(() => 
+    console.log('Currently in Waiting', "Alias:", userData.alias, "Current Round: ", userData.roundNumber), 
+    []);
 
 
     const pub = (apiURL)=> {
         console.log('sending players to start game');
         console.log("Log 1.5: Finish Posting");
-        if(photosFromAPI.length > 0){
+        if(userData.photosFromAPI.length > 0){
             console.log('API pub block')
             channel2.publish({data: {
                 gameStarted: true,
                 currentImage: apiURL,
-                deckTitle: deckTitle
+                deckTitle: userData.deckTitle
             }});
         }
             
@@ -160,7 +234,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             channel2.publish({data: {
                 gameStarted: true,
                 currentImage: "",
-                deckTitle: deckTitle
+                deckTitle: userData.deckTitle
             }});
 
         history.push("/page");
@@ -171,24 +245,25 @@ export default function Waiting({channel, channel2, channel_joining}) {
         // Assign Dummy Deck
         let payload = {
             deck_uid: "500-000009",
-            game_code: code
+            game_code: userData.code
         }
 
         await axios.post(postAssignDeckURL, payload).then((res) => {
             console.log(res)
         })
 
-        const randNum = Math.floor(Math.random() * photosFromAPI.length)
-        const randomURL = photosFromAPI[randNum]
-        let apiPhotos = photosFromAPI.filter((url) => {
+        const randNum = Math.floor(Math.random() * userData.photosFromAPI.length)
+        const randomURL = userData.photosFromAPI[randNum]
+        let apiPhotos = userData.photosFromAPI.filter((url) => {
             return url !== randomURL
         })
 
-        setImageURL(randomURL)
-        setPhotosFromAPI(apiPhotos)
+        setUserData({
+            imageURL: randomURL,
+            photosFromAPI: apiPhotos
+        })
 
-        setCookie("imageURL", randomURL)
-        setCookie("photosFromAPI", apiPhotos)
+        putCookies(["imageURL", "photosFromAPI"], {"imageURL": randomURL, "photosFromAPI": apiPhotos})
 
         pub(randomURL)
     }
@@ -196,24 +271,29 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
     async function startPlaying() {     
         // Default decks   
-        if(photosFromAPI.length === 0){
+        if(userData.photosFromAPI.length === 0){
             console.log('getUniqueImage')
 
             // Assign Deck
             let payload = {
-                deck_uid: deckSelected,
-                game_code: code,
+                deck_uid: userData.deckSelected,
+                game_code: userData.code,
             }
 
             await axios.post(postAssignDeckURL, payload).then((res) => {
                 console.log(res)
             })
 
-            await axios.get(getUniqueImageInRound + code + "," + roundNumber).then((res) => {
+            await axios.get(getUniqueImageInRound + userData.code + "," + userData.roundNumber).then((res) => {
                 console.log('GET Get Unique Image In Round', res);
-                setImageURL(res.data.image_url);
 
-                setCookie("imageURL", res.data.image_url)
+                setUserData({
+                    ...userData,
+                    imageURL: res.data.imageURL
+                })
+        
+                putCookies(["imageURL"], {"imageURL": res.data.imageURL})
+
                 setLoading(true)
             })
 
@@ -226,41 +306,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         
     }
 
-    // Loads cookies if defined previously
-    function loadCookies() {
-        if(cookies.code !== undefined)
-            setCode(cookies.code)
-        if(cookies.name !== undefined)
-            setName(cookies.name)
-        if(cookies.email !== undefined)
-            setEmail(cookies.email)
-        if(cookies.zipCode !== undefined)
-            setZipCode(cookies.zipCode)
-        if(cookies.alias !== undefined)
-            setAlias(cookies.alias)
-        if(cookies.gameUID !== undefined)
-            setGameUID(cookies.gameUID)
-        if(cookies.rounds !== undefined)
-            setRounds(cookies.rounds)
-        if(cookies.roundDuration !== undefined)
-            setRoundDuration(cookies.roundDuration)
-        if(cookies.host !== undefined && typeof host !== 'boolean')
-            setHost(JSON.parse(cookies.host))
-        if(cookies.roundNumber !== undefined) 
-            setRoundNumber(parseInt(cookies.roundNumber))
-        if(cookies.playerUID !== undefined)
-            setPlayerUID(cookies.playerUID)
-        if(cookies.imageURL !== undefined)
-            setImageURL(cookies.imageURL)
-        if(cookies.scoreboardInfo !== undefined)
-            setScoreboardInfo(cookies.scoreboardInfo)
-        if(cookies.photosFromAPI !== undefined)
-            setPhotosFromAPI(cookies.photosFromAPI)
-        if(cookies.deckSelected !== undefined)
-            setDeckSelected(cookies.deckSelected)
-        if(cookies.deckTitle !== undefined)
-            setDeckTitle(cookies.deckTitle)
-    }
+    
 
 
     return (
@@ -328,7 +374,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 copied={copied}
                 onClick = {() => {
                     setCopied(true);
-                    navigator.clipboard.writeText(code);
+                    navigator.clipboard.writeText(userData.code);
                 }}
                 destination="/waiting"
                 conditionalLink={true}
@@ -336,14 +382,14 @@ export default function Waiting({channel, channel2, channel_joining}) {
             <br></br>
 
             
-            {host && deckSelected === "" ? <Button
+            {userData.host && userData.deckSelected === "" ? <Button
                 className="landing"
                 children="Select Deck"
                 destination="/collections"
                 conditionalLink={true}  
             />
              : <></>}
-              {host && deckSelected !== "" ? <Button
+              {userData.host && userData.deckSelected !== "" ? <Button
                 className="landing"
                 children="Start Game"
                 onClick={() => startPlaying()}

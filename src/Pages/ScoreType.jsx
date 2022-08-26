@@ -5,10 +5,9 @@ import {Link} from "react-router-dom";
 import {LandingContext} from "../App";
 import axios from "axios";
 import {useHistory} from "react-router-dom";
-import { createGenerateClassName } from "@material-ui/core";
 
 function ScoreType({channel}) {
-    const {code, rounds, roundDuration, host, imageURL, setImageURL, roundNumber, alias, photosFromAPI, playerUID, setCode, setName, setEmail, setZipCode, setAlias, setRounds, setRoundDuration, setHost, setGameUID, setRoundNumber,setPlayerUID, setScoreboardInfo, setPhotosFromAPI, setDeckTitle, setDeckSelected, cookies, setCookie} = useContext(LandingContext)
+    const {userData, setUserData, cookies, setCookie} = useContext(LandingContext)
     const[buttonType, setbuttonType] = useState("");
     const history = useHistory()
 
@@ -18,7 +17,63 @@ function ScoreType({channel}) {
 
     // Load Cookies
     console.log("Scoretype Cookies", cookies)
-    loadCookies()
+    // Load cookies into userData state on first render
+    useEffect(() => {
+        const getCookies = (propsToLoad) => {
+            let localCookies = cookies.userData
+            let cookieLoad = {}
+
+            for(let i = 0; i < propsToLoad.length; i++) {
+                let propName = propsToLoad[i]
+                let propValue = localCookies[propName]
+                cookieLoad[propName] = propValue
+            }
+
+            console.log("cookieLoad", cookieLoad)
+
+            let newUserData = {
+                ...userData,
+                ...cookieLoad
+            }
+            console.log("newUserData", newUserData)
+
+            setUserData(newUserData)
+        }
+
+
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration"])
+    }, [])
+
+
+    // Sets cookies for state variables in propsToPut array.
+    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
+    // state value to update cookie correctly.
+    const putCookies = (propsToPut, instantUpdate) => {
+        console.log("In put Cookies", propsToPut)
+        let localCookies = {}
+        
+        if(cookies.userData === undefined) {
+            setCookie("userData", {})
+        } else {
+            localCookies = cookies.userData
+        }
+
+        for(let i = 0; i < propsToPut.length; i++) {
+            const propName = propsToPut[i]
+
+            // State has not updated, referecnce instantUpdate
+            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
+                localCookies[propName] = instantUpdate[propName]
+            } 
+            // State already updated, reference userData
+            else {
+                localCookies[propName] = userData[propName]
+            }
+        }
+
+        //console.log("local cookies end", localCookies)
+        setCookie("userData", localCookies)
+    }
 
 
     // Creates game with game rules input and transitions to waiting room
@@ -30,17 +85,20 @@ function ScoreType({channel}) {
 
         // POST createGame to create new game with given rounds, round time, and scoring scheme
         let payload = {
-            user_uid: playerUID,
-            rounds: rounds.toString(),
-            round_time: "00:00:" + roundDuration,
+            user_uid: userData.playerUID,
+            rounds: userData.rounds.toString(),
+            round_time: "00:00:" + userData.roundDuration,
             scoring_scheme: buttonType=== "votes" ? "V" : "R",
         }
 
         axios.post(createGameURL, payload).then((res) => {
             console.log("POST createGame", res)
 
-            setCode(res.data.game_code)
-            setCookie("code", res.data.game_code)
+            setUserData({
+                ...userData, 
+                code: res.data.game_code
+            })
+            putCookies(["code"], {"code": res.data.game_code})
 
             return res.data.game_code
         }).then((gameCode) => {
@@ -49,7 +107,7 @@ function ScoreType({channel}) {
             //  POST joinGame to join created game using host's ID, then transition to waiting room
             let payload = {
                 game_code: gameCode,
-                user_uid: playerUID
+                user_uid: userData.playerUID
             }
 
             axios.post(joinGameURL, payload).then((res) => {
@@ -58,42 +116,6 @@ function ScoreType({channel}) {
             })
         })
 
-    }
-
-    // Loads cookies if defined previously
-    function loadCookies() {
-        if(cookies.code !== undefined)
-            setCode(cookies.code)
-        if(cookies.name !== undefined)
-            setName(cookies.name)
-        if(cookies.email !== undefined)
-            setEmail(cookies.email)
-        if(cookies.zipCode !== undefined)
-            setZipCode(cookies.zipCode)
-        if(cookies.alias !== undefined)
-            setAlias(cookies.alias)
-        if(cookies.gameUID !== undefined)
-            setGameUID(cookies.gameUID)
-        if(cookies.rounds !== undefined)
-            setRounds(cookies.rounds)
-        if(cookies.roundDuration !== undefined)
-            setRoundDuration(cookies.roundDuration)
-        if(cookies.host !== undefined && typeof host !== 'boolean')
-            setHost(JSON.parse(cookies.host))
-        if(cookies.roundNumber !== undefined) 
-            setRoundNumber(parseInt(cookies.roundNumber))
-        if(cookies.playerUID !== undefined)
-            setPlayerUID(cookies.playerUID)
-        if(cookies.imageURL !== undefined)
-            setImageURL(cookies.imageURL)
-        if(cookies.scoreboardInfo !== undefined)
-            setScoreboardInfo(cookies.scoreboardInfo)
-        if(cookies.photosFromAPI !== undefined)
-            setPhotosFromAPI(cookies.photosFromAPI)
-        if(cookies.deckSelected !== undefined)
-            setDeckSelected(cookies.deckSelected)
-        if(cookies.deckTitle !== undefined)
-            setDeckTitle(cookies.deckTitle)
     }
 
 

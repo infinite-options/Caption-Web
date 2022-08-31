@@ -22,9 +22,9 @@ export default function App() {
         roundNumber: "",
         imageURL: "",
         scoreboardInfo: [],
-        photosFromAPI: [],
         deckSelected: "",
-        deckTitle: ""
+        deckTitle: "",
+        isApi: false
     })
 
     const [cookies, setCookie, removeCookie] = useCookies(['userData'])

@@ -1,7 +1,6 @@
 import { useContext, useState } from "react";
-import { GoogleOAuthProvider, useGoogleLogin, GoogleLogin } from "@react-oauth/google";
+import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
-import TestButton from "../Components/TestButton";
 import { useEffect } from "react";
 import "../Styles/GooglePhotos.css"
 import { useHistory } from 'react-router-dom';
@@ -15,13 +14,16 @@ const GoogleTest = () => {
     const [albums, setAlbums] = useState([])
     const [signedIn, setSignedIn] = useState(false)
     const [selectedAlbum, setSelectedAlbum] = useState("")
+    const [albumPhotos, setAlbumPhotos] = useState[""]
 
 
     const clientID = "336598290180-69pe1qeuqku450vnoi8v1ehhi19jhpmt.apps.googleusercontent.com"
     const clientSecret = "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"
     const currentHost = window.location.origin
+    let imageUrls = []
 
     console.log("Google Cookies", cookies)
+    
 
 
     // Load cookies into userData state on first render
@@ -49,7 +51,7 @@ const GoogleTest = () => {
         }
 
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckSelected", "isApi"])
     }, [])
 
 
@@ -71,9 +73,6 @@ const GoogleTest = () => {
 
             // State has not updated, referecnce instantUpdate
             if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                console.log("propName: ", propName)
-                console.log("localCookies: ", localCookies[propName])
-                console.log("instantUpdate: ", instantUpdate[propName])
                 localCookies[propName] = instantUpdate[propName]
             } 
             // State already updated, reference userData
@@ -87,12 +86,12 @@ const GoogleTest = () => {
         console.log("photosFromAPI", userData.photosFromAPI)
 
         //hardcode
-        setCookie("userData", {
-            ...localCookies,
-            //photosFromAPI: ["1", "2", "3"]
-            photosFromAPI: ['https://lh3.googleusercontent.com/lr/AFz2ejRAKojRd…j29wuf4sK7i9_Gn8-HeIlpw82oQ_bhp6CnLCJky-RxdjQxjiY', 'https://lh3.googleusercontent.com/lr/AFz2ejSNZUUan…Qapb4GptGjsViFI5tjYIV66yZjOZZ5ZsS-mUiCMYGwHUWv-mA', 'https://lh3.googleusercontent.com/lr/AFz2ejSBUlRL3…0FZPrOVj2wJATo5_cboiX2mOZNaZblX7tVCpa9m18Aiz75sgI', 'https://lh3.googleusercontent.com/lr/AFz2ejR2U1p7v…i4TBE58I6EZ3wUunxFvVbC9QO3SvuxwCThP3r8On1Vbyv6duA', 'https://lh3.googleusercontent.com/lr/AFz2ejT4eTnvU…7qaQcGy9tc_vTfb3cUitJhWQoCjEW55ZoDOc2gr3KM9-Pt3Nc', 'https://lh3.googleusercontent.com/lr/AFz2ejRWKqEXP…Pedk1GPufg7bj5iHdSfnV3MV42ZW2G8Xwa87YZJ13wg9L1Hvk', 'https://lh3.googleusercontent.com/lr/AFz2ejTDKoteW…KDgWs5-8-RevMS2xGR8C_o8T8rpP0WRcDxbbdYkr9PxZbW2TA', 'https://lh3.googleusercontent.com/lr/AFz2ejRAu9eMo…81dp7VZVZZFzzrfNhrgoVqN54iqvTg5iwlaxPFif8UHam8U0g']
-            //photosFromAPI: userData.photosFromAPI
-        })
+        // setCookie("userData", {
+        //     ...localCookies,
+        //     //photosFromAPI: ["1", "2", "3"]
+        //     photosFromAPI: ['https://lh3.googleusercontent.com/lr/AFz2ejRAKojRd…j29wuf4sK7i9_Gn8-HeIlpw82oQ_bhp6CnLCJky-RxdjQxjiY', 'https://lh3.googleusercontent.com/lr/AFz2ejSNZUUan…Qapb4GptGjsViFI5tjYIV66yZjOZZ5ZsS-mUiCMYGwHUWv-mA', 'https://lh3.googleusercontent.com/lr/AFz2ejSBUlRL3…0FZPrOVj2wJATo5_cboiX2mOZNaZblX7tVCpa9m18Aiz75sgI', 'https://lh3.googleusercontent.com/lr/AFz2ejR2U1p7v…i4TBE58I6EZ3wUunxFvVbC9QO3SvuxwCThP3r8On1Vbyv6duA', 'https://lh3.googleusercontent.com/lr/AFz2ejT4eTnvU…7qaQcGy9tc_vTfb3cUitJhWQoCjEW55ZoDOc2gr3KM9-Pt3Nc', 'https://lh3.googleusercontent.com/lr/AFz2ejRWKqEXP…Pedk1GPufg7bj5iHdSfnV3MV42ZW2G8Xwa87YZJ13wg9L1Hvk', 'https://lh3.googleusercontent.com/lr/AFz2ejTDKoteW…KDgWs5-8-RevMS2xGR8C_o8T8rpP0WRcDxbbdYkr9PxZbW2TA', 'https://lh3.googleusercontent.com/lr/AFz2ejRAu9eMo…81dp7VZVZZFzzrfNhrgoVqN54iqvTg5iwlaxPFif8UHam8U0g']
+        //     //photosFromAPI: userData.photosFromAPI
+        // })
         // setCookie("userData", localCookies)
         //console.log("local cookies end", localCookies)
         //  setCookie("userData", {
@@ -161,7 +160,7 @@ const GoogleTest = () => {
     // Get photos for "entry" album, called when clicking on an album
     function getPhotos(entry) {
         const body = {
-            "pageSize": "100",
+            "pageSize": "50",
             "albumId": entry.id
         }
 
@@ -172,9 +171,12 @@ const GoogleTest = () => {
 
         axios.post('https://photoslibrary.googleapis.com/v1/mediaItems:search', body, {headers: headers})
         .then(res => {
-            const imageUrls = res.data.mediaItems.map(picture => {
+            //console.log("res.data.mediaItems", res.data.mediaItems)
+            imageUrls = res.data.mediaItems.map(picture => {
                 return picture.baseUrl
             })
+
+            //console.log("imageUrls 1", imageUrls)
 
             setUserData({
                 ...userData,
@@ -203,17 +205,12 @@ const GoogleTest = () => {
             deckSelected: "500-000009"
         })
 
-        putCookies(
-            ["deckSelected"],
-            {"deckSelected": "500-000009"}
-        )
+        // putCookies(
+        //     ["deckSelected", "deckTitle"],
+        //     {"deckSelected": "500-000009", "deckTitle": "Google Photos"}
+        // )
 
         console.log("photosFromAPI before putCookies", userData.photosFromAPI)
-
-        putCookies(
-            ["photosFromAPI"],
-            {"photosFromAPI": userData.photosFromAPI}
-        )
         
         console.log("after putCookies photosAPI")
 
@@ -226,17 +223,36 @@ const GoogleTest = () => {
         console.log('payload for deck = ', payload);
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
         axios.post(postURL, payload);
-        
 
-       // history.push('/waiting')
+
+        setCookie("userData", {
+            ...cookies.userData,
+            "photosFromAPI": userData.photosFromAPI,
+            "deckTitle": userData.selectedAlbum
+        })
+
+        console.log("photosFromAPI", userData.photosFromAPI)
+        console.log("Cookies before waiting", cookies.userData)
+
+        history.push('/waiting')
     }
 
 
-    useEffect(() => {
-        //console.log('Tokens', tokens)
-        //console.log('Albums', albums)
-        console.log('Photos Set', userData.photosFromAPI)
-    })
+    // useEffect(() => {
+    //     console.log('Tokens', tokens)
+    //     console.log('Albums', albums)
+    //     console.log('Photos Set', userData.photosFromAPI)
+    //     console.log('coookies', cookies.userData["photosFromAPI"])
+        
+    // })
+
+    // useEffect(() => {
+    //     putCookies(
+    //         ["photosFromAPI"],
+    //         {"photosFromAPI": userData.photosFromAPI}
+    //         //{"photosFromAPI": userData.photosFromAPI}
+    //     )
+    // }, [userData.photosFromAPI])
 
 
     
@@ -273,6 +289,15 @@ const GoogleTest = () => {
                     ? ""
                     : <button id="buttons" onClick={submitAlbum}>Play with {selectedAlbum}</button>
                 }
+
+                <div>
+                    {cookies.userData.photosFromAPI.length !== 0 ? 
+                        cookies.userData.photosFromAPI.map(url => {
+                            return <img id="google-image" src={url}></img>
+                        }):
+                        "API photo cookies not loaded"
+                    }
+                </div>
 
             </GoogleOAuthProvider>
         </div>

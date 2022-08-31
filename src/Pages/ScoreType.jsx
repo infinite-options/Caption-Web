@@ -41,7 +41,7 @@ function ScoreType({channel}) {
         }
 
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "isApi"])
     }, [])
 
 

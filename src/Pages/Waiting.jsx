@@ -24,7 +24,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
     const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
     const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
 
-    console.log("Waiting Cookies", cookies)
+
 
     // Load cookies into userData state on first render
     useEffect(() => {
@@ -34,8 +34,9 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
             for(let i = 0; i < propsToLoad.length; i++) {
                 let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-                cookieLoad[propName] = propValue
+
+                if(cookieLoad[propName] !== userData[propName])
+                    cookieLoad[propName] = localCookies[propName]
             }
 
 
@@ -48,7 +49,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         }
 
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "photosFromAPI"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "isApi"])
     }, [])
 
 
@@ -56,7 +57,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
     // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
     // state value to update cookie correctly.
     const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
         let localCookies = {}
         
         if(cookies.userData === undefined) {
@@ -68,7 +68,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         for(let i = 0; i < propsToPut.length; i++) {
             const propName = propsToPut[i]
 
-            // State has not updated, referecnce instantUpdate
+            // State variable not updated, reference instantUpdate
             if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
                 localCookies[propName] = instantUpdate[propName]
             } 
@@ -84,8 +84,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
 
     useEffect(() => {
-        console.log('roundNumber = ', userData.roundNumber);
-        
+        // Get players list on first render
         async function getPlayers1() {
             const names_db = [];
 
@@ -105,6 +104,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         }
 
 
+        // Continually get players list after each player joins
         async function subscribe1() 
         {
             
@@ -144,6 +144,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         }
 
 
+        // Guest start game flow upon receiving start game flag in ably
         async function subscribe2() 
         {
             await channel2.subscribe(newGame => {
@@ -203,33 +204,150 @@ export default function Waiting({channel, channel2, channel_joining}) {
     }, [userData.code]);
 
 
-    useEffect(() => {
-            if (copied) {
-                setTimeout(() => {
-                    setCopied(false);
-                }, 10000);
-            }
-        }, [copied])
+
+    
+    async function startPlaying() {     
+        if(!userData.isApi)
+            getDatabaseImage()
+        else
+            getApiImage()
+    }
 
 
+    const getApiImage = async () => {
+        let payload = {
+            deck_uid: userData.deckSelected,
+            game_code: userData.code
+        }
+        await axios.post(postAssignDeckURL, payload).then((res) => {
+            console.log(res)
+        })
+
+
+        let uniqueImage = await apiCall()
+        console.log("After API Call: ", uniqueImage)
+
+
+        setUserData({
+            imageURL: uniqueImage,
+        })
+        putCookies(
+            ["imageURL"], 
+            {"imageURL": uniqueImage}
+        )
         
-    useEffect(() => 
-    console.log('Currently in Waiting', "Alias:", userData.alias, "Current Round: ", userData.roundNumber), 
-    []);
+        pub(uniqueImage)
+    }
 
 
+    const apiCall = async () => {
+        let usedUrlSet = new Set()
+        // Get previously used images
+        await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/" + userData.code + ",0").then(res => {
+            const result = res.data.result
+            console.log("result", result)
+            for(let i = 0; i < result.length; i++) {
+                usedUrlSet.add(result[i].round_image_uid)
+            }
+        })
+
+        const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
+        const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
+        const giphyURL = "https://api.giphy.com/v1/gifs/trending?api_key=Fo9QcAQLMFI8V6pdWWHWl9qmW91ZBjoK&"
+        const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"
+
+        let uniqueUrl = ""
+
+        if(userData.deckTitle === "Google Photos"){
+            // Google Call
+
+        } else if (userData.deckTitle === "Cleveland Gallery") {
+            await axios.get(clevelandURL, {limit : "2"}).then( res => {
+                for(const image of res.data.data){
+                    console.log("Cleveland Image: ", image)
+                    if(image.images !== null && image.images.web !== null && !usedUrlSet.has(image.images.web.url)){
+                        uniqueUrl = image.images.web.url
+                        console.log("unique url found", uniqueUrl)
+                    }
+                }
+            })
+        } else if (userData.deckTitle === "Chicago Gallery") {
+            await axios.get(chicagoURL, {limit : "2"}).then( res => {
+                console.log("Chicago Res", res)
+                for(const chicagoImage of res.data.data){
+                    let chicagoId = chicagoImage.image_id
+                    console.log("chicagoId", chicagoId)
+                    let currentUrl = res.data.config.iiif_url + "/" + chicagoId + "/full/843,/0/default.jpg"
+                    if(!usedUrlSet.has(currentUrl) && chicagoId !== null)
+                        uniqueUrl =  currentUrl
+                }
+            })
+        } else if (userData.deckTitle === "Giphy Gallery") {
+            await axios.get(giphyURL, {limit : "2"}).then( res => {
+                for(const giphyImage of res.data.data){
+                    if(!usedUrlSet.has(giphyImage.images.original.url))
+                        uniqueUrl = giphyImage.images.original.url
+                }
+            })
+        } else {
+            await axios.get(harvardURL, {limit : "2"}).then( res => {
+                for(const harvardImage of res.data.records){
+                    if(!usedUrlSet.has(harvardImage.baseimageurl))
+                        uniqueUrl = harvardImage.baseimageurl
+                }
+            })
+        }
+
+        let payload = {
+            "game_code": userData.code,
+            "round_number": userData.roundNumber.toString(),
+            "image": uniqueUrl
+        }
+        await axios.post("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage", payload).then(res => {
+            console.log("postRoundImage", res)
+        })
+
+        return uniqueUrl
+    }
+
+
+    const getDatabaseImage = async () => {
+        let payload = {
+            deck_uid: userData.deckSelected,
+            game_code: userData.code,
+        }
+        await axios.post(postAssignDeckURL, payload).then((res) => {
+            console.log(res)
+        })
+
+        await axios.get(getUniqueImageInRound + userData.code + "," + userData.roundNumber).then((res) => {
+            console.log('GET Get Unique Image In Round', res);
+
+            setUserData({
+                ...userData,
+                imageURL: res.data.image_url
+            })
+            putCookies(
+                ["imageURL"], 
+                {"imageURL": res.data.image_url}
+            )
+
+            setLoading(true)
+            pub();
+        })
+    }
+
+
+    // Sends start game flag to ably
+    // If using API deck, sends next round's image to ably
     const pub = (apiURL)=> {
-        console.log('sending players to start game');
-        console.log("Log 1.5: Finish Posting");
-        if(userData.photosFromAPI.length > 0){
-            console.log('API pub block')
+        if(userData.isApi){
             channel2.publish({data: {
                 gameStarted: true,
                 currentImage: apiURL,
                 deckTitle: userData.deckTitle
             }});
         }
-            
         else
             channel2.publish({data: {
                 gameStarted: true,
@@ -240,75 +358,14 @@ export default function Waiting({channel, channel2, channel_joining}) {
         history.push("/page");
     };
 
-
-    const getUniqueAPIimage = async () => {
-        // Assign Dummy Deck
-        let payload = {
-            deck_uid: "500-000009",
-            game_code: userData.code
+    // Reset "copied" text on timer button
+    useEffect(() => {
+        if (copied) {
+            setTimeout(() => {
+                setCopied(false);
+            }, 10000);
         }
-
-        await axios.post(postAssignDeckURL, payload).then((res) => {
-            console.log(res)
-        })
-
-        const randNum = Math.floor(Math.random() * userData.photosFromAPI.length)
-        const randomURL = userData.photosFromAPI[randNum]
-        let apiPhotos = userData.photosFromAPI.filter((url) => {
-            return url !== randomURL
-        })
-
-        setUserData({
-            imageURL: randomURL,
-            photosFromAPI: apiPhotos
-        })
-
-        putCookies(["imageURL", "photosFromAPI"], {"imageURL": randomURL, "photosFromAPI": apiPhotos})
-
-        pub(randomURL)
-    }
-
-
-    async function startPlaying() {     
-        // Default decks   
-        if(userData.photosFromAPI.length === 0){
-            console.log('getUniqueImage')
-
-            // Assign Deck
-            let payload = {
-                deck_uid: userData.deckSelected,
-                game_code: userData.code,
-            }
-
-            await axios.post(postAssignDeckURL, payload).then((res) => {
-                console.log(res)
-            })
-
-            await axios.get(getUniqueImageInRound + userData.code + "," + userData.roundNumber).then((res) => {
-                console.log('GET Get Unique Image In Round', res);
-
-                setUserData({
-                    ...userData,
-                    imageURL: res.data.image_url
-                })
-        
-                putCookies(["imageURL"], {"imageURL": res.data.image_url})
-
-                setLoading(true)
-                console.log("done with set")
-
-                pub();
-            })
-
-            // pub();
-        } 
-        // API decks
-        else {
-             getUniqueAPIimage()
-        }
-        
-    }
-
+    }, [copied])
     
 
 

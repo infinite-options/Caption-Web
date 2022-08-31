@@ -13,7 +13,7 @@ import {Link} from "react-router-dom";
 export default function Landing({client}) {
     // const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID, setDeckSelected, setImageURL, cookies, setCookie, removeCookie} = useContext(LandingContext);
 
-    const {userData, setUserData, cookies, setCookie, removeCookie} = useContext(LandingContext);
+    const {userData, setUserData, cookies, setCookie} = useContext(LandingContext);
 
     const [loading, setLoading] = useState(false)
 
@@ -27,6 +27,9 @@ export default function Landing({client}) {
     // Load cookies into userData state on first render
     useEffect(() => {
         const getCookies = (propsToLoad) => {
+            if(cookies.userData === undefined)
+                return
+
             let localCookies = cookies.userData
             let cookieLoad = {}
 
@@ -59,9 +62,9 @@ export default function Landing({client}) {
                 "roundNumber",
                 "imageURL",
                 "scoreboardInfo",
-                "photosFromAPI",
                 "deckSelected",
-                "deckTitle" ], 
+                "deckTitle",
+                "isApi" ], 
             {   code: "",
                 gameUID: "",
                 rounds: "10",
@@ -71,9 +74,9 @@ export default function Landing({client}) {
                 roundNumber: "",
                 imageURL: "",
                 scoreboardInfo: [],
-                photosFromAPI: [],
                 deckSelected: "",
-                deckTitle: ""}
+                deckTitle: "",
+                isApi: false }
         )
     }, [])
 

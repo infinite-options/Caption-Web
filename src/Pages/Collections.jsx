@@ -4,7 +4,6 @@ import Deck from "../Components/Deck";
 import "../Styles/Collections.css";
 import background from "../Assets/landing.png";
 import circle from "../Assets/circle.png";
-import googlePhotos from "../Assets/googlePhotosIcon.png"
 import thing from "../Assets/idk.png";
 import {Button} from "../Components/Button";
 import {Link} from "react-router-dom";
@@ -45,40 +44,9 @@ function Collections() {
             setUserData(newUserData)
         }
 
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "isApi"])
     }, [])
 
-
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
-    }
 
 
     useEffect(() => {
@@ -181,32 +149,31 @@ function Collections() {
                             </li>
                         ))
                         }
-                        <Deck
-                            src={googlePhotos}
-                            title="Play with Google Photos"
+                        {/* <Deck
+                            title="Google Photos"
                             price="free"
                             googlePhotos={true}
                         />
                         <Deck
-                                title="Cleveland Gallery"
-                                price="free"
-                                cleveland={true}
+                            title="Cleveland Gallery"
+                            price="free"
+                            cleveland={true}
                         />
                         <Deck
-                                title="Chicago Gallery"
-                                price="free"
-                                chicago={true}
+                            title="Chicago Gallery"
+                            price="free"
+                            chicago={true}
                         />
                         <Deck
-                                title="Giphy Gallery"
-                                price="free"
-                                giphy={true}
+                            title="Giphy Gallery"
+                            price="free"
+                            giphy={true}
                         />
                         <Deck
-                                title="Harvard Gallery"
-                                price="free"
-                                harvard={true}
-                        />
+                            title="Harvard Gallery"
+                            price="free"
+                            harvard={true}
+                        /> */}
                 
             </ul>
             ):(<ReactBootStrap.Spinner animation="border" role="status"/>)}

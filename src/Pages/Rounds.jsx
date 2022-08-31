@@ -41,7 +41,7 @@ export default function Rounds({ channel }) {
             setUserData(newUserData)
         }
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "isApi"])
     }, [])
 
 

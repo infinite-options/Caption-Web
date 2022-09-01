@@ -80,16 +80,18 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
 
     const pub = (apiURL) => {
         console.log("roundNumber", userData.roundNumber)
-        if(!userData.isApi)
+        if(userData.isApi){
+            console.log("Publishing for api")
             channel.publish({data: {
                 roundStarted: true,
                 currentImage: apiURL,
             }});
+        }
         else
-        channel.publish({data: {
-            roundStarted: true,
-            currentImage: "",
-        }});
+            channel.publish({data: {
+                roundStarted: true,
+                currentImage: "",
+            }});
     }
 
     // Runs on first render or when userData.scoreboard changes

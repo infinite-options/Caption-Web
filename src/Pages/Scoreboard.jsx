@@ -369,7 +369,9 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                     console.log("ChicagoImage", chicagoImage)
 
                     let currentUrl = res.data.config.iiif_url + "/" + chicagoImage.image_id + "/full/843,/0/default.jpg"
-                    if(chicagoImage !== undefined && chicagoImage.image_id !== undefined && !usedUrlArr.includes(currentUrl)){
+                    if(chicagoImage !== undefined && chicagoImage.image_id !== undefined && 
+                        chicagoImage !== null && chicagoImage.image_id !== null 
+                        && !usedUrlArr.includes(currentUrl)){
                         uniqueUrl = currentUrl
                         console.log("unique url found", uniqueUrl)
                         break

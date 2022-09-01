@@ -64,7 +64,8 @@ export default function Landing({client}) {
                 "scoreboardInfo",
                 "deckSelected",
                 "deckTitle",
-                "isApi" ], 
+                "isApi",
+                "googlePhotos" ], 
             {   code: "",
                 gameUID: "",
                 rounds: "10",
@@ -76,7 +77,11 @@ export default function Landing({client}) {
                 scoreboardInfo: [],
                 deckSelected: "",
                 deckTitle: "",
-                isApi: false }
+                isApi: false,
+                googlePhotos: {
+                    albumId: "",
+                    accessToken: ""
+                } }
         )
     }, [])
 

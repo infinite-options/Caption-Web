@@ -28,17 +28,10 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
 
     const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
     const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-    const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
-    const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
     const [loading, setLoading] = useState(false);
     const[total_round, setTotalRound] = useState([])
-    const [updateComplete, setUpdateComplete] = useState(false)
     let cookiesDone = false
-
-
-    console.log("Page Cookies", cookies)
-    console.log("Round Duration", userData.roundDuration)
     
 
     // Load cookies into userData state on first render
@@ -66,12 +59,12 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
             console.log("newUserData", newUserData)
 
             setUserData(newUserData)
-
-            setUpdateComplete(true)
         }
 
+        console.log("Getting Cookies")
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"])
+        console.log("Got Cookies")
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi"])
         // getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "code", "roundDuration", "deckTitle", "deckSelected", "imageURL"])
 
         // roundtime = userData.roundDuration

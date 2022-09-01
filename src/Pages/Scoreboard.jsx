@@ -12,13 +12,11 @@ import {LandingContext} from "../App";
 
 function Scoreboard({ channel, channel_waiting, channel_joining}) {
     const history = useHistory();
-    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
+    const { cookies, setCookie, userData, setUserData } = useContext(LandingContext);
 
-    // Load Cookies
-    console.log("Scoreboard Cookies", cookies)
     
      // Load cookies into userData state on first render
-     useEffect(() => {
+    useEffect(() => {
         const getCookies = (propsToLoad) => {
             let localCookies = cookies.userData
             let cookieLoad = {}
@@ -29,6 +27,8 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
 
                 if(cookieLoad[propName] !== propValue)
                     cookieLoad[propName] = propValue
+                //cookieLoad[propName] = localCookies[propName]
+                
             }
 
             console.log("cookieLoad", cookieLoad)
@@ -42,9 +42,9 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             setUserData(newUserData)
         }
 
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "photosFromAPI", "scoreboardInfo", "isApi"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"])
     }, [])
+
 
 
     // Sets cookies for state variables in propsToPut array.
@@ -92,10 +92,10 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         }});
     }
 
+    // Runs on first render or when userData.scoreboard changes
     useEffect(() => {
-        console.log('scoreboardInfo = ', userData.scoreboardInfo);
-
-        if(!userData.host){
+        // if(!userData.host) {
+        if(userData.code !== "" &&  !userData.host) {
             setUserData({
                 ...userData,
                 roundNumber: userData.roundNumber + 1,
@@ -190,7 +190,6 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
 
     function renderReports() {
         let winning_score = Number.NEGATIVE_INFINITY;
-        console.log("ScoreboardInfo", userData.scoreboardInfo)
         for (const playerInfo of userData.scoreboardInfo)
             winning_score = playerInfo.score > winning_score ? playerInfo.score :
                 winning_score;
@@ -230,18 +229,6 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             await axios.post(postURL, payload);
 
             const nextRound = parseInt(userData.roundNumber) + 1;
-
-            setUserData({
-                ...userData,
-                roundNumber: nextRound,
-            })
-
-            putCookies(
-                ["roundNumber"],
-                {"roundNumber": nextRound}
-            )
-
-
             
             if(!userData.isApi) {
                 const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
@@ -265,6 +252,16 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             } else {
                 await getApiImage(nextRound)
             }
+
+            setUserData({
+                ...userData,
+                roundNumber: nextRound,
+            })
+
+            putCookies(
+                ["roundNumber"],
+                {"roundNumber": nextRound}
+            )
             
 
             history.push("/page");
@@ -273,26 +270,15 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         nextPub();
     }
 
+
     const getApiImage = async (nextRound) => {
-        const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
-        
-        let payload = {
-            deck_uid: userData.deckSelected,
-            game_code: userData.code
-        }
-        await axios.post(postAssignDeckURL, payload).then((res) => {
-            console.log(res)
-        })
-
-
         let uniqueImage = await apiCall(nextRound)
-        console.log("After API Call: ", uniqueImage)
 
-
-        setUserData({
+        await setUserData({
+            ...userData, 
             imageURL: uniqueImage,
         })
-        putCookies(
+        await putCookies(
             ["imageURL"], 
             {"imageURL": uniqueImage}
         )
@@ -301,68 +287,129 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     }
 
 
-    const apiCall = async (nextRound) => {
-        let usedUrlSet = new Set()
+    const apiCall = async () => {
+        let usedUrlArr = []
+
         // Get previously used images
         await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/" + userData.code + ",0").then(res => {
             const result = res.data.result
-            console.log("GetRoundImage", result)
+            console.log("getRoundImage Result", result)
             for(let i = 0; i < result.length; i++) {
-                usedUrlSet.add(result[i].round_image_uid)
+                usedUrlArr.push(result[i].round_image_uid)
             }
+            console.log("usedUrlSet", usedUrlArr)
         })
 
         const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
         const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
         const giphyURL = "https://api.giphy.com/v1/gifs/trending?api_key=Fo9QcAQLMFI8V6pdWWHWl9qmW91ZBjoK&"
         const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"
-        
+
         let uniqueUrl = ""
 
-        if(userData.deckTitle === "Google Photos"){
-            // Google Call
+        if(userData.deckSelected === "500-000005"){
+            // Google 
+            const body = {
+                "pageSize": "50",
+                "albumId":  userData.googlePhotos.albumId
+            }
+            const headers = {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + userData.googlePhotos.accessToken ,
+            }
+    
+            await axios.post('https://photoslibrary.googleapis.com/v1/mediaItems:search', body, {headers: headers})
+            .then(res => {
+                // Collect image urls in array
+                let imageUrls = res.data.mediaItems.map(picture => {
+                    return picture.baseUrl
+                })
 
-        } else if (userData.deckTitle === "Cleveland Gallery") {
-            await axios.get(clevelandURL, {limit : "2"}).then( res => {
-                for(const image of res.data.data){
-                    console.log("Cleveland Image: ", image)
-                    if(image.images !== null && image.images.web !== null && !usedUrlSet.has(image.images.web.url)){
+                while(true) {
+                    // Generate random index number
+                    let randomIndex = (Math.random() * imageUrls.length).toFixed(0)
+
+                    let image = imageUrls[randomIndex]
+                    console.log("used list contains image: ", usedUrlArr.includes(image))
+                    if(!usedUrlArr.includes(image)){
+                        uniqueUrl = image
+                        console.log("unique url found", uniqueUrl)
+                        break
+                    }
+                }
+            })
+
+        } else if (userData.deckSelected === "500-000006") {
+            // Cleveland
+            await axios.get(clevelandURL, {limit : "20"}).then( res => {
+                console.log("Cleveland res", res)
+
+                while(true) {
+                    let randomIndex = (Math.random() * 20).toFixed(0)
+
+                    let image = res.data.data[randomIndex]
+                    if(image.images !== null && image.images.web !== null && !usedUrlArr.includes(image.images.web.url)){
                         uniqueUrl = image.images.web.url
                         console.log("unique url found", uniqueUrl)
                         break
                     }
                 }
             })
-        } else if (userData.deckTitle === "Chicago Gallery") {
-            await axios.get(chicagoURL, {limit : "2"}).then( res => {
-                for(const chicagoImage of res.data.data){
-                    if(!usedUrlSet.has(chicagoImage.image_id))
-                        uniqueUrl = chicagoImage.image_id
+        } else if (userData.deckSelected === "500-000007") {
+            // Chicago
+            await axios.get(chicagoURL, {limit : "20"}).then( res => {
+                console.log("Chicago Res", res)
+                while(true) {
+                    let randomIndex = (Math.random() * 12).toFixed(0)
+
+                    let chicagoImage = res.data.data[randomIndex]
+                    console.log("RandomIndex", randomIndex)
+                    console.log("ChicagoImage", chicagoImage)
+
+                    let currentUrl = res.data.config.iiif_url + "/" + chicagoImage.image_id + "/full/843,/0/default.jpg"
+                    if(chicagoImage !== undefined && chicagoImage.image_id !== undefined && !usedUrlArr.includes(currentUrl)){
+                        uniqueUrl = currentUrl
+                        console.log("unique url found", uniqueUrl)
                         break
+                    }
                 }
             })
-        } else if (userData.deckTitle === "Giphy Gallery") {
-            await axios.get(giphyURL, {limit : "2"}).then( res => {
-                for(const giphyImage of res.data.data){
-                    if(!usedUrlSet.has(giphyImage.images.original.url))
+        } else if (userData.deckSelected === "500-000008") {
+            // Giphy
+            await axios.get(giphyURL, {limit : "20"}).then( res => {
+                while(true) {
+                    let randomIndex = (Math.random() * 20).toFixed(0)
+
+                    let giphyImage = res.data.data[randomIndex]
+                    //let shortUrl = giphyImage.images.original.url.substring(0, 44)
+                    //if(giphyImage.images.original.url !== undefined && !usedUrlArr.includes(shortUrl)){
+
+                    if(giphyImage.images.original.url !== undefined && !usedUrlArr.includes(giphyImage.images.original.url)){
                         uniqueUrl = giphyImage.images.original.url
+                        console.log("unique url found", uniqueUrl)
                         break
+                    }
                 }
             })
-        } else {
-            await axios.get(harvardURL, {limit : "2"}).then( res => {
-                for(const harvardImage of res.data.records){
-                    if(!usedUrlSet.has(harvardImage.baseimageurl))
+        } else if (userData.deckSelected === "500-000009") {
+            // Harvard
+            await axios.get(harvardURL, {limit : "20"}).then( res => {
+                while(true) {
+                    let randomIndex = (Math.random() * 10).toFixed(0)
+
+                    let harvardImage = res.data.records[randomIndex]
+                    if(harvardImage.baseimageurl !== undefined && !usedUrlArr.includes(harvardImage.baseimageurl)){
                         uniqueUrl = harvardImage.baseimageurl
+                        console.log("unique url found", uniqueUrl)
                         break
+                    }
                 }
             })
         }
 
-
         let payload = {
             "game_code": userData.code,
-            "round_number": nextRound.toString(),
+            "round_number": userData.roundNumber.toString(),
             "image": uniqueUrl
         }
         await axios.post("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage", payload).then(res => {
@@ -372,12 +419,6 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         return uniqueUrl
     }
 
-
-
-
-    useEffect(() => 
-        console.log('Currently in Scoreboard', "Alias:", userData.alias, "Current Round: ", userData.roundNumber), 
-        []);
 
 
     return (
@@ -391,6 +432,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                 //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
             }}
         >
+            <br></br>
             <h1>{userData.deckTitle}</h1>
             <br></br>
             <h3> Scoreboard</h3>
@@ -411,7 +453,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
 
             <br></br>
 
-            { userData.host ?
+            { userData.host !== undefined ?
                 <Button
                     className="fat"
                     // destination="/page"

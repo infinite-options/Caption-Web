@@ -24,7 +24,11 @@ export default function App() {
         scoreboardInfo: [],
         deckSelected: "",
         deckTitle: "",
-        isApi: false
+        isApi: false,
+        googlePhotos: {
+            albumId: "",
+            accessToken: ""
+        }
     })
 
     const [cookies, setCookie, removeCookie] = useCookies(['userData'])

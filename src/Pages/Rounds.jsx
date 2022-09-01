@@ -150,7 +150,7 @@ export default function Rounds({ channel }) {
                         color: "blue",
                     }}
                     className="fas fa-info-circle"
-                    children=' Game Rule'
+                    children=' Game Rules'
                 />
             </Link>
 

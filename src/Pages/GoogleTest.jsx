@@ -14,16 +14,13 @@ const GoogleTest = () => {
     const [albums, setAlbums] = useState([])
     const [signedIn, setSignedIn] = useState(false)
     const [selectedAlbum, setSelectedAlbum] = useState("")
-    const [albumPhotos, setAlbumPhotos] = useState[""]
+    const [albumImages, setAlbumImages] = useState([])
 
 
     const clientID = "336598290180-69pe1qeuqku450vnoi8v1ehhi19jhpmt.apps.googleusercontent.com"
     const clientSecret = "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"
     const currentHost = window.location.origin
-    let imageUrls = []
-
-    console.log("Google Cookies", cookies)
-    
+    let imageUrls = []    
 
 
     // Load cookies into userData state on first render
@@ -83,7 +80,6 @@ const GoogleTest = () => {
 
         
         console.log("local cookies end", localCookies)
-        console.log("photosFromAPI", userData.photosFromAPI)
 
         //hardcode
         // setCookie("userData", {
@@ -159,6 +155,14 @@ const GoogleTest = () => {
 
     // Get photos for "entry" album, called when clicking on an album
     function getPhotos(entry) {
+        setUserData({
+            ...userData,
+            googlePhotos: {
+                albumId: entry.id,
+                accessToken: tokens.access_token
+            }
+        })
+
         const body = {
             "pageSize": "50",
             "albumId": entry.id
@@ -175,44 +179,53 @@ const GoogleTest = () => {
             imageUrls = res.data.mediaItems.map(picture => {
                 return picture.baseUrl
             })
-
-            //console.log("imageUrls 1", imageUrls)
-
-            setUserData({
-                ...userData,
-                photosFromAPI: imageUrls
-            })
-
-            // console.log("imageUrls", imageUrls)
-
-            // putCookies(
-            //     ["photosFromAPI"],
-            //     {"photosFromAPI": imageUrls}
-            // )
+            setAlbumImages(imageUrls)
 
         })
     }
     
     
-
+    // TO DO: alert user if max images less than round number
     // Select dummy deck in DB and transition to waiting room
     const submitAlbum = () => {
         console.log("move back to waiting room")
 
+        let maxImagesForAlbum = albumImages.length
+        if(maxImagesForAlbum < userData.rounds) {
+            setUserData({
+                ...userData,
+                rounds: maxImagesForAlbum,
+                deckSelected: "500-000005",
+                deckTitle: "Google Photos: " + selectedAlbum,
+            })
+            setCookie("userData", {
+                ...cookies.userData,
+                "rounds": maxImagesForAlbum,
+                "deckSelected": "500-000005",
+                "deckTitle": "Google Photos: " + selectedAlbum,
+                "googlePhotos": userData.googlePhotos
+            })
 
-        setUserData({
-            ...userData,
-            deckSelected: "500-000009"
-        })
+            // alert user max images less than original rounds
+        } else {
+            setUserData({
+                ...userData,
+                deckSelected: "500-000005",
+                deckTitle: "Google Photos: " + selectedAlbum,
+            })
+            setCookie("userData", {
+                ...cookies.userData,
+                "deckSelected": "500-000005",
+                "deckTitle": "Google Photos: " + selectedAlbum,
+                "googlePhotos": userData.googlePhotos
+            })
+        }
+            
 
         // putCookies(
         //     ["deckSelected", "deckTitle"],
         //     {"deckSelected": "500-000009", "deckTitle": "Google Photos"}
         // )
-
-        console.log("photosFromAPI before putCookies", userData.photosFromAPI)
-        
-        console.log("after putCookies photosAPI")
 
         const payload = {
             game_code: userData.code,
@@ -224,44 +237,16 @@ const GoogleTest = () => {
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
         axios.post(postURL, payload);
 
+        
 
-        setCookie("userData", {
-            ...cookies.userData,
-            "photosFromAPI": userData.photosFromAPI,
-            "deckTitle": userData.selectedAlbum
-        })
-
-        console.log("photosFromAPI", userData.photosFromAPI)
         console.log("Cookies before waiting", cookies.userData)
 
         history.push('/waiting')
     }
 
-
-    // useEffect(() => {
-    //     console.log('Tokens', tokens)
-    //     console.log('Albums', albums)
-    //     console.log('Photos Set', userData.photosFromAPI)
-    //     console.log('coookies', cookies.userData["photosFromAPI"])
-        
-    // })
-
-    // useEffect(() => {
-    //     putCookies(
-    //         ["photosFromAPI"],
-    //         {"photosFromAPI": userData.photosFromAPI}
-    //         //{"photosFromAPI": userData.photosFromAPI}
-    //     )
-    // }, [userData.photosFromAPI])
-
-
-    
-
-
-
     return (
         <div id="page-sizing">
-            <GoogleOAuthProvider clientId={clientID}>
+            {/* <GoogleOAuthProvider clientId={clientID}> */}
                 <br></br>
                 <div>
                     { signedIn 
@@ -279,7 +264,7 @@ const GoogleTest = () => {
                 
                 <br></br>
                 <div id="google-image-wrapper">
-                    {userData.photosFromAPI.map(url => {
+                    {albumImages.map(url => {
                         return <img id="google-image" src={url}></img>
                     })}
                 </div>
@@ -290,16 +275,7 @@ const GoogleTest = () => {
                     : <button id="buttons" onClick={submitAlbum}>Play with {selectedAlbum}</button>
                 }
 
-                <div>
-                    {cookies.userData.photosFromAPI.length !== 0 ? 
-                        cookies.userData.photosFromAPI.map(url => {
-                            return <img id="google-image" src={url}></img>
-                        }):
-                        "API photo cookies not loaded"
-                    }
-                </div>
-
-            </GoogleOAuthProvider>
+            {/* </GoogleOAuthProvider> */}
         </div>
     )
 }

@@ -27,9 +27,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
     const history = useHistory();
 
-
-    console.log("Selection Cookies", cookies)
-
     // Load cookies into userData state on first render
     useEffect(() => {
         const getCookies = (propsToLoad) => {
@@ -56,7 +53,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
 
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"])
         // getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL"])
     }, [])
 
@@ -276,7 +273,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             channel_all.unsubscribe();
             channel_waiting.unsubscribe();
         };
-    }, []);
+    }, [userData.code]);
 
 
     function changeToggle(index) {

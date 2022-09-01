@@ -49,7 +49,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         }
 
 
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "isApi"])
+        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "isApi", "googlePhotos"])
     }, [])
 
 
@@ -225,8 +225,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
 
         let uniqueImage = await apiCall()
-        console.log("After API Call: ", uniqueImage)
-
 
         setUserData({
             imageURL: uniqueImage,
@@ -241,14 +239,16 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
 
     const apiCall = async () => {
-        let usedUrlSet = new Set()
+        let usedUrlArr = []
+
         // Get previously used images
         await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/" + userData.code + ",0").then(res => {
             const result = res.data.result
-            console.log("result", result)
+            console.log("getRoundImage Result", result)
             for(let i = 0; i < result.length; i++) {
-                usedUrlSet.add(result[i].round_image_uid)
+                usedUrlArr.push(result[i].round_image_uid)
             }
+            console.log("usedUrlSet", usedUrlArr)
         })
 
         const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
@@ -258,42 +258,99 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
         let uniqueUrl = ""
 
-        if(userData.deckTitle === "Google Photos"){
-            // Google Call
+        if(userData.deckSelected === "500-000005"){
+            // Google 
+            const body = {
+                "pageSize": "50",
+                "albumId":  userData.googlePhotos.albumId
+            }
+            const headers = {
+                Accept: 'application/json',
+                Authorization: 'Bearer ' + userData.googlePhotos.accessToken ,
+            }
+    
+            await axios.post('https://photoslibrary.googleapis.com/v1/mediaItems:search', body, {headers: headers})
+            .then(res => {
+                // Collect image urls in array
+                let imageUrls = res.data.mediaItems.map(picture => {
+                    return picture.baseUrl
+                })
 
-        } else if (userData.deckTitle === "Cleveland Gallery") {
-            await axios.get(clevelandURL, {limit : "2"}).then( res => {
-                for(const image of res.data.data){
-                    console.log("Cleveland Image: ", image)
-                    if(image.images !== null && image.images.web !== null && !usedUrlSet.has(image.images.web.url)){
-                        uniqueUrl = image.images.web.url
+                while(true) {
+                    // Generate random index number
+                    let randomIndex = (Math.random() * imageUrls.length).toFixed(0)
+
+                    let image = imageUrls[randomIndex]
+                    console.log("used list contains image: ", usedUrlArr.includes(image))
+                    if(!usedUrlArr.includes(image)){
+                        uniqueUrl = image
                         console.log("unique url found", uniqueUrl)
+                        break
                     }
                 }
             })
-        } else if (userData.deckTitle === "Chicago Gallery") {
-            await axios.get(chicagoURL, {limit : "2"}).then( res => {
+
+        } else if (userData.deckSelected === "500-000006") {
+            // Cleveland
+            await axios.get(clevelandURL, {limit : "20"}).then( res => {
+                console.log("Cleveland res", res)
+
+                while(true) {
+                    let randomIndex = (Math.random() * 20).toFixed(0)
+
+                    let image = res.data.data[randomIndex]
+                    if(image.images !== null && image.images.web !== null && !usedUrlArr.includes(image.images.web.url)){
+                        uniqueUrl = image.images.web.url
+                        console.log("unique url found", uniqueUrl)
+                        break
+                    }
+                }
+            })
+        } else if (userData.deckSelected === "500-000007") {
+            // Chicago
+            await axios.get(chicagoURL, {limit : "20"}).then( res => {
                 console.log("Chicago Res", res)
-                for(const chicagoImage of res.data.data){
-                    let chicagoId = chicagoImage.image_id
-                    console.log("chicagoId", chicagoId)
-                    let currentUrl = res.data.config.iiif_url + "/" + chicagoId + "/full/843,/0/default.jpg"
-                    if(!usedUrlSet.has(currentUrl) && chicagoId !== null)
-                        uniqueUrl =  currentUrl
+                while(true) {
+                    let randomIndex = (Math.random() * 12).toFixed(0)
+
+                    let chicagoImage = res.data.data[randomIndex]
+                    console.log("RandomIndex", randomIndex)
+                    console.log("ChicagoImage", chicagoImage)
+
+                    let currentUrl = res.data.config.iiif_url + "/" + chicagoImage.image_id + "/full/843,/0/default.jpg"
+                    if(chicagoImage.image_id !== undefined && !usedUrlArr.includes(currentUrl)){
+                        uniqueUrl = currentUrl
+                        console.log("unique url found", uniqueUrl)
+                        break
+                    }
                 }
             })
-        } else if (userData.deckTitle === "Giphy Gallery") {
-            await axios.get(giphyURL, {limit : "2"}).then( res => {
-                for(const giphyImage of res.data.data){
-                    if(!usedUrlSet.has(giphyImage.images.original.url))
+        } else if (userData.deckSelected === "500-000008") {
+            // Giphy
+            await axios.get(giphyURL, {limit : "20"}).then( res => {
+                while(true) {
+                    let randomIndex = (Math.random() * 20).toFixed(0)
+
+                    let giphyImage = res.data.data[randomIndex]
+                    if(giphyImage.images.original.url !== undefined && !usedUrlArr.includes(giphyImage.images.original.url)){
                         uniqueUrl = giphyImage.images.original.url
+                        console.log("unique url found", uniqueUrl)
+                        break
+                    }
                 }
             })
-        } else {
-            await axios.get(harvardURL, {limit : "2"}).then( res => {
-                for(const harvardImage of res.data.records){
-                    if(!usedUrlSet.has(harvardImage.baseimageurl))
+        } else if (userData.deckSelected === "500-000009") {
+            // Harvard
+            await axios.get(harvardURL, {limit : "20"}).then( res => {
+                while(true) {
+                    let randomIndex = (Math.random() * 10).toFixed(0)
+
+                    let harvardImage = res.data.records[randomIndex]
+                    if(harvardImage.baseimageurl !== undefined && !usedUrlArr.includes(harvardImage.baseimageurl)){
                         uniqueUrl = harvardImage.baseimageurl
+                        console.log("unique url found", uniqueUrl)
+                        break
+                    }
                 }
             })
         }
@@ -358,6 +415,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         history.push("/page");
     };
 
+
     // Reset "copied" text on timer button
     useEffect(() => {
         if (copied) {
@@ -396,7 +454,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                         color: "blue",
                     }}
                     className="fas fa-info-circle"
-                    children=' Game Rule'
+                    children=' Game Rules'
                 />
             </Link>
             <h4>Waiting for all players to join</h4>
@@ -449,13 +507,18 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 conditionalLink={true}  
             />
              : <></>}
-              {userData.host && userData.deckSelected !== "" ? <Button
-                className="landing"
-                children="Start Game"
-                onClick={() => startPlaying()}
-                conditionalLink={true}  
-            />
-             : <></>}
+
+            {userData.host && userData.deckSelected !== "" ? 
+                <Button
+                    className="landing"
+                    children="Start Game"
+                    onClick={() => startPlaying()}
+                    conditionalLink={true}  
+                />
+                : <></>
+            }
+
+            {}
             
 
         </div>

@@ -106,7 +106,7 @@ export default function DeckCard({googlePhotos, cleveland, chicago, giphy, harva
             round_number: userData.roundNumber.toString(),
         }
 
-        await axios.post(selectDeckURL, payload).then(res => console.log(res))
+        await axios.post(selectDeckURL, payload).then(res => console.log("Select Deck", res))
 
         setUserData({
             ...userData,

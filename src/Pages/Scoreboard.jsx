@@ -453,7 +453,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
 
             <br></br>
 
-            { userData.host !== undefined ?
+            { userData.host !== undefined && userData.host ?
                 <Button
                     className="fat"
                     // destination="/page"

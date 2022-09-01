@@ -289,7 +289,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     }
 
 
-    const apiCall = async () => {
+    const apiCall = async (nextRound) => {
         let usedUrlArr = []
 
         // Get previously used images
@@ -409,9 +409,11 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             })
         }
 
+        console.log("Next Round, before postRoundImage: ", nextRound)
         let payload = {
             "game_code": userData.code,
-            "round_number": userData.roundNumber.toString(),
+            "round_number": nextRound.toString(),
+            //"round_number": userData.roundNumber.toString(),
             "image": uniqueUrl
         }
         await axios.post("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage", payload).then(res => {

@@ -120,15 +120,15 @@ export default function Landing({client, channel_waiting}) {
                 host: false,
                 roundNumber: 1
             })
-            setCookie("userData", {
-                ...cookies.userData,
-                "host": true,
-                "roundNumber": 1,
-                "name": userData.name,
-                "email": userData.email,
-                "zipCode": userData.zipCode,
-                "alias": userData.alias
-            })
+            // setCookie("userData", {
+            //     ...cookies.userData,
+            //     "name": userData.name,
+            //     "email": userData.email,
+            //     "zipCode": userData.zipCode,
+            //     "alias": userData.alias,
+            //     "host": false,
+            //     "roundNumber": 1,
+            // })
 
 
             // POST /addUser to create a new guest user
@@ -147,10 +147,11 @@ export default function Landing({client, channel_waiting}) {
                     ...userData, 
                     playerUID: pUID
                 })
-                setCookie("userData", {
-                    ...cookies.userData,
-                    "playerUID": pUID
-                })
+                // setCookie("userData", {
+                //     ...cookies.userData,
+                //     "playerUID": pUID,
+                //     "code": res.data.user_code, 
+                // })
 
                 console.log("user_code", res.data.user_code)
 
@@ -179,6 +180,14 @@ export default function Landing({client, channel_waiting}) {
                         })
                         setCookie("userData", {
                             ...cookies.userData,
+                            "name": userData.name,
+                            "email": userData.email,
+                            "zipCode": userData.zipCode,
+                            "alias": userData.alias,
+                            "host": false,
+                            "roundNumber": 1,
+                            "playerUID": pUID,
+                            "code": userData.code,
                             "rounds": res.data.num_round, 
                             "roundDuration": duration
                         })

@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
 import {useHistory} from 'react-router-dom';
-
 import {Row, Col, Card} from "reactstrap";
 import Form from "../Components/Form";
 import {Button} from "../Components/Button";
@@ -14,10 +13,14 @@ import {CountdownCircleTimer} from "react-countdown-circle-timer";
 import axios from "axios";
 import {LandingContext} from "../App";
 import Bubbles from "../Components/Bubbles";
+import { CookieHelper } from "../Components/CookieHelper"
+
 
 export default function Page({ channel, channel_waiting, channel_joining}) {
-    const { cookies, setCookie, userData, setUserData } = useContext(LandingContext);
+    const { userData } = useContext(LandingContext);
+    const { getCookies } = CookieHelper()
     const history = useHistory();
+
     const [caption, setCaption] = useState("");
     const [captionSubmitted, setCaptionSubmitted] = useState(false);
     const [roundHasStarted, setRoundHasStarted] = useState(false);
@@ -25,86 +28,41 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     const [timerDuration, setTimerDuration] = useState(-1);
     const [waitingPlayers, setWaitingPlayers] = useState([]);
     const [roundStartTime, setRoundStartTime] = useState();
+    const [loading, setLoading] = useState(false);
 
+    // Determine if we should display landing page (true) or loading icon (false)
+    const [displayHtml, setDisplayHtml] = useState(false)
+
+    // Endpoints used in Page
     const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
     const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
-    const [loading, setLoading] = useState(false);
-    const[total_round, setTotalRound] = useState([])
-    let cookiesDone = false
+
     
-
-    // Load cookies into userData state on first render
+    // HOOK: useEffect()
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-
-                if(cookieLoad[propName] !== propValue)
-                    cookieLoad[propName] = propValue
-                //cookieLoad[propName] = localCookies[propName]
-                
-            }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-            console.log("newUserData", newUserData)
-
-            setUserData(newUserData)
-        }
-
-        console.log("Getting Cookies")
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"])
-        console.log("Got Cookies")
-
-        // getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "code", "roundDuration", "deckTitle", "deckSelected", "imageURL"])
-
-        // roundtime = userData.roundDuration
+         // Check if userData is empty (after refresh/new user)
+         if(userData.host === "" || userData.roundNumber === "" || userData.playerUID === "" || userData.rounds === "" || userData.roundDuration === "" || userData.code === "" || userData.deckTitle === "" || userData.imageURL === "") {
+            getCookies(["host", "roundNumber", "playerUID", "deckSelected", "rounds", "roundDuration", "code", "deckTitle", "imageURL", "isApi"], setDisplayHtml)
+        } else
+            setDisplayHtml(true)
+        
     }, [])
 
 
-
-    const pub = (playerCount) => {
-        console.log('In pub function with playerCount == ', playerCount);
-        channel.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
-    };
-
-
+    // HOOK: useEffect()
+    // DESCRIPTION:
     useEffect(() => {
-
         async function pageAsyc(){
-            /**
-             * Mayukh: I don't know why this works, but I am sure that the getTimer endpoint must be called after startPlaying.
-             * By arranging the endpoint calls in this fashion, I am able to create a 'magical' delay that works in my favor.
-             */
-
             if (userData.host) {
                 // Host logs start of new round/time started in backend
                 await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber).then((res) => {
-                    console.log(res);
+                    console.log("GET startPlaying", res);
                     setRoundStartTime(res.data.round_start_time);
                     setRoundHasStarted(true);
                 })
-
             }
-
-            /**
-             * GET GameTimer with lag calculation
-             * Determine the amount of time left on the countdown timer.
-             *
-             * s = the second at which the round has started
-             * c = the second at which the clock is currently on
-             * d = the seconds for the duration of the round
-             */
-            console.log('In Page.jsx: code = ', userData.code, ' roundNumber = ', userData.roundNumber, ` fullURL = ${getTimerURL + userData.code + "," + userData.roundNumber}`);
         }
 
         pageAsyc();
@@ -112,6 +70,8 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
 
 
 
+    // HOOK: useEffect()
+    // DESCRIPTION:
     useEffect(() => {
         async function subscribe() 
         {
@@ -158,13 +118,11 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
             channel.unsubscribe();
             channel_waiting.unsubscribe();
         };
-    }, [waitingPlayers, userData.code, cookiesDone]);
+    }, [waitingPlayers, userData.code]);
 
 
 
-     useEffect(() => 
-     console.log('Currently in Pages', "Alias:", userData.alias, "Current Round: ", userData.roundNumber), 
-     []);
+
 
 
     
@@ -210,155 +168,168 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
         })
     }
 
+
     function toggleTimeUp() {
         setTimeUp(true);
     }
 
+
+    // Publish amount of players who haven't submitted, and who voted
+    const pub = (playerCount) => {
+        console.log('In pub function with playerCount == ', playerCount);
+        channel.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
+    };
+
     
 
     return (
-        <div
-            style={{
-                maxWidth: "375px",
-                height: "100%",
-                backgroundImage: `url(${background})`,
-            }}
-        >
-            <div style={{padding: "20px"}}>
-                <br></br>
+        displayHtml ? 
+            // Caption page HTML
+            <div
+                style={{
+                    maxWidth: "375px",
+                    height: "100%",
+                    backgroundImage: `url(${background})`,
+            }}>
+                <div style={{padding: "20px"}}>
+                    <br></br>
 
-                <h1>
-                    {userData.deckTitle}
-                </h1>
-                <br></br>
-                <h3>Round: {userData.roundNumber}/{userData.rounds}</h3>
-                {/* <p>URL: {userData.imageURL}</p>
-                <p>RoundDuration: {userData.roundDuration}</p> */}
-                <br></br>
-                
-                <img className="centerPic" src={userData.imageURL} alt="Loading Image...."/>
+                    <h1>
+                        {userData.deckTitle}
+                    </h1>
+                    <br></br>
+                    <h3>Round: {userData.roundNumber}/{userData.rounds}</h3>
+                    {/* <p>URL: {userData.imageURL}</p>
+                    <p>RoundDuration: {userData.roundDuration}</p> */}
+                    <br></br>
+                    
+                    <img className="centerPic" src={userData.imageURL} alt="Loading Image...."/>
 
-                <br></br>
-                <br></br>
+                    <br></br>
+                    <br></br>
 
-                <div>
-                    {captionSubmitted ?
-                    <></> : 
-                        <Form
-                            className="input2"
-                            field="Enter your caption here"
-                            onHandleChange={newCaption => setCaption(newCaption)}
-                            onHandleSubmit={(caption) => {
-                                console.log('setting caption and submitting');
-                                setCaption(caption);
-                                postSubmitCaption();
-                            }}
-                        />
-                    }
-                    <br/>
-
-                    {/* <Row> */}
-                <div 
-                    style = {{
-                        display: 'flex', 
-                        justifyContent: 'center', 
-                        paddingBottom: '20px', 
-                       }}
-                 >
-                        <div style={{
-                                background: "yellow",
-                                borderRadius: "30px",
-                                width: "60px",
-                            }}
-                        >
-                            {/* TO DO: prevent users from refreshing to get new 30 sec*/}
-                            {userData.roundDuration !== undefined ?
-                             <CountdownCircleTimer
-                                    background="blue"
-                                    size={60}
-                                    strokeWidth={5}
-                                    isPlaying
-                                    duration={userData.roundDuration}
-                                    // duration={userData.roundDuration}
-                                    colors="#000000"
-                                    onComplete={() => {
-                                        toggleTimeUp()
-                                        //postSubmitCaption()
-                                    }}
-                                >
-                                    {({remainingTime}) => {
-
-                                            if (remainingTime === 0)
-                                                pub(0);
-                                            return (<div className="countdownText">{remainingTime}</div>);
-                                        }
-                                    }
-                            </CountdownCircleTimer> : <></>}
-
-                            
-                            
-                            {/* {updateComplete !== "" ? <CountdownCircleTimer
-                                    background="red"
-                                    size={60}
-                                    strokeWidth={5}
-                                    isPlaying
-                                    duration={userData.roundDuration}
-                                    colors="#000000"
-                                    onComplete={() => {
-                                        toggleTimeUp()
-                                        //postSubmitCaption()
-                                    }}
-                                >
-                                    {({remainingTime}) => {
-
-                                            if (remainingTime === 0)
-                                                pub(0);
-                                            return (<div className="countdownText">{remainingTime}</div>);
-                                        }
-                                    }
-                            </CountdownCircleTimer> : <></>} */}
-                        </div>
-                </div>
-                        {/* <span style={{marginLeft: "60px"}}></span>
-                        <br></br>{" "} */}
-
-                        {captionSubmitted ? <Button
-                            className="fat"
-                            destination="/page"
-                            // onClick={postSubmitCaption}
-                            // onClick={toggleCaptionSubmitted}
-                            children="Submitted"
-                            conditionalLink={true}
-                        /> : <Button
-                            className="fat"
-                            destination="/page"
-                            onClick={postSubmitCaption}
-                            children="Submit"
-                            conditionalLink={true}
-                        />
+                    <div>
+                        {captionSubmitted ?
+                        <></> : 
+                            <Form
+                                className="input2"
+                                field="Enter your caption here"
+                                onHandleChange={newCaption => setCaption(newCaption)}
+                                onHandleSubmit={(caption) => {
+                                    console.log('setting caption and submitting');
+                                    setCaption(caption);
+                                    postSubmitCaption();
+                                }}
+                            />
                         }
+                        <br/>
 
-                    {/* </Row> */}
+                        {/* <Row> */}
+                    <div 
+                        style = {{
+                            display: 'flex', 
+                            justifyContent: 'center', 
+                            paddingBottom: '20px', 
+                        }}
+                    >
+                            <div style={{
+                                    background: "yellow",
+                                    borderRadius: "30px",
+                                    width: "60px",
+                                }}
+                            >
+                                {/* TO DO: prevent users from refreshing to get new 30 sec*/}
+                                {userData.roundDuration !== undefined ?
+                                <CountdownCircleTimer
+                                        background="blue"
+                                        size={60}
+                                        strokeWidth={5}
+                                        isPlaying
+                                        duration={userData.roundDuration}
+                                        // duration={userData.roundDuration}
+                                        colors="#000000"
+                                        onComplete={() => {
+                                            toggleTimeUp()
+                                            pub(0)
+                                        }}
+                                    >
+                                        {({remainingTime}) => {
+                                                if (remainingTime === 0)
+                                                    pub(0);
+                                                return (<div className="countdownText">{remainingTime}</div>);
+                                            }
+                                        }
+                                </CountdownCircleTimer> : <></>}
+
+                                
+                                
+                                {/* {updateComplete !== "" ? <CountdownCircleTimer
+                                        background="red"
+                                        size={60}
+                                        strokeWidth={5}
+                                        isPlaying
+                                        duration={userData.roundDuration}
+                                        colors="#000000"
+                                        onComplete={() => {
+                                            toggleTimeUp()
+                                            //postSubmitCaption()
+                                        }}
+                                    >
+                                        {({remainingTime}) => {
+
+                                                if (remainingTime === 0)
+                                                    pub(0);
+                                                return (<div className="countdownText">{remainingTime}</div>);
+                                            }
+                                        }
+                                </CountdownCircleTimer> : <></>} */}
+                            </div>
+                    </div>
+                            {/* <span style={{marginLeft: "60px"}}></span>
+                            <br></br>{" "} */}
+
+                            {captionSubmitted ? <Button
+                                className="fat"
+                                destination="/page"
+                                // onClick={postSubmitCaption}
+                                // onClick={toggleCaptionSubmitted}
+                                children="Submitted"
+                                conditionalLink={true}
+                            /> : <Button
+                                className="fat"
+                                destination="/page"
+                                onClick={postSubmitCaption}
+                                children="Submit"
+                                conditionalLink={true}
+                            />
+                            }
+
+                        {/* </Row> */}
+                    </div>
+                    {/*)}*/}
                 </div>
-                {/*)}*/}
+
+                <br/>
+
+                {/*Issue:*/}
+                {/* This Bubble component is not optimal for rendering the information in real time --> look at the code in Waiting.jsx for reference.*/}
+                {captionSubmitted ?
+                    <div> Waiting for everybody to submit their captions... <Bubbles items={waitingPlayers}/></div> : <></>}
+
+
+                {/* {timeUp && host ?
+                    <Button
+                        className="landing"
+                        children="continue"
+                        destination="/selection"
+                        conditionalLink={true}
+                    />
+                    : <></>} */}
+            </div>:
+            // Loading icon HTML
+            <div>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
             </div>
-
-            <br/>
-
-            {/*Issue:*/}
-            {/* This Bubble component is not optimal for rendering the information in real time --> look at the code in Waiting.jsx for reference.*/}
-            {captionSubmitted ?
-                <div> Waiting for everybody to submit their captions... <Bubbles items={waitingPlayers}/></div> : <></>}
-
-
-            {/* {timeUp && host ?
-                <Button
-                    className="landing"
-                    children="continue"
-                    destination="/selection"
-                    conditionalLink={true}
-                />
-                : <></>} */}
-        </div>
     );
 }

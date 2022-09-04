@@ -1,78 +1,28 @@
 import React, {useContext} from "react";
 import "../Styles/Deck.css";
-import { useHistory } from "react-router-dom";
 import {Link} from "react-router-dom";
-
 import axios from "axios";
 import {LandingContext} from "../App";
-import { useEffect } from "react";
+
+
 
 export default function DeckCard({googlePhotos, cleveland, chicago, giphy, harvard, id, title, price, src, alt}) {
     const { userData, setUserData, cookies, setCookie} = useContext(LandingContext);
-
+    
     const selectDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
 
-
+    // Decide next page
     let nextPage = "/waiting"
     if(title === "Google Photos")
             nextPage = "/googleAuth"
 
-    
-    // Load cookies into userData state on first render
-    useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
 
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-                cookieLoad[propName] = propValue
-            }
-
-            setUserData({
-                ...userData,
-                ...cookieLoad
-            })
-        }
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code"])
-    }, [])
-
-
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        setCookie("userData", localCookies)
-    }
-    
-
-    
+    // FUNCTION: selectThisDeck()
+    // DESCRIPTION: When deck is clicked, determine if we use database or api deck, then save deck id to database
     async function selectThisDeck() {
         let apiStatus = false
 
+        // Decide if we are using api or database deck
         if(title === "Google Photos"){
             console.log("Google Photos API selected. Switching to Google Sign-in Page.")
 
@@ -80,32 +30,26 @@ export default function DeckCard({googlePhotos, cleveland, chicago, giphy, harva
                 ...userData,
                 isApi: true
             })
-
-            putCookies(
-                ["isApi"], 
-                {"isApi": true}
-            )
+            setCookie("userData", {
+                ...cookies.userData,
+                "isApi": true
+            })
             return
         }
         else if(title === "Cleveland Gallery" || title === "Chicago Gallery" || title === "Giphy Gallery" || title === "Harvard Gallery"){
-            console.log(title, " API Selected") 
+            console.log("API Deck Selected: ", title) 
             apiStatus = true;
         }
         else {
-            // payload = {
-            //     game_code: userData.code,
-            //     deck_uid: id,
-            //     round_number: userData.roundNumber.toString(),
-            // };
-         
+            console.log("Database Deck Selected: ", title)
         }
 
+        // POST /selectDeck selects deck for current game in database
         let payload =  {
             game_code: userData.code,
             deck_uid: id,
             round_number: userData.roundNumber.toString(),
         }
-
         await axios.post(selectDeckURL, payload).then(res => console.log("Select Deck", res))
 
         setUserData({
@@ -114,11 +58,12 @@ export default function DeckCard({googlePhotos, cleveland, chicago, giphy, harva
             deckTitle: title,
             isApi: apiStatus
         })
-
-        putCookies(
-            ["deckSelected", "deckTitle", "isApi"],
-            {"deckSelected": id, "deckTitle": title, "isApi": apiStatus}
-        )
+        setCookie("userData", {
+            ...cookies.userData,
+            "deckSelected": id,
+            "deckTitle": title,
+            "isApi": apiStatus
+        })
     }
   
     return (

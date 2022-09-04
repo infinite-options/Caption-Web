@@ -1,4 +1,4 @@
-import React, {useContext, useEffect, useState, Component} from 'react'
+import React, {useContext, useEffect, useState} from 'react'
 import { useHistory } from "react-router-dom";
 import axios from "axios";
 import circle from "../Assets/circle.png";
@@ -9,113 +9,83 @@ import {LandingContext} from "../App";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
 import {Link} from "react-router-dom";
+import { CookieHelper } from "../Components/CookieHelper"
 
 
 export default function Waiting({channel, channel2, channel_joining}) {
-
     const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
+    const { getCookies } = CookieHelper()
+    const history = useHistory();
+
     const [names, setNames] = useState([]);
     const [copied, setCopied] = useState(false);
-    const history = useHistory();
-    const [loading, setLoading] = useState(false);
-    let gameCodeText = "Game Code: " + userData.code;
+    const [playersLoaded, setPlayersLoaded] = useState(false);
+
+    // Determine if we should display landing page (true) or loading icon (false)
+    const [displayHtml, setDisplayHtml] = useState(false)
 
 
-    const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
+    // Endpoints used in Waiting
+    const getUniqueImageInRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
     const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
+    const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
+    const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/"
+    const getRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/"
+    const postRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage"
 
 
+    // 3rd Party API Url's
+    const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
+    const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
+    const giphyURL = "https://api.giphy.com/v1/gifs/trending?api_key=Fo9QcAQLMFI8V6pdWWHWl9qmW91ZBjoK&"
+    const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"
+    const searchGooglePhotosURL = 'https://photoslibrary.googleapis.com/v1/mediaItems:search'
 
-    // Load cookies into userData state on first render
+
+    // HOOK: useEffect()
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not    
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-
-                if(cookieLoad[propName] !== userData[propName])
-                    cookieLoad[propName] = localCookies[propName]
-            }
-
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-
-            setUserData(newUserData)
+        // Check if userData is empty (after refresh/new user)
+        if(userData.host === "" || userData.roundNumber === "" || userData.playerUID === "" || userData.code === "" || userData.deckTitle === "" || userData.deckSelected === "" || userData.isApi === "" || userData.googlePhotos === "") {
+            getCookies(["host", "roundNumber", "playerUID", "code", "deckTitle", "deckSelected", "isApi", "googlePhotos", "rounds", "roundDuration"], setDisplayHtml)
         }
-
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "isApi", "googlePhotos"])
+        else
+            setDisplayHtml(true)
     }, [])
 
 
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
 
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State variable not updated, reference instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
-    }
-
-
+    // HOOK: useEffect()
+    // DESCRIPTION: Contains three functions that are responsible for getting players on mount, getting players continually after mount, and listening for start game signal from host
     useEffect(() => {
-        // Get players list on first render
-        async function getPlayers1() {
+        // FUNCTION: subscribe1()
+        // DESCRIPTION: Get list of players in waiting on first render, store in names
+        async function getPlayersInitial() {
             const names_db = [];
 
-            const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
-            await axios.get(getURL + userData.code)
+            await axios.get(getPlayersURL + userData.code)
             .then((res) => {
                 for (var index = 0; index < res.data.players_list.length; index++) {
                     names_db.push(res.data.players_list[index].user_alias);
                 }
                 
                 setNames(names_db);
-                // console.log("before loading")
-                setLoading(true);
-                // console.log("After loading")
+                setPlayersLoaded(true);
             })
             .catch(err => console.error('error = ', err));
         }
 
 
-        // Continually get players list after each player joins
-        async function subscribe1() 
+        // FUNCTION: subscribeNewPlayers()
+        // DESCRIPTION: Continually get players in waiting after each player joins
+        async function subscribeNewPlayers() 
         {
-            
+            // Listen on ably channel for new players
             await channel.subscribe(newPlayer => {
-               
                 async function getPlayers () {
-                    
                     const names_db = [];
                     
-                    const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
-                    await axios.get(getURL + userData.code)
+                    await axios.get(getPlayersURL + userData.code)
                     .then((res) => {
                         for (var index = 0; index < res.data.players_list.length; index++) {
                             names_db.push(res.data.players_list[index].user_alias);
@@ -144,9 +114,10 @@ export default function Waiting({channel, channel2, channel_joining}) {
         }
 
 
-        // Guest start game flow upon receiving start game flag in ably
-        async function subscribe2() 
-        {
+        // FUNCTION: subscribeStartGame()
+        // DESCRIPTION: Listens for start game signal from host. 
+        // Upon receiving signal, loads first round's image URL and transitions to page.
+        async function subscribeStartGame() {
             await channel2.subscribe(newGame => {
                 console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
@@ -156,20 +127,27 @@ export default function Waiting({channel, channel2, channel_joining}) {
                         ...userData,
                         deckTitle: newGame.data.deckTitle
                     })
-                    putCookies(["deckTitle"], {"deckTitle": newGame.data.deckTitle})
-            
-
+                    setCookie("userData", {
+                        ...cookies.userData,
+                        "deckTitle": newGame.data.deckTitle
+                    })
+                
+                    // Host did not send image URL over ably => get url from database and transition to page
                     if(newGame.data.currentImage.length === 0) {
                         const getImage = async () => {
-                            const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+
                             await axios.get(getImageURL + userData.code + "," + userData.roundNumber)
                             .then((res) => {
-                                console.log("GET Get Image For Players", res);
+                                console.log("GET Get Image For Players", res)
+
                                 setUserData({
                                     ...userData,
                                     imageURL: res.data.image_url
                                 })
-                                putCookies(["imageURL"], {"imageURL": res.data.image_url})
+                                setCookie("userData",{
+                                    ...cookies.userData,
+                                    "imageURL": res.data.image_url
+                                })
                             })
 
                             history.push('/page');
@@ -177,11 +155,16 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                         getImage();
                     } else {
+                        // Host sent image URL over ably. Save it and transition to page
                         setUserData({
                             ...userData,
                             imageURL: newGame.data.currentImage
                         })
-                        putCookies(["imageURL"], {"imageURL": newGame.data.currentImage})
+                        setCookie("userData", {
+                            ...cookies.userData,
+                            "imageURL": newGame.data.currentImage
+                        })
+
                         history.push('/page')
                     }
                     
@@ -189,11 +172,11 @@ export default function Waiting({channel, channel2, channel_joining}) {
             })
         }
         
-
+        
         if (userData.code) {
-            subscribe1();
-            subscribe2();
-            getPlayers1()
+            subscribeNewPlayers();
+            subscribeStartGame();
+            getPlayersInitial()
         }
 
         
@@ -205,7 +188,8 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
 
 
-    
+    // FUNCTION: startPlaying()
+     // DESCRIPTION: Called when clicking "Start Game", splits transition to next page flow for database decks and api decks
     async function startPlaying() {     
         if(!userData.isApi)
             getDatabaseImage()
@@ -214,7 +198,10 @@ export default function Waiting({channel, channel2, channel_joining}) {
     }
 
 
+    // FUNCTION: getApiImage()
+    // DESCRIPTION: Assign deck in database, then load next round's image url and signal to start game
     const getApiImage = async () => {
+        // POST /assignDeck to assign deckUID to current game in database
         let payload = {
             deck_uid: userData.deckSelected,
             game_code: userData.code
@@ -223,26 +210,35 @@ export default function Waiting({channel, channel2, channel_joining}) {
             console.log(res)
         })
 
-
+        // Load next round's image URL
         let uniqueImage = await apiCall()
 
         setUserData({
+            ...userData,
             imageURL: uniqueImage,
         })
-        putCookies(
-            ["imageURL"], 
-            {"imageURL": uniqueImage}
-        )
-        
+        setCookie("userData", {
+            ...cookies.userData,
+            "imageURL": uniqueImage
+        })
+
+        // Publish start game signal and imageURL to ably for guest players to use
         pub(uniqueImage)
     }
 
 
+    // FUNCTION: apiCall()
+    // DESCRIPTION: Gets a list of previously used images, then list of images from API. Selects/returns a unique url not in previously used images.
     const apiCall = async () => {
         let usedUrlArr = []
+        let uniqueUrl = ""
 
-        // Get previously used images
-        await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/" + userData.code + ",0").then(res => {
+        // Display loading screen while api's are called
+        setDisplayHtml(false)
+
+
+        // GET /getRoundImage gets previously used images
+        await axios.get(getRoundImageURL + userData.code + ",0").then(res => {
             const result = res.data.result
             console.log("getRoundImage Result", result)
             for(let i = 0; i < result.length; i++) {
@@ -251,15 +247,9 @@ export default function Waiting({channel, channel2, channel_joining}) {
             console.log("usedUrlSet", usedUrlArr)
         })
 
-        const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
-        const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
-        const giphyURL = "https://api.giphy.com/v1/gifs/trending?api_key=Fo9QcAQLMFI8V6pdWWHWl9qmW91ZBjoK&"
-        const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"
-
-        let uniqueUrl = ""
-
+        // Get set of photos from URLs, then select a unique image that hasn't been used
         if(userData.deckSelected === "500-000005"){
-            // Google 
+            // Google Photos API Call
             const body = {
                 "pageSize": "50",
                 "albumId":  userData.googlePhotos.albumId
@@ -269,7 +259,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 Authorization: 'Bearer ' + userData.googlePhotos.accessToken ,
             }
     
-            await axios.post('https://photoslibrary.googleapis.com/v1/mediaItems:search', body, {headers: headers})
+            await axios.post(searchGooglePhotosURL, body, {headers: headers})
             .then(res => {
                 // Collect image urls in array
                 let imageUrls = res.data.mediaItems.map(picture => {
@@ -291,7 +281,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             })
 
         } else if (userData.deckSelected === "500-000006") {
-            // Cleveland
+            // Cleveland API Call
             await axios.get(clevelandURL, {limit : "20"}).then( res => {
                 console.log("Cleveland res", res)
 
@@ -307,7 +297,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 }
             })
         } else if (userData.deckSelected === "500-000007") {
-            // Chicago
+            // Chicago API Call
             await axios.get(chicagoURL, {limit : "20"}).then( res => {
                 console.log("Chicago Res", res)
                 while(true) {
@@ -326,7 +316,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 }
             })
         } else if (userData.deckSelected === "500-000008") {
-            // Giphy
+            // Giphy API Call
             await axios.get(giphyURL, {limit : "20"}).then( res => {
                 while(true) {
                     let randomIndex = (Math.random() * 20).toFixed(0)
@@ -340,7 +330,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 }
             })
         } else if (userData.deckSelected === "500-000009") {
-            // Harvard
+            // Harvard API Call
             await axios.get(harvardURL, {limit : "20"}).then( res => {
                 while(true) {
                     let randomIndex = (Math.random() * 10).toFixed(0)
@@ -355,20 +345,28 @@ export default function Waiting({channel, channel2, channel_joining}) {
             })
         }
 
+
+        // POST /postRoundImage posts the current url to used url list in database
         let payload = {
             "game_code": userData.code,
             "round_number": userData.roundNumber.toString(),
             "image": uniqueUrl
         }
-        await axios.post("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage", payload).then(res => {
+        await axios.post(postRoundImageURL, payload).then(res => {
             console.log("postRoundImage", res)
         })
+
+        // Remove loading icon
+        setDisplayHtml(true)
 
         return uniqueUrl
     }
 
 
+    // FUNCTION: getDatabaseImage()
+    // DESCRIPTION: Gets unique image url for next round from database
     const getDatabaseImage = async () => {
+        // POST /assignDeck to assign deckUID to current game in database
         let payload = {
             deck_uid: userData.deckSelected,
             game_code: userData.code,
@@ -377,26 +375,27 @@ export default function Waiting({channel, channel2, channel_joining}) {
             console.log(res)
         })
 
-        await axios.get(getUniqueImageInRound + userData.code + "," + userData.roundNumber).then((res) => {
+        // GET /getUniqueImageInRound to get a unique image url for next round
+        await axios.get(getUniqueImageInRoundURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('GET Get Unique Image In Round', res);
 
             setUserData({
                 ...userData,
                 imageURL: res.data.image_url
             })
-            putCookies(
-                ["imageURL"], 
-                {"imageURL": res.data.image_url}
-            )
+            setCookie("userData", {
+                ...cookies.userData,
+                "imageURL": res.data.image_url
+            })
 
-            setLoading(true)
+            // Publish start game signal to ably
             pub();
         })
     }
 
 
-    // Sends start game flag to ably
-    // If using API deck, sends next round's image to ably
+    // FUNCTION: getDatabaseImage()
+    // DESCRIPTION: Sends start game flag to ably. If using API deck, also sends next round's image to ably.
     const pub = (apiURL)=> {
         if(userData.isApi){
             channel2.publish({data: {
@@ -415,8 +414,8 @@ export default function Waiting({channel, channel2, channel_joining}) {
         history.push("/page");
     };
 
-
-    // Reset "copied" text on timer button
+    // HOOK: useEffect()
+    // DESCRIPTION: Reset "copied" text on timer button
     useEffect(() => {
         if (copied) {
             setTimeout(() => {
@@ -428,99 +427,104 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
 
     return (
-        <div
-            style={{
-                maxWidth: "375px",
-                height: "812px",
-            }}
-        >
-
-            <img className="innerImage1" src={circle}/>
-            <img className="innerImage2" src={thing}/>
-
-            <br></br>
-            <br></br>
-            <br></br>
-            <br></br>
-            <br></br>
-            <br></br>
-            <Link to="/gamerules">
-                <i
-                    style={{
-                        position: "absolute",
-                        top: "100px",
-                        paddingBottom:"20px",
-                        left: "30px",
-                        color: "blue",
-                    }}
-                    className="fas fa-info-circle"
-                    children=' Game Rules'
-                />
-            </Link>
-            <h4>Waiting for all players to join</h4>
-            {/* Add spinner */}
-            
-            
-            <ul className="flex-container">
-            {loading ? (
-                names.map((value) => (
-                    <li className="flex-item">
-                        {value !== "" ? <i className="fas fa-circle fa-3x" style={{
-                            height: "200px",
-                            color: "purple"
-                        }}/> : ""}
-                        {value}
-                    </li>
-                ))
-            
-            ): (<ReactBootStrap.Spinner animation="border" role="status"/>)}
-            </ul>
-
-            {/* Game Code */}
-            <Button
-                className="cardStyle"
-                children={gameCodeText}
-                destination="/waiting"
-                conditionalLink={true}
-            />
-            <br></br>
-            
-
-            <Button
-                className="landing"
-                children="Share with other players"
-                copied={copied}
-                onClick = {() => {
-                    setCopied(true);
-                    navigator.clipboard.writeText(userData.code);
+        displayHtml ? 
+            // Waiting page HTML
+            <div
+                style={{
+                    maxWidth: "375px",
+                    height: "812px",
                 }}
-                destination="/waiting"
-                conditionalLink={true}
-            />
-            <br></br>
+            >
 
-            
-            {userData.host && userData.deckSelected === "" ? <Button
-                className="landing"
-                children="Select Deck"
-                destination="/collections"
-                conditionalLink={true}  
-            />
-             : <></>}
+                <img className="innerImage1" src={circle}/>
+                <img className="innerImage2" src={thing}/>
 
-            {userData.host && userData.deckSelected !== "" ? 
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+                <br></br>
+
+                <Link to="/gamerules">
+                    <i
+                        style={{
+                            position: "absolute",
+                            top: "100px",
+                            paddingBottom:"20px",
+                            left: "30px",
+                            color: "blue",
+                        }}
+                        className="fas fa-info-circle"
+                        children=' Game Rules'
+                    />
+                </Link>
+                <h4>Waiting for all players to join</h4>
+                {/* Add spinner */}
+                
+                
+                <ul className="flex-container">
+                {playersLoaded ? (
+                    names.map((value) => (
+                        <li className="flex-item">
+                            {value !== "" ? <i className="fas fa-circle fa-3x" style={{
+                                height: "200px",
+                                color: "purple"
+                            }}/> : ""}
+                            {value}
+                        </li>
+                    ))
+                
+                ): (<ReactBootStrap.Spinner animation="border" role="status"/>)}
+                </ul>
+
+                {/* Game Code */}
+                <Button
+                    className="cardStyle"
+                    children={"Game Code: " + userData.code}
+                    destination="/waiting"
+                    conditionalLink={true}
+                />
+                <br></br>
+                
+
                 <Button
                     className="landing"
-                    children="Start Game"
-                    onClick={() => startPlaying()}
+                    children="Share with other players"
+                    copied={copied}
+                    onClick = {() => {
+                        setCopied(true);
+                        navigator.clipboard.writeText(userData.code);
+                    }}
+                    destination="/waiting"
+                    conditionalLink={true}
+                />
+
+                <br></br>
+
+                
+                {userData.host && userData.deckSelected === "" ? <Button
+                    className="landing"
+                    children="Select Deck"
+                    destination="/collections"
                     conditionalLink={true}  
                 />
-                : <></>
-            }
+                : <></>}
 
-            {}
-            
-
-        </div>
+                {userData.host && userData.deckSelected !== "" ? 
+                    <Button
+                        className="landing"
+                        children="Start Game"
+                        onClick={() => startPlaying()}
+                        conditionalLink={true}  
+                    />
+                    : <></>
+                }
+            </div> : 
+            // Loading icon HTML
+            <div>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
+            </div>
     )
 }

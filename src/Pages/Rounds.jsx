@@ -1,83 +1,40 @@
-import React, {useContext, useEffect, useState, useRef} from 'react'
-import axios from "axios";
+import React, {useContext, useEffect, useState} from 'react'
 import circle from "../Assets/circle.png";
 import thing from "../Assets/idk.png";
 import {Button} from '../Components/Button';
 import "../Styles/Waiting.css";
-import {Row, Col, Card} from "reactstrap";
-import Deck from "../Components/Deck";
 import {LandingContext} from "../App";
 import Form from "../Components/Form";
 import {useHistory} from "react-router-dom";
-import validator from 'validator';
 import {Link} from "react-router-dom";
+import * as ReactBootStrap from 'react-bootstrap';
+import validator from 'validator';
+import {CookieHelper} from "../Components/CookieHelper"
 
-export default function Rounds({ channel }) {
+
+export default function Rounds() {
+    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
+    const { getCookies } = CookieHelper()
     const history = useHistory();
-    const { userData, setUserData, cookies, setCookie} = useContext(LandingContext);
 
-    console.log("Rounds Cookies", cookies)
+    // Determine if we should display landing page (true) or loading icon (false)
+    const [displayHtml, setDisplayHtml] = useState(false)
 
-    // Load cookies into userData state on first render
+
+    // HOOK: useEffect()
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-                cookieLoad[propName] = propValue
-            }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-
-            console.log("newUserData", newUserData)
-            setUserData(newUserData)
+        // Check if userData is empty (after refresh/new user)
+        if(userData.host === "" || userData.playerUID === "") {
+            getCookies(["host", "playerUID"], setDisplayHtml)
         }
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "isApi"])
+        else
+            setDisplayHtml(true)
     }, [])
 
 
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
-    }
-
-
-
-    // Needs integer typecheck
+    // FUNCTION: handleRoundsChange()
+    // DESCRIPTION: Actively sets/checks validity of rounds input
     const handleRoundsChange = (roundsInput) => {
         let num = Number(roundsInput);
          if(validator.isFloat(roundsInput)&&(validator.isInt(roundsInput)===false)){
@@ -95,7 +52,9 @@ export default function Rounds({ channel }) {
          }
     };
 
-    // Needs integer typecheck
+
+    // FUNCTION: handleDurationChange()
+    // DESCRIPTION: Actively sets/checks validity of rounds input
     const handleRoundsDurationChange = (durationInput) => {
         let num = Number(durationInput);
          if(validator.isFloat(durationInput)&&(validator.isInt(durationInput)===false)){
@@ -115,83 +74,93 @@ export default function Rounds({ channel }) {
     };
 
 
+    // FUNCTION: handleSubmit()
+    // DESCRIPTION: On clicking "continue", save cookies and transition to scoretype
     function handleSubmit() {
-        putCookies(["rounds", "roundDuration"])
+        setCookie("userData", {
+            ...cookies.userData,
+            "rounds": userData.rounds,
+            "roundDuration": userData.roundDuration
+        })
+
         history.push("/scoretype")
     }
 
 
     return (
-        <div 
-            style={{
-                maxWidth: "375px",
-                height: "812px",
-                }}
-        >
-
-            <img 
-                className="innerImage1" 
-                src={circle}
-            />
-            <img 
-                className="innerImage2" 
-                src={thing}
-            />
-
-            <div className="spacer"/>
-
-            <Link to="/gamerules">
-                <i
-                    style={{
-                        position: "absolute",
-                        top: "150px",
-                        left: "30px",
-                        paddingBottom:'20px',
-                        color: "blue",
+        displayHtml ?
+            // Rounds page HTML
+            <div 
+                style={{
+                    maxWidth: "375px",
+                    height: "812px",
                     }}
-                    className="fas fa-info-circle"
-                    children=' Game Rules'
+            >
+                <img 
+                    className="innerImage1" 
+                    src={circle}
                 />
-            </Link>
+                <img 
+                    className="innerImage2" 
+                    src={thing}
+                />
 
-            <h4> Enter the number of rounds and time for each round</h4>
+                <div className="spacer"/>
 
-            <br></br>
+                <Link to="/gamerules">
+                    <i
+                        style={{
+                            position: "absolute",
+                            top: "150px",
+                            left: "30px",
+                            paddingBottom:'20px',
+                            color: "blue",
+                        }}
+                        className="fas fa-info-circle"
+                        children=' Game Rules'
+                    />
+                </Link>
 
-            <h4>Number of Rounds</h4>
+                <h4> Enter the number of rounds and time for each round</h4>
 
-            <Form
-                className="input1 grey"
-                field="10"
-                onHandleChange={handleRoundsChange}
-            />
-            
-            <h5>This means how many images would you like to go through during your game. <br></br> (1 image = 1 round) </h5>
+                <br></br>
 
-            <br></br>
+                <h4>Number of Rounds</h4>
 
-            <h4>Time for each round (seconds)</h4>
+                <Form
+                    className="input1 grey"
+                    field="10"
+                    onHandleChange={handleRoundsChange}
+                />
+                
+                <h5>This means how many images would you like to go through during your game. <br></br> (1 image = 1 round) </h5>
 
-            <Form
-                className="input1 grey"
-                field="30"
-                onHandleChange={handleRoundsDurationChange}
-            />
-            
-            <h5>This defines how many seconds you would like to give everyone to caption an image. <br></br> We
-                recommend 30 seconds!</h5>
+                <br></br>
 
-            <br></br>
+                <h4>Time for each round (seconds)</h4>
 
-            <Button 
-                className="landing" 
-                conditionalLink={true} 
-                // destination="/scoretype"
-                children="Continue"
-                onClick={() => handleSubmit()}
-            />
+                <Form
+                    className="input1 grey"
+                    field="30"
+                    onHandleChange={handleRoundsDurationChange}
+                />
+                
+                <h5>This defines how many seconds you would like to give everyone to caption an image. <br></br> We
+                    recommend 30 seconds!</h5>
 
+                <br></br>
 
-        </div>
+                <Button 
+                    className="landing" 
+                    conditionalLink={true} 
+                    children="Continue"
+                    onClick={() => handleSubmit()}
+                />
+            </div> :
+            // Loading icon HTML
+            <div>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
+            </div>
     )
 }

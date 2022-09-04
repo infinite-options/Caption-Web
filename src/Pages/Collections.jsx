@@ -1,184 +1,106 @@
 import React, {useContext, useEffect, useState,} from "react";
-import {Row, Col, Card} from "reactstrap";
 import Deck from "../Components/Deck";
 import "../Styles/Collections.css";
-import background from "../Assets/landing.png";
-import circle from "../Assets/circle.png";
-import thing from "../Assets/idk.png";
-import {Button} from "../Components/Button";
 import {Link} from "react-router-dom";
 import axios from "axios";
 import {LandingContext} from "../App";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
-
-
+import { CookieHelper } from "../Components/CookieHelper"
 
 function Collections() {
-    const [deckArray, setDeckArray] = useState([]);
-    const { userData, setUserData, cookies, setCookie} = useContext(LandingContext);
+    const { userData } = useContext(LandingContext);
+    const { getCookies } = CookieHelper()
     const [loading, setLoading] = useState(false);
+    const [deckArray, setDeckArray] = useState([]);
 
-    // Load cookies
-    console.log("Collections cookies", cookies)
-    // Load cookies into userData state on first render
+    // Determine if we should display landing page (true) or loading icon (false)
+    const [displayHtml, setDisplayHtml] = useState(false)
+
+    // Endpoints used in Collections
+    const decksURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks";
+
+
+    // HOOK: useEffect()
+    // ARGUMENTS: []
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-                cookieLoad[propName] = propValue
-            }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-            console.log("newUserData", newUserData)
-
-            setUserData(newUserData)
+         // Check if userData is empty (after refresh/new user)
+         if(userData.playerUID === "") {
+            getCookies(["playerUID"], setDisplayHtml)
         }
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "isApi"])
+        else
+            setDisplayHtml(true)
     }, [])
 
 
-
+    // HOOK: useEffect()
+    // ARGUMENTS: [userData.playerUID]
+    // DESCRIPTION: 
     useEffect(() => {
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks";
-        axios.get(getURL + "/" + userData.playerUID + "," + "true").then((res) => {
+        axios.get(decksURL + "/" + userData.playerUID + "," + "true").then((res) => {
             console.log("GET decks", res);
+
             setDeckArray(res.data.decks_info);
             setLoading(true)
-            console.log('deckArray: ', res.data.decks_info);
         })
     }, [userData.playerUID]);
 
-
-
         
     return (
-        <div
-            style={{
+        displayHtml ? 
+            // Collections page HTML
+            <div style={{
                 maxWidth: "375px",
                 height: "812px",
-            }}
-        >
-            {/* <img className="innerImage1" src={circle} /> */}
+            }}>
+                {/* <img className="innerImage1" src={circle} /> */}
+                <br></br>
+                <br></br>
 
-            <br></br>
-            <br></br>
-
-            <Link to="/gamerules">
-                <i
-                    style={{
-                        position: "absolute",
-                        top: "55px",
-                        paddingBottom:"20px",
-                        left: "30px",
-                        color: "blue",
-                    }}
-                    className="fas fa-info-circle"
-                    children=' Game Rule'
-                />
-            </Link>
-            <br></br>
-
-            <br></br>
-            <h4>Select a deck</h4>
-            <br></br>
-            <br></br>
-            <br></br>
-
-            {/* <ul className="flex-container">
-                {deckArray.map((deck) => (
-                    <li className="flex-item">
-                        <Deck
-                            id = {deck.deck_uid}
-                            src={deck.deck_thumbnail_url}
-                            // alt={deck.deck_title}
-                            title={deck.deck_title}
-                            price= "free"
-                        />
-                    </li>
-                ))}
-                    <Deck
-                        src={googlePhotos}
-                        title="Play with Google Photos"
-                        price="free"
-                        googlePhotos={true}
+                <Link to="/gamerules">
+                    <i style={{
+                            position: "absolute",
+                            top: "55px",
+                            paddingBottom:"20px",
+                            left: "30px",
+                            color: "blue",
+                        }}
+                        className="fas fa-info-circle"
+                        children=' Game Rule'
                     />
-                <Deck
-                        title="Cleveland Gallery"
-                        price="free"
-                        cleveland={true}
-                />
-                <Deck
-                        title="Chicago Gallery"
-                        price="free"
-                        chicago={true}
-                />
-                <Deck
-                        title="Giphy Gallery"
-                        price="free"
-                        giphy={true}
-                />
-                <Deck
-                        title="Harvard Gallery"
-                        price="free"
-                        harvard={true}
-                />
-            </ul> */}
-            {loading ? (
-            <ul className="flex-container">
-                
+                </Link>
+
+                <br></br>
+                <br></br>
+
+                <h4>Select a deck</h4>
+
+                <br></br>
+                <br></br>
+                <br></br>
+
+                {loading ?
+                    <ul className="flex-container">
                         {deckArray.map((deck) => (
                             <li className="flex-item">
                                 <Deck
                                     id = {deck.deck_uid}
                                     src={deck.deck_thumbnail_url}
-                                    // alt={deck.deck_title}
                                     title={deck.deck_title}
                                     price= "free"
                                 />
                             </li>
-                        ))
-                        }
-                        {/* <Deck
-                            title="Google Photos"
-                            price="free"
-                            googlePhotos={true}
-                        />
-                        <Deck
-                            title="Cleveland Gallery"
-                            price="free"
-                            cleveland={true}
-                        />
-                        <Deck
-                            title="Chicago Gallery"
-                            price="free"
-                            chicago={true}
-                        />
-                        <Deck
-                            title="Giphy Gallery"
-                            price="free"
-                            giphy={true}
-                        />
-                        <Deck
-                            title="Harvard Gallery"
-                            price="free"
-                            harvard={true}
-                        /> */}
-                
-            </ul>
-            ):(<ReactBootStrap.Spinner animation="border" role="status"/>)}
-            {/* <img className="innerImage2" src={thing} /> */}
-        </div>
+                        ))}
+                    </ul> :
+                    <ReactBootStrap.Spinner animation="border" role="status"/>
+                }
+            </div> :
+             // Loading icon HTML
+             <div>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
+            </div>
     );
 }
 

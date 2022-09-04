@@ -1,14 +1,18 @@
 import { useContext, useState } from "react";
-import { GoogleOAuthProvider, useGoogleLogin } from "@react-oauth/google";
+import { useGoogleLogin } from "@react-oauth/google";
 import axios from "axios";
+import * as ReactBootStrap from 'react-bootstrap';
 import { useEffect } from "react";
 import "../Styles/GooglePhotos.css"
 import { useHistory } from 'react-router-dom';
 import { LandingContext } from "../App";
+import { CookieHelper } from "../Components/CookieHelper"
 
-const GoogleTest = () => {
+
+const GooglePhotos = () => {
     const history = useHistory();
     const { userData, setUserData, cookies, setCookie } = useContext(LandingContext)
+    const { getCookies } = CookieHelper()
 
     const [tokens, setTokens] = useState({})
     const [albums, setAlbums] = useState([])
@@ -16,85 +20,30 @@ const GoogleTest = () => {
     const [selectedAlbum, setSelectedAlbum] = useState("")
     const [albumImages, setAlbumImages] = useState([])
 
+    // Determine if we should display landing page (true) or loading icon (false)
+    const [displayHtml, setDisplayHtml] = useState(false)
+
+    // Endpoints used in GooglePhotos
+    const selectDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
+    const searchGooglePhotosURL = "https://photoslibrary.googleapis.com/v1/mediaItems:search"
+
 
     const clientID = "336598290180-69pe1qeuqku450vnoi8v1ehhi19jhpmt.apps.googleusercontent.com"
     const clientSecret = "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"
-    const currentHost = window.location.origin
-    let imageUrls = []    
 
 
-    // Load cookies into userData state on first render
+    // HOOK: useEffect()
+    // ARGUMENTS: []
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not    
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-                
-                cookieLoad[propName] = propValue
-            }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-            console.log("newUserData", newUserData)
-
-            setUserData(newUserData)
+        // Check if userData is empty (after refresh/new user)
+        if(userData.name === "" || userData.email === "" || userData.zipCode === "" || userData.alias === "") {
+            getCookies(["roundNumber", "rounds", "roundDuration", "code", "deckSelected", "isApi"], setDisplayHtml)
         }
-
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckSelected", "isApi"])
+        else
+            setDisplayHtml(true)
     }, [])
-
-
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        
-        console.log("local cookies end", localCookies)
-
-        //hardcode
-        // setCookie("userData", {
-        //     ...localCookies,
-        //     //photosFromAPI: ["1", "2", "3"]
-        //     photosFromAPI: ['https://lh3.googleusercontent.com/lr/AFz2ejRAKojRd…j29wuf4sK7i9_Gn8-HeIlpw82oQ_bhp6CnLCJky-RxdjQxjiY', 'https://lh3.googleusercontent.com/lr/AFz2ejSNZUUan…Qapb4GptGjsViFI5tjYIV66yZjOZZ5ZsS-mUiCMYGwHUWv-mA', 'https://lh3.googleusercontent.com/lr/AFz2ejSBUlRL3…0FZPrOVj2wJATo5_cboiX2mOZNaZblX7tVCpa9m18Aiz75sgI', 'https://lh3.googleusercontent.com/lr/AFz2ejR2U1p7v…i4TBE58I6EZ3wUunxFvVbC9QO3SvuxwCThP3r8On1Vbyv6duA', 'https://lh3.googleusercontent.com/lr/AFz2ejT4eTnvU…7qaQcGy9tc_vTfb3cUitJhWQoCjEW55ZoDOc2gr3KM9-Pt3Nc', 'https://lh3.googleusercontent.com/lr/AFz2ejRWKqEXP…Pedk1GPufg7bj5iHdSfnV3MV42ZW2G8Xwa87YZJ13wg9L1Hvk', 'https://lh3.googleusercontent.com/lr/AFz2ejTDKoteW…KDgWs5-8-RevMS2xGR8C_o8T8rpP0WRcDxbbdYkr9PxZbW2TA', 'https://lh3.googleusercontent.com/lr/AFz2ejRAu9eMo…81dp7VZVZZFzzrfNhrgoVqN54iqvTg5iwlaxPFif8UHam8U0g']
-        //     //photosFromAPI: userData.photosFromAPI
-        // })
-        // setCookie("userData", localCookies)
-        //console.log("local cookies end", localCookies)
-        //  setCookie("userData", {
-        //     ...localCookies
-        // })
-
-    }
+    
 
     // OAuth Flow
     // https://developers.google.com/identity/oauth2/web/guides/how-user-authz-works
@@ -107,7 +56,7 @@ const GoogleTest = () => {
                 code: response.code,
                 client_id: clientID,
                 client_secret: clientSecret,
-                redirect_uri: currentHost,
+                redirect_uri: window.location.origin,
                 grant_type: "authorization_code"
                 
             })
@@ -130,7 +79,6 @@ const GoogleTest = () => {
         onFailure: response => console.log(response),
         scope: "https://www.googleapis.com/auth/photoslibrary.readonly"
     })
-
 
 
     // Display album choice buttons if signed in
@@ -173,10 +121,10 @@ const GoogleTest = () => {
             Authorization: 'Bearer ' + tokens.access_token ,
         }
 
-        axios.post('https://photoslibrary.googleapis.com/v1/mediaItems:search', body, {headers: headers})
+        axios.post(searchGooglePhotosURL, body, {headers: headers})
         .then(res => {
             //console.log("res.data.mediaItems", res.data.mediaItems)
-            imageUrls = res.data.mediaItems.map(picture => {
+            let imageUrls = res.data.mediaItems.map(picture => {
                 return picture.baseUrl
             })
             setAlbumImages(imageUrls)
@@ -187,8 +135,8 @@ const GoogleTest = () => {
     
     // TO DO: alert user if max images less than round number
     // Select dummy deck in DB and transition to waiting room
-    const submitAlbum = () => {
-        console.log("move back to waiting room")
+    const submitAlbum = async () => {
+        console.log("Transition back to waiting room")
 
         let maxImagesForAlbum = albumImages.length
         if(maxImagesForAlbum < userData.rounds) {
@@ -220,33 +168,24 @@ const GoogleTest = () => {
                 "googlePhotos": userData.googlePhotos
             })
         }
-            
-
-        // putCookies(
-        //     ["deckSelected", "deckTitle"],
-        //     {"deckSelected": "500-000009", "deckTitle": "Google Photos"}
-        // )
 
         const payload = {
             game_code: userData.code,
             deck_uid: "500-000009",
             round_number: userData.roundNumber.toString(),
         };
-
-        console.log('payload for deck = ', payload);
-        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck";
-        axios.post(postURL, payload);
-
-        
-
-        console.log("Cookies before waiting", cookies.userData)
+        await axios.post(selectDeckURL, payload).then( res => {
+            console.log("POST /SelectDeck", res)
+        });
 
         history.push('/waiting')
     }
 
+
     return (
-        <div id="page-sizing">
-            {/* <GoogleOAuthProvider clientId={clientID}> */}
+        displayHtml ? 
+            // Landing page HTML
+            <div id="page-sizing">
                 <br></br>
                 <div>
                     { signedIn 
@@ -254,7 +193,7 @@ const GoogleTest = () => {
                         : <div>
                             <h4>Sign in to play with an album</h4>
                             <button id="buttons" onClick={() => login()}>Log In to Google Photos</button>
-                          </div>
+                            </div>
                     }
                 </div>
                 
@@ -274,10 +213,13 @@ const GoogleTest = () => {
                     ? ""
                     : <button id="buttons" onClick={submitAlbum}>Play with {selectedAlbum}</button>
                 }
-
-            {/* </GoogleOAuthProvider> */}
-        </div>
+            </div> :
+            // Loading icon HTML
+            <div>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
+            </div>
     )
 }
 
-export default GoogleTest
+export default GooglePhotos

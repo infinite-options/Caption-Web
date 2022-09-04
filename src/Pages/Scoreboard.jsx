@@ -1,83 +1,39 @@
 import React, {useEffect, useState, useContext} from "react";
 import {useHistory} from 'react-router-dom';
-import Pic from "../Assets/sd.jpg";
-import {Row, Col, Card} from "reactstrap";
 import "../Styles/Scoreboard.css";
 import Report from "../Components/Report";
 import {Button} from "../Components/Button";
 import background from "../Assets/temp2.png";
 import axios from "axios";
-import Deck from "../Components/Deck";
+import * as ReactBootStrap from 'react-bootstrap';
 import {LandingContext} from "../App";
+import {CookieHelper} from "../Components/CookieHelper"
+
 
 function Scoreboard({ channel, channel_waiting, channel_joining}) {
     const history = useHistory();
     const { cookies, setCookie, userData, setUserData } = useContext(LandingContext);
+    const {getCookies} = CookieHelper()
 
-    
-     // Load cookies into userData state on first render
+    // Determine if we should display Scoreboard page or loading icon
+    // True = display html, False = display loading screen
+    const [displayHtml, setDisplayHtml] = useState(false)
+
+
+    // HOOK: useEffect()
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-
-                if(cookieLoad[propName] !== propValue)
-                    cookieLoad[propName] = propValue
-                //cookieLoad[propName] = localCookies[propName]
-                
+        // Check if userData is empty (on refresh/new user)
+            if(userData.code === "" || userData.roundNumber === "" || userData.imageUrl === "" || userData.scoreboardInfo === [] || userData.playerUID === "") {
+                getCookies(["host", "roundNumber", "playerUID", "rounds", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"], setDisplayHtml)
             }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-            console.log("newUserData", newUserData)
-
-            setUserData(newUserData)
-        }
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"])
+            else
+                setDisplayHtml(true)
     }, [])
 
 
-
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
-    }
-
-
+    // FUNCTION: pub()
+    // DESCRIPTION: 
     const pub = (apiURL) => {
         console.log("roundNumber", userData.roundNumber)
         if(userData.isApi){
@@ -94,20 +50,22 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             }});
     }
 
-    // Runs on first render or when userData.scoreboard changes
+
+    // HOOK: useEffect()
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
-        // if(!userData.host) {
         if(userData.code !== "" &&  !userData.host) {
             setUserData({
                 ...userData,
                 roundNumber: userData.roundNumber + 1,
             })
+            setCookie("userData", {
+                ...cookies.userData,
+                "roundNumber": userData.roundNumber + 1,
+            })
 
-            putCookies(
-                ["roundNumber"],
-                {"roundNumber": userData.roundNumber + 1}
-            )
-
+            // FUNCTION: subscribe()
+            // DESCRIPTION: 
             async function subscribe() 
             {
                 console.log('subscribing')
@@ -128,11 +86,11 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                                         ...userData,
                                         imageURL: res.data.image_url
                                     })
+                                    setCookie("userData", {
+                                        ...cookies.userData,
+                                        "imageURL": res.data.image_url
+                                    })
 
-                                    putCookies(
-                                        ["imageURL"],
-                                        {"imageURL": res.data.image_url}
-                                    )
                                 })
 
                                 history.push('/page');
@@ -144,11 +102,10 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                                 ...userData,
                                 imageURL: roundStarted.data.currentImage
                             })
-
-                            putCookies(
-                                ["imageURL"],
-                                {"imageURL": roundStarted.data.currentImage}
-                            )
+                            setCookie("userData", {
+                                ...cookies.userData,
+                                "imageURL": roundStarted.data.currentImage
+                            })
 
                             history.push('page/')
                         }
@@ -164,7 +121,8 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             };
         }
 
-
+        // FUNCTION: subscribe1()
+        // DESCRIPTION: 
         async function subscribe1() 
         {
             await channel_waiting.subscribe(newPlayer => {
@@ -189,7 +147,8 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     }, [userData.scoreboardInfo]);
 
 
-
+    // FUNCTION: renderReports()
+    // DESCRIPTION: 
     function renderReports() {
         let winning_score = Number.NEGATIVE_INFINITY;
         for (const playerInfo of userData.scoreboardInfo)
@@ -214,7 +173,8 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         );
     }
 
-
+    // FUNCTION: startNextRound()
+    // DESCRIPTION: 
     function startNextRound() {
         if (!userData.host)
             return;
@@ -231,40 +191,40 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             await axios.post(postURL, payload);
 
             const nextRound = parseInt(userData.roundNumber) + 1;
+            let nextUrl = ""
             
             if(!userData.isApi) {
                 const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
                 
-                console.log('test1: unique URL = ', getUniqueImageInRound + userData.code + "," + nextRound);
-
                 await axios.get(getUniqueImageInRound + userData.code + "," + nextRound).then((res) => {
                     console.log('GET Get Unique Image In Round', res);
-                    setUserData({
-                        ...userData,
-                        imageURL: res.data.image_url
-                    })
-
-                    putCookies(
-                        ["imageURL"],
-                        {"imageURL": res.data.image_url}
-                    )
+                    // setUserData({
+                    //     ...userData,
+                    //     imageURL: res.data.image_url
+                    // })
+                    // setCookie("userData", {
+                    //     ...cookies.userData,
+                    //     "imageURL": res.data.image_url
+                    // })
+                    nextUrl = res.data.image_url
 
                     pub();
                 })
             } else {
-                await getApiImage(nextRound)
+                nextUrl = await apiCall(nextRound)
             }
 
-            setUserData({
+            console.log("next url", nextUrl)
+            await setUserData({
                 ...userData,
+                imageURL: nextUrl,
                 roundNumber: nextRound,
             })
-
-            putCookies(
-                ["roundNumber"],
-                {"roundNumber": nextRound}
-            )
-            
+            await setCookie("userData", {
+                ...cookies.userData,
+                "imageURL": nextUrl,
+                "roundNumber": nextRound,
+            })
 
             history.push("/page");
         }
@@ -272,23 +232,19 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         nextPub();
     }
 
+    // FUNCTION: getApiImage()
+    // DESCRIPTION: 
+    // const getApiImage = async (nextRound) => {
+    //     let uniqueImage = await apiCall(nextRound)
 
-    const getApiImage = async (nextRound) => {
-        let uniqueImage = await apiCall(nextRound)
-
-        await setUserData({
-            ...userData, 
-            imageURL: uniqueImage,
-        })
-        await putCookies(
-            ["imageURL"], 
-            {"imageURL": uniqueImage}
-        )
         
-        pub(uniqueImage)
-    }
+    //     pub(uniqueImage)
+    //     return uniqueImage
+    // }
 
 
+    // FUNCTION: apiCall()
+    // DESCRIPTION: 
     const apiCall = async (nextRound) => {
         let usedUrlArr = []
 
@@ -368,10 +324,10 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                     console.log("RandomIndex", randomIndex)
                     console.log("ChicagoImage", chicagoImage)
 
-                    let currentUrl = res.data.config.iiif_url + "/" + chicagoImage.image_id + "/full/843,/0/default.jpg"
-                    if(chicagoImage !== undefined && chicagoImage.image_id !== undefined && 
-                        chicagoImage !== null && chicagoImage.image_id !== null 
-                        && !usedUrlArr.includes(currentUrl)){
+                    let currentUrl = ""
+                    if(chicagoImage !== undefined && chicagoImage.image_id !== undefined && chicagoImage !== null && chicagoImage.image_id !== null )
+                        currentUrl = res.data.config.iiif_url + "/" + chicagoImage.image_id + "/full/843,/0/default.jpg"
+                    if(currentUrl !== "" && !usedUrlArr.includes(currentUrl)){
                         uniqueUrl = currentUrl
                         console.log("unique url found", uniqueUrl)
                         break
@@ -422,55 +378,65 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             console.log("postRoundImage", res)
         })
 
+        console.log("URL in apiCall: ", uniqueUrl)
+        pub(uniqueUrl)
+
         return uniqueUrl
     }
 
 
 
     return (
-        <div
-            style={{
-                maxWidth: "370px",
-                height: "100%",
-                //As long as I import the image from my package strcuture, I can use them like so
-                backgroundImage: `url(${background})`,
-                // backgroundImage:
-                //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
-            }}
-        >
-            <br></br>
-            <h1>{userData.deckTitle}</h1>
-            <br></br>
-            <h3> Scoreboard</h3>
+        displayHtml ?
+            // Scoreboard page HTML
+            <div
+                style={{
+                    maxWidth: "370px",
+                    height: "100%",
+                    //As long as I import the image from my package strcuture, I can use them like so
+                    backgroundImage: `url(${background})`,
+                    // backgroundImage:
+                    //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
+                }}
+            >
+                <br></br>
+                <h1>{userData.deckTitle}</h1>
+                <br></br>
+                <h3> Scoreboard</h3>
 
 
-            <img className="centerPic" style={{
-                height: "255px",
-                width: "255px",
-            }}
-                 src={userData.imageURL}/>
-            <br/>
+                <img className="centerPic" style={{
+                    height: "255px",
+                    width: "255px",
+                }}
+                    src={userData.imageURL}/>
+                <br/>
 
 
-            {userData.scoreboardInfo !== undefined ? 
-                renderReports() :
-                ""
-            }
+                {userData.scoreboardInfo !== undefined ? 
+                    renderReports() :
+                    ""
+                }
 
-            <br></br>
+                <br></br>
 
-            { userData.host !== undefined && userData.host ?
-                <Button
-                    className="fat"
-                    // destination="/page"
-                    onClick={startNextRound}
-                    children="Next Round"
-                    conditionalLink={true}
-                /> : <></>
-            }
+                { userData.host !== undefined && userData.host ?
+                    <Button
+                        className="fat"
+                        // destination="/page"
+                        onClick={startNextRound}
+                        children="Next Round"
+                        conditionalLink={true}
+                    /> : <></>
+                }
 
-            <br/>
-        </div>
+                <br/>
+            </div> :
+            // Loading Icon HTML Code
+            <div>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
+            </div>
     );
 }
 

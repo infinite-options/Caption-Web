@@ -15,7 +15,7 @@ import Rounds from "./Pages/Rounds";
 import Endgame from "./Pages/Endgame";
 import ScoreType from "./Pages/ScoreType";
 import UploadPage from "./Pages/UploadPage";
-import GoogleTest from "./Pages/GoogleTest";
+import GooglePhotos from "./Pages/GooglePhotos";
 import {LandingContext} from "./App";
 import Ably from 'ably/promises';
 import Confirmation from "./Pages/Confirmation";
@@ -28,7 +28,7 @@ const client = new Ably.Realtime('KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF');
 
 export default function Nav() {
 
-    const {code, setCode, setName, setEmail, setZipCode, setAlias, setGameUID, setRounds, roundDuration, setRoundDuration, setHost, setRoundNumber, setPlayerUID, setImageURL, rounds, roundNumber, tokens, setTokens, photosFromAPI, setPhotosFromAPI, deckSelected, setDeckSelected, loading, setLoading, deckTitle, setDeckTitle, userData, setUserData, cookies, setCookie} = useContext(LandingContext);
+    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
     
     const channel_page = client.channels.get(`Captions/Page/${userData.code}`);
     const channel_waiting = client.channels.get(`Captions/Waiting/${userData.code}`);
@@ -44,8 +44,7 @@ export default function Nav() {
                 <Router>
                     <Switch>
                         <Route exact path='/'>
-                            <Landing setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
-                                    setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} setRoundDuration={setRoundDuration}/>
+                            <Landing client = {client} channel_waiting={channel_waiting}/>
                         </Route>
 
 
@@ -54,50 +53,48 @@ export default function Nav() {
                                     setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds}/> */}
 
                         <Route exact path='/confirmation'>
-                            <Confirmation setCode={setCode} setName={setName} setEmail={setEmail} setZipCode={setZipCode}
-                                    setAlias={setAlias} setGameUID={setGameUID} setHost={setHost} setPlayerUID={setPlayerUID} client = {client} channel= {channel_joining} setRoundNumber= {setRoundNumber} setRounds ={setRounds} loading={loading} setLoading={setLoading}/>
+                            <Confirmation client = {client} />
                         </Route>
 
-
                         <Route exact path='/rounds'>
-                            <Rounds setRounds={setRounds} setRoundDuration={setRoundDuration} photosFromAPI={photosFromAPI} />
+                            <Rounds />
                         </Route>
 
 
                         <Route exact path="/scoretype">
-                            <ScoreType channel = {channel_rounds} photosFromAPI={photosFromAPI}/>
+                            <ScoreType channel = {channel_rounds} />
                         </Route>
 
 
                         <Route exact path='/waiting'>
-                            <Waiting channel = {channel_waiting} channel2 = {channel_rounds} channel_joining= {channel_joining} deckSelected={deckSelected} loaing={loading} setLoading={setLoading}/>
+                            <Waiting channel = {channel_waiting} channel2 = {channel_rounds} channel_joining= {channel_joining} />
                         </Route>
 
 
-                        <Route exact path="/collections" component={Collections} photosFromAPI={photosFromAPI}/>
+                        <Route exact path="/collections" component={Collections} />
                     
 
                         <Route exact path="/googleAuth">
-                            <GoogleTest photosFromAPI={photosFromAPI} setPhotosFromAPI={setPhotosFromAPI} setDeckSelected={setDeckSelected}/>
+                            <GooglePhotos />
                         </Route>
 
 
                         <Route exact path = "/page">
-                            <Page1 setImageURL = {setImageURL} setRounds = {setRounds} channel = {channel_page} channel_waiting = {channel_waiting} channel_joining = {channel_joining} roundDuration={roundDuration}/>
+                            <Page1 channel = {channel_page} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
                         </Route>
 
 
                         <Route exact path="/selection" >
-                            <Selection channel_host = {channel_voted_host} channel_all = {channel_voted_all} channel_waiting = {channel_waiting} channel_joining = {channel_joining} roundDuration={roundDuration}/>
+                            <Selection channel_host = {channel_voted_host} channel_all = {channel_voted_all} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
                         </Route>
 
 
                         <Route exact path='/scoreboard'>
-                            <Scoreboard setRoundNumber = {setRoundNumber} channel = {channel_scoreboard} channel_waiting = {channel_waiting} channel_joining = {channel_joining} photosFromAPI={photosFromAPI}/>
+                            <Scoreboard channel = {channel_scoreboard} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
                         </Route>
 
                         <Route exact path='/endgame'>
-                            <Endgame setRoundNumber = {setRoundNumber} setCode={setCode} setEmail={setEmail} setName={setName} setZipCode={setZipCode} setAlias={setAlias} setGameUID={setGameUID} setRounds={setRounds} setRoundDuration={setRoundDuration} setHost={setHost} setPlayerUID={setPlayerUID} setPhotosFromAPI={setPhotosFromAPI} setDeckSelected={setDeckSelected} setLoading={setLoading}/>
+                            <Endgame />
                         </Route>
 
 

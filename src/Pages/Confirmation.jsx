@@ -6,81 +6,33 @@ import {useHistory} from "react-router-dom";
 import axios from "axios";
 import * as ReactBootStrap from 'react-bootstrap';
 import "bootstrap/dist/css/bootstrap.min.css";
-//import {setTimeout} from "timers/promises";
+import {CookieHelper} from "../Components/CookieHelper"
 
 
 export default function Confirmation({ client }){
-    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
+    const { userData } = useContext(LandingContext);
+    const { getCookies } = CookieHelper()
     const [temp, setTemp] = useState("");
-    const [input, setInput] = useState("");
     const [correct, setCorrect] = useState(true);
-    const  [loading, setLoading] = useState(false)
     const history = useHistory();
 
+    // Determine if we should display landing page (true) or loading icon (false)
+    const [displayHtml, setDisplayHtml] = useState(false)
 
+
+    // Endpoints used in confirmation
     const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
     const checkEmailCodeURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidationCode";
 
-    // Load Cookies
-    console.log("Landing Cookies", cookies)
 
-    // Load cookies into userData state on first render
+    // HOOK: useEffect()
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-                cookieLoad[propName] = propValue
-            }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-            console.log("newUserData", newUserData)
-
-            setUserData(newUserData)
+        // Check if userData is empty (after refresh/new user)
+        if(userData.host === ""  || userData.email === ""  || userData.alias === "" || userData.playerUID === "") {
+            getCookies(["host", "email", "alias", "playerUID"], setDisplayHtml)
         }
-
-
-        getCookies(["host", "roundNumber", "name", "email", "zipCode", "alias", "playerUID"])
     }, [])
-
-
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
-    }
 
     
     async function afterIncorrectCode() {
@@ -88,30 +40,25 @@ export default function Confirmation({ client }){
         setTimeout(() => {  setCorrect(true) }, 1500);
     }
     
-
-    // Validates email against database
-    async function emailValidation() {
-        setInput(temp);
-        
-        // Check email validation code
+    // FUNCITON: emailValidation()
+    // DESCRIPTION: Validates email against database
+    async function emailValidation() {        
+        // POST /checkEmailCode to check email validation code with database
         const payload = {
                 user_uid: userData.playerUID,
                 code: temp
         };
-        
         await axios.post(checkEmailCodeURL, payload).then((res) => {
             console.log("POST Check Email Validation Code", res);
 
-            // If email code valid, host transtitions to rounds, guest joins game and transitions to waiting
+            // If email code valid, host transitions to rounds, guest joins game and transitions to waiting
             if (res.data.email_validated_status==="TRUE") {
                 if(userData.host) {
                     history.push("/rounds")
-                   
-                    
                 } else {
                     console.log('gameCode', userData.code)
 
-                    //  POST joinGame to join created game using host's ID, then transition to waiting room
+                    // POST /joinGame to join created game using guest's player ID, then transition to waiting room
                     let payload = {
                         game_code: userData.code,
                         user_uid: userData.playerUID
@@ -119,10 +66,10 @@ export default function Confirmation({ client }){
 
                     axios.post(joinGameURL, payload).then((res) => {
                         console.log("POST joinGame", res)
-                        setLoading(true)
+
                         const channel = client.channels.get(`Captions/Waiting/${userData.code}`);
                         channel.publish({data: {newPlayerName: userData.alias}});
-                        setLoading(true)
+
                         history.push("/waiting")
                        
                     })
@@ -130,30 +77,33 @@ export default function Confirmation({ client }){
             }
             else {
                 afterIncorrectCode();
-                
             }
         });
     }
 
     return (
-        <div class = "header">
-            <h1>Confirmation Page</h1>
-            <h5>Please enter the code that was sent to {userData.email}</h5>
-            
-            <h3 class="try">{(!correct) ? "Invalid Code. Try Again" : null}</h3>
-            
+        displayHtml ? 
+            // Confirmation page HTML
+            <div class = "header">
+                <h1>Confirmation Page</h1>
+                <h5>Please enter the code that was sent to {userData.email}</h5>
+                
+                <h3 class="try">{(!correct) ? "Invalid Code. Try Again" : null}</h3>
+                
+                <div>
+                    <ReactCodeInput type='text' fields={3}  onChange={(e) => setTemp(e)}/>
+                </div>
+
+                <button
+                    onClick = {() => emailValidation(temp)}
+                >
+                    Submit
+                </button>
+            </div> :
+            // Loading icon HTML
             <div>
-                <ReactCodeInput type='text' fields={3}  onChange={(e) => setTemp(e)}/>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
             </div>
-
-            <button
-                onClick = {() => emailValidation(temp)}
-            >
-                Submit
-            </button>
-            
-            
-
-        </div>
     )
 }

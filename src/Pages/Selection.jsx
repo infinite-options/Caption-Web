@@ -12,10 +12,13 @@ import {LandingContext} from "../App";
 import {CountdownCircleTimer} from "react-countdown-circle-timer";
 import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
+import { CookieHelper } from "../Components/CookieHelper"
+
 
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
     const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
-    
+    const { getCookies } = CookieHelper()
+    const history = useHistory();
 
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
@@ -25,66 +28,19 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [timeLeft, setTimeLeft] = useState(Number.POSITIVE_INFINITY);
     const [loading, setLoading] = useState(false);
 
-    const history = useHistory();
+    // Determine if we should display landing page (true) or loading icon (false)
+    const [displayHtml, setDisplayHtml] = useState(false)
+
 
     // Load cookies into userData state on first render
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-
-                if(cookieLoad[propName] !== propValue)
-                    cookieLoad[propName] = propValue
-            }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-            console.log("newUserData", newUserData)
-
-            setUserData(newUserData)
+        // Check if userData is empty (after refresh/new user)
+        if(userData.host === "" || userData.roundNumber === "" || userData.name === "" || userData.alias === "" || userData.playerUID === "" || userData.rounds === "" || userData.roundDuration === "" || userData.code === "" || userData.deckTitle === "" || userData.imageURL === "" || userData.scoreBoardInfo === "") {
+            getCookies(["host", "roundNumber", "name", "alias", "deckSelected", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "imageURL", "scoreboardInfo", "isApi"], setDisplayHtml)
         }
-
-
-        getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"])
-        // getCookies(["host", "roundNumber", "name", "alias", "email", "zipCode", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "deckSelected", "imageURL"])
+        else
+            setDisplayHtml(true)
     }, [])
-
-
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
-    }
 
     const pub_host = (playerCount) => {
         // console.log('in pub_host');
@@ -229,11 +185,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 ...userData,
                                 scoreboardInfo: res.data.scoreboard
                             })
-                            
-                            putCookies(
-                                ["scoreboardInfo"], 
-                                {"scoreboardInfo": res.data.scoreboard}
-                            )
+                            setCookie("userData", {
+                                ...cookies.userData,
+                                "scoreboardInfo": res.data.scoreboard
+                            })
                         });
 
                         if (userData.rounds <= userData.roundNumber)
@@ -320,8 +275,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     
 
     function renderCaptions() {
-        
-        
         var captions = [];
         
         // console.log('temp.length = ', playersArr.length);
@@ -366,99 +319,108 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         else if (timeLeft === 0 && !localUserVoted) {
             console.log("Time ran out and user didn't vote")
             postVote()
-            //pub_all()
+            pub_all()
         }
             
     }, [timeLeft]);
 
 
-    useEffect(() => {
-        // console.log('timeLeft = ', timeLeft);
-    }, [timeLeft]);
+
+    // useEffect(() => {
+    //     // console.log('timeLeft = ', timeLeft);
+    // }, [timeLeft]);
+
 
 
     return (
-        <div
-            style={{
-                maxWidth: "375px",
-                height: "100%",
-                //As long as I import the image from my package strcuture, I can use them like so
-                backgroundImage: `url(${background})`,
-                // backgroundImage:
-                //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
-            }}
-        >
-            <br></br>
-            <h1>{userData.deckTitle}</h1>
-            <br></br>
-
-            <h4>Pick Your Favorite Caption</h4>
-            <br></br>
-
-            <img style={{
-                objectFit: "cover",
-                height: "325px",
-                width: "325px",
-                borderRadius: "50px",
-            }} src={userData.imageURL}/>
-
-            <br></br>
-            <br></br>
-            {/* {renderCaptions()} */}
-            {loading ? (
-                renderCaptions()
-            ):(
-                <ReactBootStrap.Spinner animation="border" role="status"/>
-            )}
-
-            {/* {loading ? (
-                localUserVoted ?
-                <></>
-                : selectedCaption ?
-                    <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
-                          conditionalLink={true}/>
-                    : <></>
-            ) : (
-                <ReactBootStrap.Spinner animation="border" role="status"/>
-            )} */}
-            {localUserVoted ?
-                <></>
-                : selectedCaption ?
-                    <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
-                          conditionalLink={true}/>
-                    : <></>
-            }
-            
-            
-            <div style = {{
-                display: 'flex', 
-                justifyContent: 'center', 
-                paddingBottom: '20px', 
-                paddingTop: selectedCaption ? '20px' : '0px'}}
+        displayHtml ?
+            // Selection page HTML
+            <div
+                style={{
+                    maxWidth: "375px",
+                    height: "100%",
+                    //As long as I import the image from my package strcuture, I can use them like so
+                    backgroundImage: `url(${background})`,
+                    // backgroundImage:
+                    //   "url('https://images.unsplash.com/photo-1557683325-3ba8f0df79de?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxleHBsb3JlLWZlZWR8MTZ8fHxlbnwwfHx8fA%3D%3D&w=1000&q=80')",
+                }}
             >
-                <div style={{
-                        background: "yellow",
-                        borderRadius: "30px",
-                        width: "60px",
-                    }}
+                <br></br>
+                <h1>{userData.deckTitle}</h1>
+                <br></br>
+
+                <h4>Pick Your Favorite Caption</h4>
+                <br></br>
+
+                <img style={{
+                    objectFit: "cover",
+                    height: "325px",
+                    width: "325px",
+                    borderRadius: "50px",
+                }} src={userData.imageURL}/>
+
+                <br></br>
+                <br></br>
+                {/* {renderCaptions()} */}
+                {loading ? (
+                    renderCaptions()
+                ):(
+                    <ReactBootStrap.Spinner animation="border" role="status"/>
+                )}
+
+                {/* {loading ? (
+                    localUserVoted ?
+                    <></>
+                    : selectedCaption ?
+                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
+                            conditionalLink={true}/>
+                        : <></>
+                ) : (
+                    <ReactBootStrap.Spinner animation="border" role="status"/>
+                )} */}
+                {localUserVoted ?
+                    <></>
+                    : selectedCaption ?
+                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
+                            conditionalLink={true}/>
+                        : <></>
+                }
+                
+                
+                <div style = {{
+                    display: 'flex', 
+                    justifyContent: 'center', 
+                    paddingBottom: '20px', 
+                    paddingTop: selectedCaption ? '20px' : '0px'}}
                 >
-                    {userData.roundDuration !== ""  ? <CountdownCircleTimer
-                            background="red"
-                            size={60}
-                            strokeWidth={5}
-                            isPlaying
-                            duration={userData.roundDuration}
-                            colors="#000000"
-                            
-                        >
-                            {({remainingTime}) => {
-                                    return (<div className="countdownText">{remainingTime}</div>)
+                    <div style={{
+                            background: "yellow",
+                            borderRadius: "30px",
+                            width: "60px",
+                        }}
+                    >
+                        {userData.roundDuration !== ""  ? <CountdownCircleTimer
+                                background="red"
+                                size={60}
+                                strokeWidth={5}
+                                isPlaying
+                                duration={userData.roundDuration}
+                                colors="#000000"
+                                
+                            >
+                                {({remainingTime}) => {
+                                        return (<div className="countdownText">{remainingTime}</div>)
+                                    }
                                 }
-                            }
-                        </CountdownCircleTimer> : <></>
-                    }
+                            </CountdownCircleTimer> : <></>
+                        }
+                    </div>
                 </div>
+            </div> :
+            // Loading icon HTML
+            <div>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
             </div>
-        </div>
     );
 };

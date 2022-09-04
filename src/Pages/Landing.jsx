@@ -1,200 +1,99 @@
 import React, {useContext, useEffect, useState, useRef} from "react";
 import axios from "axios";
-import {useHistory} from "react-router-dom";
-import "../Styles/Landing.css";
-import Form from "../Components/Form";
-import {Button} from "../Components/Button.jsx";
-import background from "../Assets/landing.png";
-import {LandingContext} from "../App";
+import { useHistory, Link } from "react-router-dom";
 import * as ReactBootStrap from 'react-bootstrap';
+import "../Styles/Landing.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import {Link} from "react-router-dom";
+import background from "../Assets/landing.png";
+import Form from "../Components/Form";
+import { Button } from "../Components/Button.jsx";
+import { LandingContext } from "../App";
+import { CookieHelper } from "../Components/CookieHelper"
 
-export default function Landing({client}) {
-    // const {code, name, alias, email, zipCode, host, roundNumber, confirmationCode, playerUID, setDeckSelected, setImageURL, cookies, setCookie, removeCookie} = useContext(LandingContext);
-
-    const {userData, setUserData, cookies, setCookie} = useContext(LandingContext);
-
-    const [loading, setLoading] = useState(false)
-
+export default function Landing({client, channel_waiting}) {
+    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
+    const { initializeCookies, getCookies } = CookieHelper()
     const history = useHistory();
 
+    // Determine if we should display landing page (true) or loading icon (false)
+    const [displayHtml, setDisplayHtml] = useState(false)
+
+    // Endpoints used in Landing
     const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
     const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
     const checkGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame"
 
 
-    // Load cookies into userData state on first render
+    // HOOK: useEffect()
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
-        const getCookies = (propsToLoad) => {
-            if(cookies.userData === undefined)
-                return
-
-            let localCookies = cookies.userData
-            let cookieLoad = {}
-
-            for(let i = 0; i < propsToLoad.length; i++) {
-                let propName = propsToLoad[i]
-                let propValue = localCookies[propName]
-                cookieLoad[propName] = propValue
-            }
-
-            console.log("cookieLoad", cookieLoad)
-
-            let newUserData = {
-                ...userData,
-                ...cookieLoad
-            }
-            console.log("newUserData", newUserData)
-
-            setUserData(newUserData)
+        // If userData cookie does not exist, intialize and return
+        if(cookies.userData === undefined) {
+            console.log("USERDATA COOKIE UNDEFINED")
+            setCookie("userData", {
+                "name": "",
+                "alias": "",
+                "zipCode": "",
+                "email": ""
+            })
         }
 
+        // Reset/Initialize Cookies
+        initializeCookies()
 
-        getCookies(["name", "email", "zipCode", "alias"])
-        putCookies(
-            [   "code",
-                "gameUID",
-                "rounds",
-                "roundDuration",
-                "host",
-                "playerUID",
-                "roundNumber",
-                "imageURL",
-                "scoreboardInfo",
-                "deckSelected",
-                "deckTitle",
-                "isApi",
-                "googlePhotos" ], 
-            {   code: "",
-                gameUID: "",
-                rounds: "10",
-                roundDuration: "30",
-                host: "",
-                playerUID: "",
-                roundNumber: "",
-                imageURL: "",
-                scoreboardInfo: [],
-                deckSelected: "",
-                deckTitle: "",
-                isApi: false,
-                googlePhotos: {
-                    albumId: "",
-                    accessToken: ""
-                } }
-        )
+        // Check if userData is empty (after refresh/new user)
+        if(userData.name === "" || userData.email === "" || userData.zipCode === "" || userData.alias === "") {
+            getCookies(["name", "email", "zipCode", "alias"], setDisplayHtml)
+            setDisplayHtml(true)
+        }
+        else
+            setDisplayHtml(true)
     }, [])
 
 
-    // Sets cookies for state variables in propsToPut array.
-    // If updating state right before calling putCookies(), call putCookies(["stateName"], {"stateName": "stateValue"}) with a literal
-    // state value to update cookie correctly.
-    const putCookies = (propsToPut, instantUpdate) => {
-        console.log("In put Cookies", propsToPut)
-        let localCookies = {}
-        
-        if(cookies.userData === undefined) {
-            setCookie("userData", {})
-        } else {
-            localCookies = cookies.userData
-        }
-
-        for(let i = 0; i < propsToPut.length; i++) {
-            const propName = propsToPut[i]
-
-            // State has not updated, referecnce instantUpdate
-            if(instantUpdate !== undefined && instantUpdate[propName] !== undefined) {
-                localCookies[propName] = instantUpdate[propName]
-            } 
-            // State already updated, reference userData
-            else {
-                localCookies[propName] = userData[propName]
-            }
-        }
-
-        //console.log("local cookies end", localCookies)
-        setCookie("userData", localCookies)
-    }
-
-    
-    
-    // Input Validation Functions
-    function validateInputToCreateGame() {
-        return userData["alias"] !== ""
-    }
-
-    function validateInputToJoinGame() {
-        return (userData["code"] !== "" && validateInputToCreateGame());
-    }
-
-    function validateEmail(email) {
-        const re = /[\w\d]{1,}@[\w\d]{1,}.[\w\d]{1,}/;
-        // /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        return re.test(String(email).toLowerCase());
-    }
-
-    function validateZipcode(zipCode) {
-        const reZ = /^\d{5}$/ ;
-        return reZ.test(zipCode);
-    }
-
-
-
-
-    // HOST: Start create game flow
+    // FUNCTION: createGame()
+    // DESCRIPTION: On clicking "Create New Game"-- checks for valid data, then posts new host user to backend
     async function createGame() {   
         console.log("Starting createGame()")
-
-        // Validate email and zip code input
-        const valid = validateEmail(userData["email"]);
-        const validZ = validateZipcode(userData["zipCode"]);
-        if (!valid) {
-            alert('Invalid email. Please re-enter.');
-            return;
-        }
-        if(!validZ){
-            alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
-            return;
-        }
-
-         
-        if(validateInputToCreateGame()) {
+ 
+        // Check if input formatted correctly
+        if(checkPlayerInput()) {
+            // Save data in hooks
             setUserData({
                 ...userData, 
                 host: true,
                 roundNumber: 1
             })
-            
 
-            putCookies(
-                ["host", "roundNumber", "name", "alias", "email", "zipCode"], 
-                {"host": true, "roundNumber": 1}
-            )
-            
 
-            // POST addUser to create a new host user
+            // POST /addUser to create a new host user
             let payload = {
                 user_name: userData["name"],
                 user_alias: userData["alias"],
                 user_email: userData["email"],
                 user_zip: userData["zipCode"],
             }
-    
-            axios.post(addUserURL, payload).then((res) => {
-                console.log("POST addUser as host", res)
+            await axios.post(addUserURL, payload).then((res) => {
+                console.log("POST /addUser as host", res)
+
                 let pUID = res.data.user_uid
 
+                // Save data in hooks/cookies
                 setUserData({
                     ...userData, 
                     playerUID: pUID
                 })
+                setCookie("userData", {
+                    ...cookies.userData,
+                    "name": userData.name,
+                    "email": userData.email,
+                    "zipCode": userData.zipCode,
+                    "alias": userData.alias,
+                    "playerUID": pUID,
+                    "host": true,
+                    "roundNumber": 1,
+                })
 
-                // set Cookie for playerUID
-                putCookies(
-                    ["playerUID"],
-                    {"playerUID": pUID}
-                )
-                
 
                 // If email is validated transition to waiting room, else transition to confirmation page
                 if(res.data.user_code === "TRUE") {
@@ -204,230 +103,270 @@ export default function Landing({client}) {
                     history.push('/confirmation')
                 }
             })
-        } else {
-            window.alert("To create a game, fill out the necessary information");
         }
-
     }
 
 
-    // GUEST: Start join game flow
+    // FUNCTION: joinGame()
+    // DESCRIPTION: On clicking "Join Game"-- validates user input and checks if game code exists in database. If so, post new player to backend and add player to game.
     async function joinGame() {
         console.log("Starting joinGame()");
 
-        // Validate email, zip code, and game code input
-        const valid = validateEmail(userData["email"]);
-        if (!valid) {
-            alert('Invalid email. Please re-enter.');
-            return;
-        }
-        const validZ = validateZipcode(userData["zipCode"]);
-        if(!validZ){
-            alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
-            return;
-        }
-        const validGame = await axios.get(checkGameURL + '/' + userData["code"]).then((res) => {
-            console.log("GET checkGame", res)
-
-            if(res.data.warning !== "Invalid game code") 
-                return true
-            return false
-        })
-        if(!validGame) {
-            alert("Game code does not exist. Please enter a valid game code.")
-            return
-        }
-
-
-        if (validateInputToJoinGame()) {
+        // Check if input formatted correctly
+        if (checkGuestInput()) {
+            // Save data in hooks and cookies
             setUserData({
                 ...userData, 
                 host: false,
                 roundNumber: 1
             })
+            setCookie("userData", {
+                ...cookies.userData,
+                "host": true,
+                "roundNumber": 1,
+                "name": userData.name,
+                "email": userData.email,
+                "zipCode": userData.zipCode,
+                "alias": userData.alias
+            })
 
-            // set cookies 
-            putCookies(
-                ["host", "roundNumber", "name", "alias", "email", "zipCode", "code"], 
-                {"host": false, "roundNumber": 1})
 
-            // POST addUser to create a new guest user
+            // POST /addUser to create a new guest user
             let payload = {
                 user_name: userData.name,
                 user_alias: userData.alias,
                 user_email: userData.email,
                 user_zip: userData.zipCode,
             }
-            
             await axios.post(addUserURL, payload).then((res) => {
-                console.log("POST addUser as guest", res);
+                console.log("POST /addUser (guest)", res);
+                
+                // Save to hooks/cookies 
                 let pUID = res.data.user_uid
-
                 setUserData({
                     ...userData, 
                     playerUID: pUID
                 })
-                
+                setCookie("userData", {
+                    ...cookies.userData,
+                    "playerUID": pUID
+                })
 
-
-                putCookies(["playerUID"], {"playerUID": pUID})
-                
-                
-                // set playerUID cookie replace below
-                // setCookie("playerUID", res.data.user_uid)
-
-                setLoading(true)
-
-                // If email is validated join game and transition to waiting room, else transition to confirmation page
                 console.log("user_code", res.data.user_code)
+
+                // If email is validated, join game and transition to waiting room. Else, transition to confirmation page
                 if(res.data.user_code === "TRUE") {
-                    //  POST joinGame to join created game using host's ID, then transition to waiting room
                     console.log("User exists and email validated. Transition to waiting.")
 
+                    // POST /joinGame to join existing game using guest's playerUID, then transition to waiting room
                    let payload = {
                         game_code: userData.code,
                         user_uid: res.data.user_uid
                     }
-
                     axios.post(joinGameURL, payload).then((res) => {
-                        console.log("POST joinGame", res)
+                        console.log("POST /joinGame (guest)", res)
 
-                        // Convert round duration format (min:sec) into seconds
+                        // Convert roundDuration time format (min:sec) into seconds
                         const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
                         const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
                         let duration = duration_mins * 60 + duration_secs;
 
+                        // Save to hooks/cookies
                         setUserData({
                             ...userData, 
                             rounds: res.data.num_rounds,
                             roundDuration: duration
                         })
+                        setCookie("userData", {
+                            ...cookies.userData,
+                            "rounds": res.data.num_round, 
+                            "roundDuration": duration
+                        })
                         
-                        // set cookies for below replace
-                        putCookies(
-                            ["rounds", "roundDuration"], 
-                            {"rounds": res.data.num_round, "roundDuration": duration}
-                        )
+                        console.log("Publishing guest player to waiting/", userData.code)
 
-                        //setCookie("rounds", res.data.num_rounds)
-                        // setCookie("roundDuration", duration)
-                        
-                        console.log("Publishing to waiting/", userData.code)
+                        // Publish new player to ably to notify other players
                         const channel = client.channels.get(`Captions/Waiting/${userData.code}`)
                         channel.publish({data: {newPlayerName: userData.alias}})
 
+                        // channel_waiting.publish({data: {newPlayerName: userData.alias}})
+
                         history.push("/waiting")
-                       
                     })
                 } else {
                     history.push('/confirmation')
                 }
             })
-
-        } else {
-            window.alert("To join a game, fill out the necessary information and the correct gamecode.");
         }
-
     }
-    
-    
-    return (
+
+
+    // FUNCTION: checkPlayerInput()
+    // DESCRIPTION: Check if name, email, zip code, and alias have been inputted correctly
+    const checkPlayerInput = () => {
+        if(!checkNameInput()) {
+            alert('Please enter a name before proceeding.')
+            return false
+        }
+        if(!checkEmailInput()) {
+            alert('Invalid email. Please re-enter.')
+            return false
+        }
+        if(!checkZipInput()){
+            alert("Invalid Zipcode. Please enter a 5 digit zipcode.")
+            return false
+        }
+        if(!checkAliasInput()) {
+            alert('Please enter an alias before proceeding.');
+            return false
+        }
+        return true;
+    }
+
+
+    // FUNCTION: validateGuest():
+    // DESCRIPTION: Validates joining guest's input. Also validates entered game code with database
+    const checkGuestInput = async () => {
+        if(!checkPlayerInput())
+            return false
         
-        <div
-            
-            style={{
+        if(userData.code === "") {
+            alert("Please enter a game code before proceeding.")
+            return false
+        }
+        
+        // Check if game code exists in database
+        await axios.get(checkGameURL + '/' + userData["code"]).then((res) => {
+            console.log("GET checkGame", res)
+
+            if(res.data.warning === "Invalid game code") {
+                alert("Game code does not exist. Please enter a valid game code.")
+                return false
+            }
+        })
+        return true
+    }
+
+
+    // Input Checker Functions
+    function checkNameInput() {
+        return userData.name !== ""
+    }
+    function checkEmailInput() {
+        const re = /[\w\d]{1,}@[\w\d]{1,}.[\w\d]{1,}/;
+        // /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        return re.test(String(userData.email).toLowerCase());
+    }
+    function checkZipInput() {
+        const reZ = /^\d{5}$/ ;
+        return reZ.test(userData.zipCode);
+    }
+    function checkAliasInput() {
+        return userData.alias !== ""
+    }
+
+    
+
+    return (
+        displayHtml ? 
+            // Landing page HTML
+            <div style={{
                 maxWidth: "375px",
                 height: "812px",
                 backgroundImage: `url(${background})`,
-            }}
-        >
+            }}>
 
-            <div className="spacer"/>
-            
-            <Link to="/gamerules">
-                <i
-                    style={{
-                        position: "absolute",
-                        top: "175px",
-                        left:'30px',
-                        paddingBottom:'20px',
-                        color: "blue",
+                <div className="spacer"/>
+                
+                <Link to="/gamerules">
+                    <i
+                        style={{
+                            position: "absolute",
+                            top: "175px",
+                            left:'30px',
+                            paddingBottom:'20px',
+                            color: "blue",
 
-                    }}
-                    children=' Game Rules'
-                    className="fas fa-info-circle"
+                        }}
+                        children=' Game Rules'
+                        className="fas fa-info-circle"
+                    />
+                </Link>
+                <br></br>
+                <Form
+                    className="input1"
+                    field="Your Name"
+                    variable={userData["name"]}
+                    onHandleChange={nameInput => setUserData({
+                        ...userData, 
+                        name: nameInput
+                    })}
+                    type="text"
                 />
-            </Link>
-            <br></br>
-            <Form
-                className="input1"
-                field="Your Name"
-                variable={userData["name"]}
-                onHandleChange={nameInput => setUserData({
-                    ...userData, 
-                    name: nameInput
-                })}
-                type="text"
-            />
-            <br></br>
-            <Form
-                className="input1"
-                field="Email Address"
-                variable={userData["email"]}
-                onHandleChange={emailInput => setUserData({
-                    ...userData, 
-                    email: emailInput
-                })}
-            />
+                <br></br>
+                <Form
+                    className="input1"
+                    field="Email Address"
+                    variable={userData["email"]}
+                    onHandleChange={emailInput => setUserData({
+                        ...userData, 
+                        email: emailInput
+                    })}
+                />
 
-            <br></br>
-            <Form
-                className="input1"
-                field="Zip Code"
-                variable={userData["zipCode"]}
-                onHandleChange={zipCodeInput => setUserData({
-                    ...userData, 
-                    zipCode: zipCodeInput
-                })}
-            />
-            <br></br>
-            <Form
-                className="input1"
-                field="Alias (screen name)"
-                variable={userData["alias"]}
-                onHandleChange={aliasInput => setUserData({
-                    ...userData, 
-                    alias: aliasInput
-                })}
-            />
-            <br></br>
-            <br></br>
+                <br></br>
+                <Form
+                    className="input1"
+                    field="Zip Code"
+                    variable={userData["zipCode"]}
+                    onHandleChange={zipCodeInput => setUserData({
+                        ...userData, 
+                        zipCode: zipCodeInput
+                    })}
+                />
+                <br></br>
+                <Form
+                    className="input1"
+                    field="Alias (screen name)"
+                    variable={userData["alias"]}
+                    onHandleChange={aliasInput => setUserData({
+                        ...userData, 
+                        alias: aliasInput
+                    })}
+                />
+                <br></br>
+                <br></br>
 
-            <Button
-                isSelected={true}
-                onClick={createGame}
-                className="landing"
-                children="Create New Game"
-                conditionalLink={validateInputToCreateGame() && validateEmail(userData["email"]) && validateZipcode(userData["zipCode"])}
-            />
-            <div className="middleText">OR</div>
-            <Form
-                className="input1"
-                field="Enter Game Code"
-                onHandleChange={codeInput => setUserData({
-                    ...userData, 
-                    code: codeInput
-                })}
-            />
-            <br></br>
-            <Button
-                isSelected={true}
-                onClick={joinGame}
-                className="landing"
-                children="Join Game"
-            />
+                <Button
+                    isSelected={true}
+                    onClick={createGame}
+                    className="landing"
+                    children="Create New Game"
+                />
+                <div className="middleText">OR</div>
+                <Form
+                    className="input1"
+                    field="Enter Game Code"
+                    onHandleChange={codeInput => setUserData({
+                        ...userData, 
+                        code: codeInput
+                    })}
+                />
+                <br></br>
+                <Button
+                    isSelected={true}
+                    onClick={joinGame}
+                    className="landing"
+                    children="Join Game"
+                />
 
-        </div>
+            </div> :
+            // Loading icon HTML
+            <div>
+                <h1>Loading game data...</h1>
+                <ReactBootStrap.Spinner animation="border" role="status"/>
+            </div>
+            
     );
 }
 

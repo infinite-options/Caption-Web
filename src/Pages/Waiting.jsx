@@ -136,11 +136,14 @@ export default function Waiting({channel, channel2, channel_joining}) {
                                     imageURL: res.data.image_url,
                                     deckTitle: newGame.data.deckTitle
                                 })
+                                console.log("cookies before setCookies waiting: 139 ", cookies.userData)
                                 setCookie("userData",{
                                     ...cookies.userData,
                                     "imageURL": res.data.image_url,
                                     "deckTitle": newGame.data.deckTitle
                                 })
+                                console.log("Set Cookies in waiting: 139")
+
                             })
 
                             history.push('/page');
@@ -155,11 +158,13 @@ export default function Waiting({channel, channel2, channel_joining}) {
                             deckTitle: newGame.data.deckTitle
 
                         })
+                        console.log("cookies before setCookies waiting: 158 ", cookies.userData)
                         setCookie("userData", {
                             ...cookies.userData,
                             "imageURL": newGame.data.currentImage,
                             "deckTitle": newGame.data.deckTitle
                         })
+                        console.log("Set Cookies in waiting: 158")
 
                         history.push('/page')
                     }
@@ -213,10 +218,13 @@ export default function Waiting({channel, channel2, channel_joining}) {
             ...userData,
             imageURL: uniqueImage,
         })
+        console.log("cookies before setCookies waiting: 219 ", cookies.userData)
         setCookie("userData", {
             ...cookies.userData,
             "imageURL": uniqueImage
         })
+        console.log("Set Cookies in waiting: 219")
+
 
         // Publish start game signal and imageURL to ably for guest players to use
         pub(uniqueImage)
@@ -379,10 +387,13 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 ...userData,
                 imageURL: res.data.image_url
             })
+            console.log("cookies before setCookies waiting: 385 ", cookies.userData)
             setCookie("userData", {
                 ...cookies.userData,
                 "imageURL": res.data.image_url
             })
+            console.log("Set Cookies in waiting: 385")
+
 
             // Publish start game signal to ably
             pub();

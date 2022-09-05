@@ -50,8 +50,8 @@ export const CookieHelper = () => {
 
         // If userData has incorrect cookieName value, load value from cookies
         for(let i = 0; i < hooksNeeded.length; i++) {
-            console.log("userData[hooksNeeded[i]]: ", userData[hooksNeeded[i]])
-            console.log("cookies.userData[hooksNeeded[i]]", cookies.userData[hooksNeeded[i]])
+            console.log("userData", userData[hooksNeeded[i]])
+            console.log("cookies.userData", cookies.userData[hooksNeeded[i]])
 
             if(userData[hooksNeeded[i]] !== cookies.userData[hooksNeeded[i]]){
                 hooksUpdate[hooksNeeded[i]] = cookies.userData[hooksNeeded[i]]

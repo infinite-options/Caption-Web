@@ -11,7 +11,7 @@ import { LandingContext } from "../App";
 import { CookieHelper } from "../Components/CookieHelper"
 
 export default function Landing({client, channel_waiting}) {
-    const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
+    const { userData, setUserData, cookies, setCookie, removeCookie } = useContext(LandingContext);
     const { initializeCookies, getCookies } = CookieHelper()
     const history = useHistory();
 
@@ -27,6 +27,9 @@ export default function Landing({client, channel_waiting}) {
     // HOOK: useEffect()
     // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
+        // just for page
+        removeCookie("userData", {path : "/page"})
+
         // If userData cookie does not exist, intialize and return
         if(cookies.userData === undefined) {
             console.log("USERDATA COOKIE UNDEFINED")

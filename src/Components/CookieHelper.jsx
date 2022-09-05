@@ -53,8 +53,12 @@ export const CookieHelper = () => {
             console.log("userData[hooksNeeded[i]]: ", userData[hooksNeeded[i]])
             console.log("cookies.userData[hooksNeeded[i]]", cookies.userData[hooksNeeded[i]])
 
-            if(userData[hooksNeeded[i]] !== cookies.userData[hooksNeeded[i]]) {}
+            if(userData[hooksNeeded[i]] !== cookies.userData[hooksNeeded[i]]){
                 hooksUpdate[hooksNeeded[i]] = cookies.userData[hooksNeeded[i]]
+                console.log("Updated: ", hooksNeeded[i])
+            }
+                
+            
         }
 
         console.log("hooksUpdate after loop: ", hooksUpdate)

@@ -17,7 +17,7 @@ import { CookieHelper } from "../Components/CookieHelper"
 
 
 export default function Page({ channel, channel_waiting, channel_joining}) {
-    const { userData } = useContext(LandingContext);
+    const { userData, cookies } = useContext(LandingContext);
     const { getCookies } = CookieHelper()
     const history = useHistory();
 
@@ -44,6 +44,7 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     // HOOK: useEffect()
     // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
+        console.log("Page cookies", cookies.userData)
          // Check if userData is empty (after refresh/new user)
          if(userData.host === "" || userData.roundNumber === "" || userData.playerUID === "" || userData.rounds === "" || userData.roundDuration === "" || userData.code === "" || userData.deckTitle === "" || userData.imageURL === "") {
             getCookies(["host", "roundNumber", "playerUID", "deckSelected", "rounds", "roundDuration", "code", "deckTitle", "imageURL", "isApi"], setDisplayHtml)

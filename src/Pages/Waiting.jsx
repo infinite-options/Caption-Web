@@ -142,7 +142,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                                     "imageURL": res.data.image_url,
                                     "deckTitle": newGame.data.deckTitle
                                 })
-                                console.log("Set Cookies in waiting: 139")
+                                console.log("Set Cookies in waiting: 139", cookies.userData)
 
                             })
 
@@ -164,7 +164,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                             "imageURL": newGame.data.currentImage,
                             "deckTitle": newGame.data.deckTitle
                         })
-                        console.log("Set Cookies in waiting: 158")
+                        console.log("Set Cookies in waiting: 158 ", cookies.userData)
 
                         history.push('/page')
                     }
@@ -223,7 +223,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             ...cookies.userData,
             "imageURL": uniqueImage
         })
-        console.log("Set Cookies in waiting: 219")
+        console.log("Set Cookies in waiting: 219", cookies.userData)
 
 
         // Publish start game signal and imageURL to ably for guest players to use
@@ -392,7 +392,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 ...cookies.userData,
                 "imageURL": res.data.image_url
             })
-            console.log("Set Cookies in waiting: 385")
+            console.log("Set Cookies in waiting: 385", cookies.userData)
 
 
             // Publish start game signal to ably

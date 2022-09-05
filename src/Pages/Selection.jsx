@@ -61,6 +61,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // HOOK: useEffect()
     // DESCRIPTION: Gets voting options and subscribes to ably channels
     useEffect(() => {
+
         // FUNCTION: getCaptions()
         // DESCRIPTION: Gets captions for user to vote on. Transitions to next page if only one caption/player
         async function getCaptions() {
@@ -74,7 +75,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                 const temp_players_arr = [];
                 // Push response's submitted captions to temp_players_arr
-                    // gameUID empty right now?
+                    // NOTE: gameUID empty right now?
                 for (let i = 0; i < res.data.players.length; i++){
                     if (res.data.players[i].round_user_uid !== userData.gameUID)
                         temp_players_arr.push(res.data.players[i]);
@@ -120,7 +121,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     } else if(userData.host){
                         pub_playerVote(0);
                     }
-
                 }
 
                 /**
@@ -208,6 +208,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
 
 
+        // Call defined functions from above
+
         getCaptions();
 
         if (userData.host) {
@@ -235,11 +237,11 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
         if(playersArr[index].round_user_uid !== userData.playerUID) {
             toggleArr[index] = true;
-            console.log('playersArr[index] = ', playersArr[index]);
+            //console.log('playersArr[index] = ', playersArr[index]);
             setSelectedCaption(playersArr[index].caption);
         }
 
-        console.log("Result: " + toggleArr);
+        console.log("ChangeToggle() Result: " + toggleArr);
     }
 
 
@@ -260,9 +262,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             console.log("POST voteCaption", res);
         });
         
-        
+
         await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then((res) => {
-            console.log('publishing with res.data.players_count = ', res.data.players_count);
+            // console.log('publishing with res.data.players_count = ', res.data.players_count);
             pub_playerVote(res.data.players_count);
         });
     }
@@ -312,6 +314,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // FUNCTION: pub_playerVote()
     // DESCRIPTION: publishes player's alias that just voted and number of players left that haven't voted
     const pub_playerVote = (playerCount) => {
+        console.log("pub_playerVote(): playersLeft is ", playerCount, ", userWhoVoted is ", userData.alias )
         channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
     };
 
@@ -325,6 +328,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
     // HOOK: useEffect()
     // DESCRIPTION: we've set timerDuration, immediately set timeLeft (used to signal end of round)
+        // Use for refresh timer reset
     useEffect(() => timerDuration === -1 ? '' : setTimeLeft(timerDuration), [timerDuration]);
 
 

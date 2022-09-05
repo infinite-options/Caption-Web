@@ -20,6 +20,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     const [displayHtml, setDisplayHtml] = useState(false)
 
 
+    // Endpoints used in Scoreboard
     const postRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage"
     const getRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/" 
     const createNextRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
@@ -57,7 +58,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             // })
 
             // FUNCTION: subscribe()
-            // DESCRIPTION: 
+            // DESCRIPTION: Listen for roundStarted signal on ably. When round has started, load next round's image url and transition to next page.
             async function subscribe() 
             {
                 await channel.subscribe(roundStarted => {

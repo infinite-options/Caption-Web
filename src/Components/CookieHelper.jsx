@@ -41,11 +41,19 @@ export const CookieHelper = () => {
         console.log("Starting getCookies() in", window.location.href)
         let hooksUpdate = {}
 
+        console.log("hooksUpdate: ", hooksUpdate)
+        console.log("hooksNeeded", hooksNeeded)
+
         // If userData has incorrect cookieName value, load value from cookies
         for(let i = 0; i < hooksNeeded.length; i++) {
-            if(userData[hooksNeeded[i]] !== cookies.userData[hooksNeeded[i]])
+            console.log("userData[hooksNeeded[i]]: ", userData[hooksNeeded[i]])
+            console.log("cookies.userData[hooksNeeded[i]]", cookies.userData[hooksNeeded[i]])
+
+            if(userData[hooksNeeded[i]] !== cookies.userData[hooksNeeded[i]]) {}
                 hooksUpdate[hooksNeeded[i]] = cookies.userData[hooksNeeded[i]]
         }
+
+        console.log("hooksUpdate after loop: ", hooksUpdate)
 
         let hooksUpdateSize = Object.keys(hooksUpdate).length
 
@@ -63,7 +71,6 @@ export const CookieHelper = () => {
             setDisplayHtml(true)
         }
     }
-
     
 
 

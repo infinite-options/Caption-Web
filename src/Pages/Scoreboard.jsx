@@ -20,6 +20,14 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     const [displayHtml, setDisplayHtml] = useState(false)
 
 
+    const postRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage"
+    const getRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/" 
+    const createNextRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
+    const getUniqueImageInRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
+    const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
+
+
+
     // HOOK: useEffect()
     // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
@@ -32,63 +40,48 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     }, [])
 
 
-    // FUNCTION: pub()
-    // DESCRIPTION: 
-    const pub = (apiURL) => {
-        console.log("roundNumber", userData.roundNumber)
-        if(userData.isApi){
-            console.log("Publishing for api")
-            channel.publish({data: {
-                roundStarted: true,
-                currentImage: apiURL,
-            }});
-        }
-        else
-            channel.publish({data: {
-                roundStarted: true,
-                currentImage: "",
-            }});
-    }
-
+    
 
     // HOOK: useEffect()
-    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
+    // DESCRIPTION: If not host, listen on ably for round started signal. Get next round image on receiving signal.
     useEffect(() => {
         if(userData.code !== "" &&  !userData.host) {
-            setUserData({
-                ...userData,
-                roundNumber: userData.roundNumber + 1,
-            })
-            setCookie("userData", {
-                ...cookies.userData,
-                "roundNumber": userData.roundNumber + 1,
-            })
+            // DONT INCREMENT EVERY TIME
+            // setUserData({
+            //     ...userData,
+            //     roundNumber: userData.roundNumber + 1,
+            // })
+            // setCookie("userData", {
+            //     ...cookies.userData,
+            //     "roundNumber": userData.roundNumber + 1,
+            // })
 
             // FUNCTION: subscribe()
             // DESCRIPTION: 
             async function subscribe() 
             {
-                console.log('subscribing')
                 await channel.subscribe(roundStarted => {
+
                     if (roundStarted.data.roundStarted) {
-                        console.log(roundStarted)
+                        // Database Deck
                         if(roundStarted.data.currentImage === "") {
                             const getImage = async () => {
-                                const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
                                 const nextRound = userData.roundNumber + 1;
-                                console.log('[code, nextRound] = ', [userData.code, nextRound]);
-                                console.log('fullURL scoreboard = ', getImageURL + userData.code + "," + nextRound);
 
+                                // Get next round's image from database
                                 await axios.get(getImageURL + userData.code + "," + nextRound).then((res) => {
                                     console.log("GET Get Image For Players",res);
 
+                                    // Save data to hooks and cookies
                                     setUserData({
                                         ...userData,
-                                        imageURL: res.data.image_url
+                                        imageURL: res.data.image_url,
+                                        roundNumber: nextRound
                                     })
                                     setCookie("userData", {
                                         ...cookies.userData,
-                                        "imageURL": res.data.image_url
+                                        "imageURL": res.data.image_url,
+                                        "roundNumber": nextRound
                                     })
 
                                 })
@@ -98,13 +91,16 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     
                             getImage();                        
                         } else {
+                            // API deck: get next round's image from ably and save to hooks/cookies
                             setUserData({
                                 ...userData,
-                                imageURL: roundStarted.data.currentImage
+                                imageURL: roundStarted.data.currentImage,
+                                roundNumber: userData.roundNumber + 1
                             })
                             setCookie("userData", {
                                 ...cookies.userData,
-                                "imageURL": roundStarted.data.currentImage
+                                "imageURL": roundStarted.data.currentImage,
+                                "roundNumber": userData.roundNumber + 1
                             })
 
                             history.push('page/')
@@ -121,13 +117,13 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
             };
         }
 
-        // FUNCTION: subscribe1()
-        // DESCRIPTION: 
-        async function subscribe1() 
+
+        // FUNCTION: subscribeWaiting()
+        // DESCRIPTION: Host listens on channel_waiting. If new player joins, host publishes round info to channel_joining to give new player correct info
+        async function subscribeWaiting() 
         {
             await channel_waiting.subscribe(newPlayer => {
                 async function getPlayers () {
-                    console.log("Made it in getPlayers Func");
                     channel_joining.publish({data: {
                         roundNumber: userData.roundNumber, 
                         path: window.location.pathname
@@ -139,7 +135,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         }
 
         if (userData.host)
-            subscribe1();
+            subscribeWaiting();
 
         return function cleanup() {
             channel_waiting.unsubscribe();
@@ -148,7 +144,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
 
 
     // FUNCTION: renderReports()
-    // DESCRIPTION: 
+    // DESCRIPTION: Renders scoreboard
     function renderReports() {
         let winning_score = Number.NEGATIVE_INFINITY;
         for (const playerInfo of userData.scoreboardInfo)
@@ -174,47 +170,48 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
     }
 
     // FUNCTION: startNextRound()
-    // DESCRIPTION: 
+    // DESCRIPTION: Runs on clicking "next round"
     function startNextRound() {
         if (!userData.host)
             return;
 
-        console.log('starting next round');
+        console.log('In startNextRound()');
         
-        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound";
-        const payload = {
-            game_code: userData.code.toString(),
-            round_number: userData.roundNumber.toString(),
-        }
-
+        
+        // FUNCTION: nextpub()
+        // DESCRIPTION: Creates next round, then gets url for next round
         async function nextPub(){
-            await axios.post(postURL, payload);
-
+            // Create next round in backend
+            const payload = {
+                game_code: userData.code.toString(),
+                round_number: userData.roundNumber.toString(),
+            }
+            await axios.post(createNextRoundURL, payload).then(res => {
+                console.log("POST createNextRound", res)
+            });
+            
             const nextRound = parseInt(userData.roundNumber) + 1;
             let nextUrl = ""
             
-            if(!userData.isApi) {
-                const getUniqueImageInRound = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/";
-                
-                await axios.get(getUniqueImageInRound + userData.code + "," + nextRound).then((res) => {
+
+            // Database Deck: set next round's image url to nextUrl
+            if(!userData.isApi) {                
+                await axios.get(getUniqueImageInRoundURL + userData.code + "," + nextRound).then((res) => {
                     console.log('GET Get Unique Image In Round', res);
-                    // setUserData({
-                    //     ...userData,
-                    //     imageURL: res.data.image_url
-                    // })
-                    // setCookie("userData", {
-                    //     ...cookies.userData,
-                    //     "imageURL": res.data.image_url
-                    // })
+
                     nextUrl = res.data.image_url
 
                     pub();
                 })
-            } else {
+            } 
+            // API deck: call apiCall() to set next round's image url to nextUrl
+            else {
                 nextUrl = await apiCall(nextRound)
             }
 
-            console.log("next url", nextUrl)
+            console.log("nextPub(): next url", nextUrl)
+
+            // Save to hooks/cookies
             await setUserData({
                 ...userData,
                 imageURL: nextUrl,
@@ -232,24 +229,14 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         nextPub();
     }
 
-    // FUNCTION: getApiImage()
-    // DESCRIPTION: 
-    // const getApiImage = async (nextRound) => {
-    //     let uniqueImage = await apiCall(nextRound)
-
-        
-    //     pub(uniqueImage)
-    //     return uniqueImage
-    // }
-
 
     // FUNCTION: apiCall()
-    // DESCRIPTION: 
+    // DESCRIPTION: Gets a list of previously used images, then list of images from API. Selects/returns a unique url not in previously used images.
     const apiCall = async (nextRound) => {
         let usedUrlArr = []
 
         // Get previously used images
-        await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/" + userData.code + ",0").then(res => {
+        await axios.get(getRoundImageURL + userData.code + ",0").then(res => {
             const result = res.data.result
             console.log("getRoundImage Result", result)
             for(let i = 0; i < result.length; i++) {
@@ -264,6 +251,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"
 
         let uniqueUrl = ""
+        setDisplayHtml(false)
 
         if(userData.deckSelected === "500-000005"){
             // Google 
@@ -275,7 +263,6 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                 Accept: 'application/json',
                 Authorization: 'Bearer ' + userData.googlePhotos.accessToken ,
             }
-    
             await axios.post('https://photoslibrary.googleapis.com/v1/mediaItems:search', body, {headers: headers})
             .then(res => {
                 // Collect image urls in array
@@ -296,7 +283,6 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                     }
                 }
             })
-
         } else if (userData.deckSelected === "500-000006") {
             // Cleveland
             await axios.get(clevelandURL, {limit : "20"}).then( res => {
@@ -319,9 +305,8 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                 console.log("Chicago Res", res)
                 while(true) {
                     let randomIndex = (Math.random() * 12).toFixed(0)
-
                     let chicagoImage = res.data.data[randomIndex]
-                    console.log("RandomIndex", randomIndex)
+
                     console.log("ChicagoImage", chicagoImage)
 
                     let currentUrl = ""
@@ -371,19 +356,37 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
         let payload = {
             "game_code": userData.code,
             "round_number": nextRound.toString(),
-            //"round_number": userData.roundNumber.toString(),
             "image": uniqueUrl
         }
-        await axios.post("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage", payload).then(res => {
+        await axios.post(postRoundImageURL, payload).then(res => {
             console.log("postRoundImage", res)
         })
 
-        console.log("URL in apiCall: ", uniqueUrl)
+        console.log("apiCall URL before exiting: ", uniqueUrl)
         pub(uniqueUrl)
 
         return uniqueUrl
     }
 
+
+    // FUNCTION: pub()
+    // DESCRIPTION: Publishes signal to start next round. If using api deck, publishes image URL for next round.
+    const pub = (apiURL) => {
+        if(userData.isApi){
+            console.log("pub() using api deck: ", apiURL)
+            channel.publish({data: {
+                roundStarted: true,
+                currentImage: apiURL,
+            }});
+        }
+        else{
+            console.log("pub() using database deck")
+             channel.publish({data: {
+                roundStarted: true,
+                currentImage: "",
+            }});
+        }
+    }
 
 
     return (

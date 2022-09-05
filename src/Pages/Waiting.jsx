@@ -58,7 +58,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
     // HOOK: useEffect()
     // DESCRIPTION: Contains three functions that are responsible for getting players on mount, getting players continually after mount, and listening for start game signal from host
     useEffect(() => {
-        // FUNCTION: subscribe1()
+        // FUNCTION: getPlayersInitial()
         // DESCRIPTION: Get list of players in waiting on first render, store in names
         async function getPlayersInitial() {
             const names_db = [];
@@ -122,15 +122,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
-
-                    setUserData({
-                        ...userData,
-                        deckTitle: newGame.data.deckTitle
-                    })
-                    setCookie("userData", {
-                        ...cookies.userData,
-                        "deckTitle": newGame.data.deckTitle
-                    })
                 
                     // Host did not send image URL over ably => get url from database and transition to page
                     if(newGame.data.currentImage.length === 0) {
@@ -142,11 +133,13 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                                 setUserData({
                                     ...userData,
-                                    imageURL: res.data.image_url
+                                    imageURL: res.data.image_url,
+                                    deckTitle: newGame.data.deckTitle
                                 })
                                 setCookie("userData",{
                                     ...cookies.userData,
-                                    "imageURL": res.data.image_url
+                                    "imageURL": res.data.image_url,
+                                    "deckTitle": newGame.data.deckTitle
                                 })
                             })
 
@@ -158,11 +151,14 @@ export default function Waiting({channel, channel2, channel_joining}) {
                         // Host sent image URL over ably. Save it and transition to page
                         setUserData({
                             ...userData,
-                            imageURL: newGame.data.currentImage
+                            imageURL: newGame.data.currentImage,
+                            deckTitle: newGame.data.deckTitle
+
                         })
                         setCookie("userData", {
                             ...cookies.userData,
-                            "imageURL": newGame.data.currentImage
+                            "imageURL": newGame.data.currentImage,
+                            "deckTitle": newGame.data.deckTitle
                         })
 
                         history.push('/page')

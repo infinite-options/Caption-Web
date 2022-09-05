@@ -77,6 +77,8 @@ export default function Landing({client, channel_waiting}) {
                 console.log("POST /addUser as host", res)
 
                 let pUID = res.data.user_uid
+                // Show loading screen while making post request
+                setDisplayHtml(false)
 
                 // Save data in hooks/cookies
                 setUserData({
@@ -114,22 +116,15 @@ export default function Landing({client, channel_waiting}) {
 
         // Check if input formatted correctly
         if (checkGuestInput()) {
-            // Save data in hooks and cookies
+            // Save data in hooks
             setUserData({
                 ...userData, 
                 host: false,
                 roundNumber: 1
             })
-            // setCookie("userData", {
-            //     ...cookies.userData,
-            //     "name": userData.name,
-            //     "email": userData.email,
-            //     "zipCode": userData.zipCode,
-            //     "alias": userData.alias,
-            //     "host": false,
-            //     "roundNumber": 1,
-            // })
 
+            // Show loading screen while making post request
+            setDisplayHtml(false)
 
             // POST /addUser to create a new guest user
             let payload = {
@@ -147,11 +142,6 @@ export default function Landing({client, channel_waiting}) {
                     ...userData, 
                     playerUID: pUID
                 })
-                // setCookie("userData", {
-                //     ...cookies.userData,
-                //     "playerUID": pUID,
-                //     "code": res.data.user_code, 
-                // })
 
                 console.log("user_code", res.data.user_code)
 
@@ -188,7 +178,7 @@ export default function Landing({client, channel_waiting}) {
                             "roundNumber": 1,
                             "playerUID": pUID,
                             "code": userData.code,
-                            "rounds": res.data.num_round, 
+                            "rounds": res.data.num_rounds, 
                             "roundDuration": duration
                         })
                         
@@ -197,8 +187,6 @@ export default function Landing({client, channel_waiting}) {
                         // Publish new player to ably to notify other players
                         const channel = client.channels.get(`Captions/Waiting/${userData.code}`)
                         channel.publish({data: {newPlayerName: userData.alias}})
-
-                        // channel_waiting.publish({data: {newPlayerName: userData.alias}})
 
                         history.push("/waiting")
                     })

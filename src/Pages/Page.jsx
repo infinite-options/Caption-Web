@@ -21,6 +21,7 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     const { getCookies } = CookieHelper()
     const history = useHistory();
 
+    // Hooks used in page
     const [caption, setCaption] = useState("");
     const [captionSubmitted, setCaptionSubmitted] = useState(false);
     const [roundHasStarted, setRoundHasStarted] = useState(false);
@@ -37,6 +38,7 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
     const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
+    const getAllSubmittedCaptionsURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
 
     
     // HOOK: useEffect()
@@ -52,11 +54,11 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
 
 
     // HOOK: useEffect()
-    // DESCRIPTION:
+    // DESCRIPTION: On first render/start of round, host gets current round's start time. Also logs start time for round in database simultaneously
     useEffect(() => {
         async function pageAsyc(){
             if (userData.host) {
-                // Host logs start of new round/time started in backend
+                // Host gets start of new round/time started from backend
                 await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber).then((res) => {
                     console.log("GET startPlaying", res);
                     setRoundStartTime(res.data.round_start_time);
@@ -71,9 +73,11 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
 
 
     // HOOK: useEffect()
-    // DESCRIPTION:
+    // DESCRIPTION: Processes how many players voted in subscribePlayersLeft(). Deals with new joining players while in round in subscribeNewPlayers()
     useEffect(() => {
-        async function subscribe() 
+        // FUNCTION: subscribePlayersLeft()
+        // DESCRIPTION: Listens on ably channel for players who have voted. If new player voted, add to waitingPlayers array. If no players left to vote, transition to selection page.
+        async function subscribePlayersLeft() 
         {
             await channel.subscribe(newVote => {
                 console.log('Countdown on submit-caption screen: PlayersLeft = ', newVote.data.playersLeft);
@@ -90,16 +94,22 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
             });
         }
         
-        subscribe();
+        subscribePlayersLeft();
 
 
-        async function subscribe1() 
+        // FUNCTION: subscribeNewPlayers()
+        // DESCRIPTION: Listens on ably channel for new joining players, adds them to current round.
+        async function subscribeNewPlayers() 
         {
             await channel_waiting.subscribe(newPlayer => {
                 async function getPlayers () {
                     console.log("Made it in getPlayers Func");
+
+                    // Once newPlayer has joined, host publishes roundNumber and path so new player gets the correct round information. 
                     if (userData.host)
                         channel_joining.publish({data: {roundNumber: userData.roundNumber, path: window.location.pathname}});
+                    
+                    // Add newPlayer to waitingPlayers list
                     const temp = [newPlayer.data.newPlayerName];
                     for (const name of waitingPlayers) {
                         temp.push(name);
@@ -111,7 +121,7 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
             });
         }
 
-        subscribe1();
+        subscribeNewPlayers();
     
 
         return function cleanup() {
@@ -121,24 +131,21 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     }, [waitingPlayers, userData.code]);
 
 
-
-
-
-
     
+    // FUNCTION: postSubmitCaption()
+    // DESCRIPTION: On clicking submit or time running out, submits user caption
     async function postSubmitCaption() {
         if(caption === "" && !timeUp){
             alert("Please enter a caption.")
             return
         }
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
 
         /**
          * Issue:
          * The user should not be able to select/vote for their own caption.
          * Should be easy --> match internal state with info in the endpoint result.
          */
-        await axios.get(getURL + userData.code + "," + userData.roundNumber).then((res) => {
+        await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('page_get_res before post = ', res);
         });
 
@@ -156,7 +163,7 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
             console.log('POST Submit Caption', res);
         });
 
-        await axios.get(getURL + userData.code + "," + userData.roundNumber).then((res) => {
+        await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('page_get_res after = ', res);
         });
 

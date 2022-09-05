@@ -20,6 +20,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const { getCookies } = CookieHelper()
     const history = useHistory();
 
+    // Hooks used in Selection
     const [toggleArr, setToggleArr] = useState([]);
     const [playersArr, setPlayersArr] = useState([]);
     const [selectedCaption, setSelectedCaption] = useState("");
@@ -28,11 +29,24 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [timeLeft, setTimeLeft] = useState(Number.POSITIVE_INFINITY);
     const [loading, setLoading] = useState(false);
 
+
     // Determine if we should display landing page (true) or loading icon (false)
     const [displayHtml, setDisplayHtml] = useState(false)
 
 
-    // Load cookies into userData state on first render
+    // Endpoints used in Selection
+    const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+    const postVoteCaptionURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
+    const getAllSubmittedCaptionsURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
+    const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
+    const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
+    const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
+    const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+
+
+
+    // HOOK: useEffect()
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
         // Check if userData is empty (after refresh/new user)
         if(userData.host === "" || userData.roundNumber === "" || userData.name === "" || userData.alias === "" || userData.playerUID === "" || userData.rounds === "" || userData.roundDuration === "" || userData.code === "" || userData.deckTitle === "" || userData.imageURL === "" || userData.scoreBoardInfo === "") {
@@ -42,71 +56,46 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             setDisplayHtml(true)
     }, [])
 
-    const pub_host = (playerCount) => {
-        // console.log('in pub_host');
-        channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
-    };
 
 
-    const pub_all = () => {
-        channel_all.publish({data: {everybodyVoted: true}});
-    };
-
-
-
+    // HOOK: useEffect()
+    // DESCRIPTION: Gets voting options and subscribes to ably channels
     useEffect(() => {
-        const getURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
-        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-
-        // console.log('rounds = ', rounds, ', roundNumber = ', roundNumber);
-
-        async function idontknow() {
+        // FUNCTION: getCaptions()
+        // DESCRIPTION: Gets captions for user to vote on. Transitions to next page if only one caption/player
+        async function getCaptions() {
+            // Host logs start of new round/start time started in backend
             if (userData.host) {
-                // Host logs start of new round/start time started in backend
-                const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
                 await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber);
             }
             
+            await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
+                console.log('GET Get All Submitted Caption', res);
 
-            // console.log('roundNumber = ', roundNumber, ` and I am ${host ? '' : 'not'} the host`);
-
-           
-            await axios.get(getURL + userData.code + "," + userData.roundNumber).then((res) => {
-                // console.log('GET Get All Submitted Caption', res);
                 const temp_players_arr = [];
-
+                // Push response's submitted captions to temp_players_arr
+                    // gameUID empty right now?
                 for (let i = 0; i < res.data.players.length; i++){
                     if (res.data.players[i].round_user_uid !== userData.gameUID)
                         temp_players_arr.push(res.data.players[i]);
-                    if (res.data.players[i].round_user_uid !== userData.playerUID){
-                        // console.log("Made it before disabling");
-                        // document.getElementsByClassName("fat").disabled = true;
-                        // console.log("Made it after disabling");
-                    }
-                    
                 }
 
-                function shuffleArray(array) {
-                    for (let i = array.length - 1; i > 0; i--) {
-                        const j = Math.floor(Math.random() * (i + 1));
-                        [array[i], array[j]] = [array[j], array[i]];
-                    }
-                }
 
+                // Shuffle and save players array to temp_players_arr
                 shuffleArray(temp_players_arr);
-                // console.log("temp: ", temp_players_arr)
-
                 setPlayersArr(temp_players_arr);
 
+
+                // One or 0 players in game
                 if (res.data.players.length <= 1)
                 {
+                    // FUNCTION: noPlayersThenSubmit()
+                    // DESCRIPTION: Runs when no other players. Posts vote then gets players who haven't voted.
                     async function noPlayersThenSubmit()
                     {
                         if (res.data.players[0].round_user_uid !== userData.playerUID) {
-                            console.log('default vote for user ', userData.alias);
-                            const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
-                            const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
-        
+                            console.log('Default vote for user ', userData.alias);
+                            
                             const payload = {
                                 user_id: userData.playerUID,
                                 caption: res.data.players[0].caption,
@@ -114,18 +103,22 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 round_number: userData.roundNumber.toString()
                             };
 
-                            await axios.post(postURL, payload).then((res) => {
-                                console.log(res);
+                            await axios.post(postVoteCaptionURL, payload).then((res) => {
+                                console.log('POST voteCaption', res);
                             });
-                            await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => console.log('pwhv response = ', res.data));
-                        } else
-                            pub_host(0);
+
+                            await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => 
+                                console.log('GET playersWhoHaventVoted', res)
+                            );
+                        } 
+                        else
+                            pub_playerVote(0);
                     }
 
                     if (res.data.players.length === 1){
                         noPlayersThenSubmit();
                     } else if(userData.host){
-                        pub_host(0);
+                        pub_playerVote(0);
                     }
 
                 }
@@ -138,49 +131,61 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     toggleArr[i] = false;
                 }
             })
+
             setLoading(true)
-
-            const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
-
         }
 
-        idontknow();
 
-        console.log("Toggle Arr: " + toggleArr);
+        // FUNCTION: subscribeNewPlayer()
+        // DESCRIPTION: Host listens for new players joining. If new players joined, post current round info to channel_joining for new player.
+        async function subscribeNewPlayer() 
+        {
+            await channel_waiting.subscribe(newPlayer => {
+                async function getPlayers () {
+                    channel_joining.publish({data: {roundNumber: userData.roundNumber, path: window.location.pathname}})
+                }
+        
+                getPlayers();
+            });
+        }
 
+
+        // FUNCTION: subscribe_host()
+        // DESCRIPTION: Listens on ably channel. If receives signal that all players voted, host gets updated scores from backend and publishes that everyone voted
         async function subscribe_host() 
         {
             await channel_host.subscribe(newVote => {
-                // console.log('Countdown on voting screen: PlayersLeft = ', newVote.data.playersLeft);
-                // console.log('Test-phase2: playerCount = ', newVote.data.playersLeft);
                 if (newVote.data.playersLeft === 0) {
-                    const blah = async () => {
-                        const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/";
+                    const hostPub = async () => {
                         if (userData.host)
-                            await axios.get(getUpdateScoresURL + userData.code + "," + userData.roundNumber);
-                        pub_all();
+                            await axios.get(getUpdateScoresURL + userData.code + "," + userData.roundNumber).then( res => {
+                                console.log('GET updatedScores', res)
+                            });
+                        pub_everyoneVoted();
                     }
 
-                    blah();
+                    hostPub();
                 }
             });
         }
 
+
+        // FUNCTION: subscribe_all()
+        // DESCRIPTION: If everyone voted, load scoreboard for current round
         async function subscribe_all()
         {
             await channel_all.subscribe(ping => {
                 const getNewScoreboard = async () => {
                     if (ping.data.everybodyVoted)
                     {
-                        const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
-
                         await axios.get(getScoreBoardURL + userData.code + "," + userData.roundNumber).then((res) => {
                             console.log('GET score board ', res);
 
+                            // Sort and save scoreboard to hooks/cookies
                             res.data.scoreboard.sort((a, b) => (
                                 b.score === a.score ? b.game_score - a.game_score : b.score - a.score
                             ));
-                            
+            
                             setUserData({
                                 ...userData,
                                 scoreboardInfo: res.data.scoreboard
@@ -202,22 +207,11 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             })
         }
 
-        
-        async function subscribe1() 
-        {
-            await channel_waiting.subscribe(newPlayer => {
-                async function getPlayers () {
-                    // console.log("Made it in getPlayers Func");
-                    channel_joining.publish({data: {roundNumber: userData.roundNumber, path: window.location.pathname}})
-                }
-        
-                getPlayers();
-            });
-        }
 
+        getCaptions();
 
         if (userData.host) {
-            subscribe1();
+            subscribeNewPlayer();
             subscribe_host();
         }
         
@@ -229,16 +223,19 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             channel_waiting.unsubscribe();
         };
     }, [userData.code]);
+    //}, [displayHtml]);
 
 
+    // FUNCTION: changeToggle()
+    // DESCRIPTION: Sets selected caption in hooks when clicked on
     function changeToggle(index) {
-        console.log("Called: " + index);
+        console.log("In ChangeToggle(): " + index);
         for (var i = 0; i < toggleArr.length; i++) {
             toggleArr[i] = false;
         }
         if(playersArr[index].round_user_uid !== userData.playerUID) {
             toggleArr[index] = true;
-            console.log('feshfjksef: playersArr[index] = ', playersArr[index]);
+            console.log('playersArr[index] = ', playersArr[index]);
             setSelectedCaption(playersArr[index].caption);
         }
 
@@ -246,38 +243,36 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     }
 
 
+    // FUNCTION: postVote()
+    // DESCRIPTION: posts user's vote on clicking submit
     async function postVote() {
-        console.log('postVote called');
-
+        console.log("In postVote()")
         setLocalUserVoted(true);
 
-        const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption";
+        // POST voteCaption
         const payload = {
             user_id: userData.playerUID,
             caption: selectedCaption === '' ? null : selectedCaption,
             game_code: userData.code.toString(),
             round_number: userData.roundNumber.toString()
         };
-        console.log('user ', userData.alias, ' is posting vote with payload: ', payload);
-
-        await axios.post(postURL, payload).then((res) => {
-            console.log("POST Vote Caption", res);
+        await axios.post(postVoteCaptionURL, payload).then((res) => {
+            console.log("POST voteCaption", res);
         });
         
-
-
-        const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
+        
         await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('publishing with res.data.players_count = ', res.data.players_count);
-            pub_host(res.data.players_count);
+            pub_playerVote(res.data.players_count);
         });
     }
     
 
+    // FUNCTION: renderCaptions()
+    // DESCRIPTION: renders captions as buttons
     function renderCaptions() {
         var captions = [];
         
-        // console.log('temp.length = ', playersArr.length);
         for (var index = 0; index < playersArr.length; index++) {
             /**
              * The value of index continues to increment due to the loop,
@@ -299,36 +294,60 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 />
             </div>);
         }
-        // console.log('captions = ', captions);
       
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
 
 
+    // FUNCTION: shuffleArray()
+    // DESCRIPTION: shuffles inputted array 
+    function shuffleArray(array) {
+        for (let i = array.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [array[i], array[j]] = [array[j], array[i]];
+        }
+    }
 
-    useEffect(() => console.log('selected-Caption: ', selectedCaption), [selectedCaption]);
+
+    // FUNCTION: pub_playerVote()
+    // DESCRIPTION: publishes player's alias that just voted and number of players left that haven't voted
+    const pub_playerVote = (playerCount) => {
+        channel_host.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
+    };
 
 
-    // After we've set timerDuration, immediately set timeLeft (used to signal end of round)
+    // FUNCTION: pub_everyoneVoted()
+    // DESCRIPTION: publishes everybodyVoted status as true, move to next round
+    const pub_everyoneVoted = () => {
+        channel_all.publish({data: {everybodyVoted: true}});
+    };
+
+
+    // HOOK: useEffect()
+    // DESCRIPTION: we've set timerDuration, immediately set timeLeft (used to signal end of round)
     useEffect(() => timerDuration === -1 ? '' : setTimeLeft(timerDuration), [timerDuration]);
 
 
+    // HOOK: useEffect()
+    // DESCRIPTION: Counts down time left until 0
     useEffect(() => {
         if (timeLeft > 0 && timeLeft !== Number.POSITIVE_INFINITY)
             setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
         else if (timeLeft === 0 && !localUserVoted) {
             console.log("Time ran out and user didn't vote")
             postVote()
-            pub_all()
+
+            pub_everyoneVoted()
         }
             
     }, [timeLeft]);
 
 
-
-    // useEffect(() => {
-    //     // console.log('timeLeft = ', timeLeft);
-    // }, [timeLeft]);
+    // HOOK: useEffect()
+    // DESCRIPTION: prints timeLeft on change
+    useEffect(() => {
+        console.log('timeLeft = ', timeLeft);
+    }, [timeLeft]);
 
 
 

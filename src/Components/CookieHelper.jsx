@@ -35,12 +35,16 @@ export const CookieHelper = () => {
         // setDisplayHtml => Type: Function => Function that renders html on page
     // DESCRIPTION : If hooks' values from hooksNeeded are empty, load cookie values into hooks
     const getCookies = (hooksNeeded, setDisplayHtml) => {
+        console.log("hooksUpdate before: ", hooksUpdate)
+
+
         if(cookies.userData === undefined) 
             return
 
         console.log("Starting getCookies() in", window.location.href)
         let hooksUpdate = {}
 
+        console.log("Current cookies", cookies.userData)
         console.log("hooksUpdate: ", hooksUpdate)
         console.log("hooksNeeded", hooksNeeded)
 

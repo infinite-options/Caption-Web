@@ -100,6 +100,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         pub_playerVote(0);
                     }
                 }
+                
 
                 /**
                  * Initialize the toggle array with the correct size and populate the array with all false values
@@ -429,6 +430,18 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
                             conditionalLink={true}/>
                         : <></>
+                }
+
+                {
+                    localUserVoted ?
+                        <p>User voted</p> :
+                        <p>Haven't voted</p>
+                }
+
+                {
+                    selectedCaption ?
+                        <p>Caption selected {selectedCaption}</p> :
+                        <p>Caption not selected</p>
                 }
                 
                 

@@ -437,6 +437,11 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                             voteStatus = true
 
+                            setUserData({
+                                ...userData,
+                                voteStatus: true
+                            })
+
                             await setCookie("userData", {
                                 ...cookies.userData,
                                 "voteStatus": true
@@ -446,6 +451,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                             console.log("votestatus changed in timer", voteStatus)
                             console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
+                            console.log("UserData status: ", userData.voteStatus)
                         }}
                             conditionalLink={true}/>
                         : <></>
@@ -490,15 +496,27 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                                     console.log("VoteStatus in timer: ", voteStatus)
 
-                                    if(voteStatus === false)
+                                    console.log("UserData status in timer: ", userData.voteStatus)
+
+                                    // if(voteStatus === false)
+                                    //     postVote(null)
+
+                                    if(userData.voteStatus === false)
                                         postVote(null)
                         
+                                    
+                                    setUserData({
+                                        ...userData,
+                                        voteStatus: false
+                                    })
+
                                     setCookie("userData", {
                                         ...cookies.userData,
                                         "voteStatus": false
                                     })
 
-                                    console.log("Reset cookies after timeout", cookies.userData["voteStatus"])
+                                    console.log("Reset userData votestatus: ", userData.voteStatus)
+                                    // console.log("Reset cookies after timeout", cookies.userData["voteStatus"])
                                 }}
                             >
                                 {({remainingTime}) => {

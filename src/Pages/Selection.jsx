@@ -272,6 +272,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         console.log("In postVote()")
         setLocalUserVoted(true);
 
+        console.log("Payload before post vote caption", payload)
+
         // // POST voteCaption
         // const payload = {
         //     user_id: userData.playerUID,

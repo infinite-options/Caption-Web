@@ -431,14 +431,15 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 {localUserVoted ?
                     <></>
                     : selectedCaption ?
-                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ e => {
+                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ async (e) => {
                             
                             postVote()
 
-                            setCookie("userData", {
+                            await setCookie("userData", {
                                 ...cookies.userData,
                                 "voteStatus": true
                             })
+
 
                             console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
                         }}
@@ -447,9 +448,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 }
 
                 {
-                    voteStatus ?
-                        <p>User voted</p> :
-                        <p>Haven't voted</p>
+                    ...cookies.userData["voteStatus"] ?
+                        <p>User voted:{cookies.userData["voteStatus"]}</p> :
+                        <p>Haven't voted: {cookies.userData["voteStatus"]}</p>
                 }
 
                 {
@@ -487,6 +488,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                         ...cookies.userData,
                                         "voteStatus": false
                                     })
+
+                                    console.log("Reset cookies after timeout", cookies.userData["voteStatus"])
                                 }}
                             >
                                 {({remainingTime}) => {

@@ -251,6 +251,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // FUNCTION: postVote()
     // DESCRIPTION: posts user's vote on clicking submit
     async function postVote(onlyCaption) {
+        console.log("Only caption passed in: ", onlyCaption)
+        console.log("selectedCaption ", selectedCaption)
+        
         // POST voteCaption
         let payload = {
             user_id: userData.playerUID,

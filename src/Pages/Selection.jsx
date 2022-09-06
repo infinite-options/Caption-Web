@@ -274,7 +274,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
 
         console.log("In postVote()")
-        setLocalUserVoted(true);
+        // setLocalUserVoted(true);
 
         console.log("Payload before post vote caption", payload)
 
@@ -425,7 +425,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 {localUserVoted ?
                     <></>
                     : selectedCaption ?
-                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ e => postVote()}
+                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ e => {
+                            setLocalUserVoted(true);
+                            postVote()
+                        }}
                             conditionalLink={true}/>
                         : <></>
                 }
@@ -463,8 +466,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 duration={userData.roundDuration}
                                 colors="#000000"
                                 onComplete={() => {
+                                    console.log("Local user voted: ", localUserVoted)
                                     if(!localUserVoted)
                                         postVote(null)
+                                    // postVote(null)
                                 }}
                             >
                                 {({remainingTime}) => {

@@ -34,7 +34,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [displayHtml, setDisplayHtml] = useState(false)
 
     // Used to indicate if user voted yet
-    var voteStatus = false
+    let voteStatus = false
 
 
     // Endpoints used in Selection
@@ -435,12 +435,14 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             
                             postVote()
 
+                            voteStatus = true
+
                             await setCookie("userData", {
                                 ...cookies.userData,
                                 "voteStatus": true
                             })
 
-                            voteStatus = cookies.userData["voteStatus"]
+                            // voteStatus = cookies.userData["voteStatus"]
 
 
                             console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
@@ -482,8 +484,12 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 duration={userData.roundDuration}
                                 colors="#000000"
                                 onComplete={() => {
-                                    console.log("Timed out: Cookies vote status ", cookies.userData["voteStatus"])
-                                    if(!cookies.userData["voteStatus"])
+                                    // console.log("Timed out: Cookies vote status ", cookies.userData["voteStatus"])
+                                    // if(!cookies.userData["voteStatus"])
+                                    //     postVote(null)
+
+                                    console.log("VoteStatus in timer: ", voteStatus)
+                                    if(voteStatus === false)
                                         postVote(null)
                         
                                     setCookie("userData", {

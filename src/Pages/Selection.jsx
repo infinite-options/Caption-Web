@@ -431,6 +431,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ e => {
                             // setLocalUserVoted(true);
                             voteStatus = true
+                            console.log("Vote Status set to true: ", voteStatus)
                             postVote()
                         }}
                             conditionalLink={true}/>
@@ -471,7 +472,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 colors="#000000"
                                 onComplete={() => {
                                     // console.log("Local user voted: ", localUserVoted)
-                                    console.log("Local user voted: ", voteStatus)
+                                    console.log("Vote Status in Timer: ", voteStatus)
                                     if(!voteStatus)
                                         postVote(null)
                                     // postVote(null)

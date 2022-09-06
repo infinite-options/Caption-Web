@@ -34,7 +34,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [displayHtml, setDisplayHtml] = useState(false)
 
     // Used to indicate if user voted yet
-    let voteStatus = false
+    var voteStatus = false
 
 
     // Endpoints used in Selection
@@ -297,6 +297,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // FUNCTION: renderCaptions()
     // DESCRIPTION: renders captions as buttons
     function renderCaptions() {
+        // voteStatus = true
         var captions = [];
         
         for (var index = 0; index < playersArr.length; index++) {

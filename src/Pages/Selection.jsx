@@ -133,9 +133,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         noPlayersThenSubmit(res);
                         
                         console.log("Selected Caption: ", selectedCaption)
-                        postVote()
+                        // postVote(res.data.players[0].caption)
                         
-
                     } else if(userData.host){
                         console.log("No one submitted a vote")
                         pub_playerVote(0);
@@ -255,6 +254,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 setSelectedCaption(res.data.players[0].caption)
 
                 // postVote()
+                postVote(res.data.players[0].caption)
+
             } 
             // if the caption is the current user's caption
             else {
@@ -278,6 +279,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 //         pub_playerVote(0)
                 // });
                 setSelectedCaption(null)
+
+                postVote()
+
             }
         }
 
@@ -321,17 +325,38 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
     // FUNCTION: postVote()
     // DESCRIPTION: posts user's vote on clicking submit
-    async function postVote() {
-        console.log("In postVote()")
-        setLocalUserVoted(true);
-
+    async function postVote(onlyCaption) {
         // POST voteCaption
-        const payload = {
+        let payload = {
             user_id: userData.playerUID,
             caption: selectedCaption === '' ? null : selectedCaption,
             game_code: userData.code.toString(),
             round_number: userData.roundNumber.toString()
         };
+
+        // if there is an argument (caption)
+            // payload includes 
+        if(onlyCaption !== undefined) {
+            payload = {
+                user_id: userData.playerUID,
+                caption: onlyCaption,
+                game_code: userData.code.toString(),
+                round_number: userData.roundNumber.toString()
+            };
+        }
+
+        console.log("In postVote()")
+        setLocalUserVoted(true);
+
+        // // POST voteCaption
+        // const payload = {
+        //     user_id: userData.playerUID,
+        //     caption: selectedCaption === '' ? null : selectedCaption,
+        //     game_code: userData.code.toString(),
+        //     round_number: userData.roundNumber.toString()
+        // };
+
+
         await axios.post(postVoteCaptionURL, payload).then((res) => {
             console.log("POST voteCaption", res);
         });

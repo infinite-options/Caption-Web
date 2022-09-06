@@ -443,13 +443,13 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             // console.log("Vote Status set to true: ", voteStatus)
                             postVote()
                             console.log("Vote status after post vote is ", voteStatus)
-                            
+
                             setCookie("userData", {
                                 ...cookies.userData,
-                                voteStatus: true
+                                "voteStatus": true
                             })
 
-                            console.log("In vote button: Cookies vote status ", cookies.userData.voteStatus)
+                            console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
                         }}
                             conditionalLink={true}/>
                         : <></>
@@ -490,8 +490,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 onComplete={() => {
                                     // console.log("Local user voted: ", localUserVoted)
                                     console.log("Vote Status in Timer: ", voteStatus)
-                                    console.log("Cookies vote status: ", cookies.userData.voteStatus)
-                                    if(!cookies.userData.voteStatus)
+                                    console.log("Timed out: Cookies vote status ", cookies.userData["voteStatus"])
+                                    if(!cookies.userData["voteStatus"])
                                         postVote(null)
                                     // postVote(null)
                                 }}

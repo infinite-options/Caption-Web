@@ -253,7 +253,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     async function postVote(onlyCaption) {
         console.log("Only caption passed in: ", onlyCaption)
         console.log("selectedCaption ", selectedCaption)
-        
+
         // POST voteCaption
         let payload = {
             user_id: userData.playerUID,
@@ -425,7 +425,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 {localUserVoted ?
                     <></>
                     : selectedCaption ?
-                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
+                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ e => postVote()}
                             conditionalLink={true}/>
                         : <></>
                 }

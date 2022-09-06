@@ -33,6 +33,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // Determine if we should display landing page (true) or loading icon (false)
     const [displayHtml, setDisplayHtml] = useState(false)
 
+    // Used to indicate if user voted yet
+    let voteStatus = false
+
 
     // Endpoints used in Selection
     const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/";
@@ -426,7 +429,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     <></>
                     : selectedCaption ?
                         <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ e => {
-                            setLocalUserVoted(true);
+                            // setLocalUserVoted(true);
+                            voteStatus = true
                             postVote()
                         }}
                             conditionalLink={true}/>
@@ -434,7 +438,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 }
 
                 {
-                    localUserVoted ?
+                    voteStatus ?
                         <p>User voted</p> :
                         <p>Haven't voted</p>
                 }
@@ -466,8 +470,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 duration={userData.roundDuration}
                                 colors="#000000"
                                 onComplete={() => {
-                                    console.log("Local user voted: ", localUserVoted)
-                                    if(!localUserVoted)
+                                    // console.log("Local user voted: ", localUserVoted)
+                                    console.log("Local user voted: ", voteStatus)
+                                    if(!voteStatus)
                                         postVote(null)
                                     // postVote(null)
                                 }}

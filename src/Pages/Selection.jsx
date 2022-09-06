@@ -87,7 +87,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 setPlayersArr(temp_players_arr);
 
 
-                // One or 0 players in game
+                // One or 0 players submitted caption
                 if (res.data.players.length <= 1)
                 {
                     // FUNCTION: noPlayersThenSubmit()
@@ -111,9 +111,12 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => 
                                 console.log('GET playersWhoHaventVoted', res)
                             );
+
                         } 
-                        else
-                            pub_playerVote(0);
+                        // else
+                        //     pub_playerVote(0);
+                        pub_playerVote(0);
+
                     }
 
                     if (res.data.players.length === 1){

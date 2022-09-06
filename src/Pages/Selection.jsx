@@ -129,9 +129,13 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     //     pub_playerVote(0);
                     // }
                     if (res.data.players.length === 1){
+                        console.log("Only one caption submitted")
                         noPlayersThenSubmit(res);
                         
+                        postVote()
+
                     } else if(userData.host){
+                        console.log("No one submitted a vote")
                         pub_playerVote(0);
                     }
                 }
@@ -226,47 +230,51 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             if (res.data.players[0].round_user_uid !== userData.playerUID) {
                 console.log('Default vote for user ', userData.alias);
                 
-                // If it is not current user's caption, 
-                const payload = {
-                    user_id: userData.playerUID,
-                    caption: res.data.players[0].caption,
-                    game_code: userData.code.toString(),
-                    round_number: userData.roundNumber.toString()
-                };
+                // // If it is not current user's caption, 
+                // const payload = {
+                //     user_id: userData.playerUID,
+                //     caption: res.data.players[0].caption,
+                //     game_code: userData.code.toString(),
+                //     round_number: userData.roundNumber.toString()
+                // };
 
-                // Submit vote for only caption
-                await axios.post(postVoteCaptionURL, payload).then((res) => {
-                    console.log('POST voteCaption', res);
-                });
+                // // Submit vote for only caption
+                // await axios.post(postVoteCaptionURL, payload).then((res) => {
+                //     console.log('POST voteCaption', res);
+                // });
 
-                // Finds number of players who haven't voted
-                await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => {
-                    console.log('GET playersWhoHaventVoted', res)
-                    if(res.players_count === 0)
-                        pub_playerVote(0)
-                });
+                // // Finds number of players who haven't voted
+                // await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => {
+                //     console.log('GET playersWhoHaventVoted', res)
+                //     if(res.players_count === 0)
+                //         pub_playerVote(0)
+                // });
+                setSelectedCaption(res.data.players[0].caption)
+
+                // postVote()
             } 
             // if the caption is the current user's caption
             else {
             //     pub_playerVote(0);
-                const payload = {
-                    user_id: userData.playerUID,
-                    caption: null,
-                    game_code: userData.code.toString(),
-                    round_number: userData.roundNumber.toString()
-                };
+                // const payload = {
+                //     user_id: userData.playerUID,
+                //     caption: null,
+                //     game_code: userData.code.toString(),
+                //     round_number: userData.roundNumber.toString()
+                // };
 
-                // Submit vote for only caption
-                await axios.post(postVoteCaptionURL, payload).then((res) => {
-                    console.log('POST voteCaption', res);
-                });
+                // // Submit vote for only caption
+                // await axios.post(postVoteCaptionURL, payload).then((res) => {
+                //     console.log('POST voteCaption', res);
+                // });
                 
-                // Finds number of players who haven't voted
-                await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => {
-                    console.log('GET playersWhoHaventVoted', res)
-                    if(res.players_count === 0)
-                        pub_playerVote(0)
-                });
+                // // Finds number of players who haven't voted
+                // await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => {
+                //     console.log('GET playersWhoHaventVoted', res)
+                //     if(res.players_count === 0)
+                //         pub_playerVote(0)
+                // });
+                setSelectedCaption(null)
             }
         }
 

@@ -210,7 +210,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
 
 
-        // Call defined functions from above
+        // Call functions defined above
 
         getCaptions();
 
@@ -239,7 +239,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
         if(playersArr[index].round_user_uid !== userData.playerUID) {
             toggleArr[index] = true;
-            //console.log('playersArr[index] = ', playersArr[index]);
+
+            console.log('playersArr[index] = ', playersArr[index]);
             setSelectedCaption(playersArr[index].caption);
         }
 
@@ -273,14 +274,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         setLocalUserVoted(true);
 
         console.log("Payload before post vote caption", payload)
-
-        // // POST voteCaption
-        // const payload = {
-        //     user_id: userData.playerUID,
-        //     caption: selectedCaption === '' ? null : selectedCaption,
-        //     game_code: userData.code.toString(),
-        //     round_number: userData.roundNumber.toString()
-        // };
 
 
         await axios.post(postVoteCaptionURL, payload).then((res) => {

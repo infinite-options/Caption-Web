@@ -137,7 +137,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         async function subscribe_host() 
         {
             await channel_host.subscribe(newVote => {
-                if (newVote.data.playersLeft === 0) {
+                if (newVote.data.playersLeft <= 0) {
                     const hostPub = async () => {
                         if (userData.host)
                             await axios.get(getUpdateScoresURL + userData.code + "," + userData.roundNumber).then( res => {

@@ -65,11 +65,12 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         // FUNCTION: getCaptions()
         // DESCRIPTION: Gets captions for user to vote on. Transitions to next page if only one caption/player
         async function getCaptions() {
-            // Host logs start of new round/start time started in backend
             if (userData.host) {
+                // Confirms game has started and returns round start time
                 await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber);
             }
             
+            // Returns all submitted captions
             await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
                 console.log('GET Get All Submitted Caption', res);
 
@@ -77,8 +78,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 // Push response's submitted captions to temp_players_arr
                     // NOTE: gameUID empty right now?
                 for (let i = 0; i < res.data.players.length; i++){
-                    if (res.data.players[i].round_user_uid !== userData.gameUID)
-                        temp_players_arr.push(res.data.players[i]);
+                    // if (res.data.players[i].round_user_uid !== userData.gameUID)
+                    //     temp_players_arr.push(res.data.players[i]);
+                    temp_players_arr.push(res.data.players[i]);
                 }
 
 
@@ -92,35 +94,43 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 {
                     // FUNCTION: noPlayersThenSubmit()
                     // DESCRIPTION: Runs when no other players. Posts vote then gets players who haven't voted.
-                    async function noPlayersThenSubmit()
-                    {
-                        if (res.data.players[0].round_user_uid !== userData.playerUID) {
-                            console.log('Default vote for user ', userData.alias);
+                    // async function noPlayersThenSubmit()
+                    // {
+                    //     if (res.data.players[0].round_user_uid !== userData.playerUID) {
+                    //         console.log('Default vote for user ', userData.alias);
                             
-                            const payload = {
-                                user_id: userData.playerUID,
-                                caption: res.data.players[0].caption,
-                                game_code: userData.code.toString(),
-                                round_number: userData.roundNumber.toString()
-                            };
+                    //         const payload = {
+                    //             user_id: userData.playerUID,
+                    //             caption: res.data.players[0].caption,
+                    //             game_code: userData.code.toString(),
+                    //             round_number: userData.roundNumber.toString()
+                    //         };
 
-                            await axios.post(postVoteCaptionURL, payload).then((res) => {
-                                console.log('POST voteCaption', res);
-                            });
+                    //         await axios.post(postVoteCaptionURL, payload).then((res) => {
+                    //             console.log('POST voteCaption', res);
+                    //         });
 
-                            await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => 
-                                console.log('GET playersWhoHaventVoted', res)
-                            );
+                    //         await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => 
+                    //             console.log('GET playersWhoHaventVoted', res)
+                    //         );
 
-                        } 
-                        // else
-                        //     pub_playerVote(0);
-                        pub_playerVote(0);
+                    //     } 
+                    //     // else
+                    //     //     pub_playerVote(0);
+                    //     pub_playerVote(0);
 
-                    }
+                    // }
 
+                    
+
+                    // if (res.data.players.length === 1){
+                    //     noPlayersThenSubmit();
+                    // } else if(userData.host){
+                    //     pub_playerVote(0);
+                    // }
                     if (res.data.players.length === 1){
-                        noPlayersThenSubmit();
+                        noPlayersThenSubmit(res);
+                        
                     } else if(userData.host){
                         pub_playerVote(0);
                     }
@@ -208,6 +218,56 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                 getNewScoreboard();
             })
+        }
+
+        async function noPlayersThenSubmit(res)
+        {
+            // Check if it is someone else's caption
+            if (res.data.players[0].round_user_uid !== userData.playerUID) {
+                console.log('Default vote for user ', userData.alias);
+                
+                // If it is not current user's caption, 
+                const payload = {
+                    user_id: userData.playerUID,
+                    caption: res.data.players[0].caption,
+                    game_code: userData.code.toString(),
+                    round_number: userData.roundNumber.toString()
+                };
+
+                // Submit vote for only caption
+                await axios.post(postVoteCaptionURL, payload).then((res) => {
+                    console.log('POST voteCaption', res);
+                });
+
+                // Finds number of players who haven't voted
+                await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => {
+                    console.log('GET playersWhoHaventVoted', res)
+                    if(res.players_count === 0)
+                        pub_playerVote(0)
+                });
+            } 
+            // if the caption is the current user's caption
+            else {
+            //     pub_playerVote(0);
+                const payload = {
+                    user_id: userData.playerUID,
+                    caption: null,
+                    game_code: userData.code.toString(),
+                    round_number: userData.roundNumber.toString()
+                };
+
+                // Submit vote for only caption
+                await axios.post(postVoteCaptionURL, payload).then((res) => {
+                    console.log('POST voteCaption', res);
+                });
+                
+                // Finds number of players who haven't voted
+                await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then(res => {
+                    console.log('GET playersWhoHaventVoted', res)
+                    if(res.players_count === 0)
+                        pub_playerVote(0)
+                });
+            }
         }
 
 

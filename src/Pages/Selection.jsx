@@ -444,7 +444,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                             // voteStatus = cookies.userData["voteStatus"]
 
-
+                            console.log("votestatus changed in timer", voteStatus)
                             console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
                         }}
                             conditionalLink={true}/>
@@ -489,6 +489,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                     //     postVote(null)
 
                                     console.log("VoteStatus in timer: ", voteStatus)
+
                                     if(voteStatus === false)
                                         postVote(null)
                         

@@ -132,7 +132,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         console.log("Only one caption submitted")
                         noPlayersThenSubmit(res);
                         
+                        console.log("Selected Caption: ", selectedCaption)
                         postVote()
+                        
 
                     } else if(userData.host){
                         console.log("No one submitted a vote")
@@ -249,6 +251,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 //     if(res.players_count === 0)
                 //         pub_playerVote(0)
                 // });
+                console.log("Only submitted caption is: ", res.data.players[0].caption)
                 setSelectedCaption(res.data.players[0].caption)
 
                 // postVote()

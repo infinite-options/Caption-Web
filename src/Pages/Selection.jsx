@@ -463,7 +463,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 duration={userData.roundDuration}
                                 colors="#000000"
                                 onComplete={() => {
-                                    postVote(null)
+                                    if(!localUserVoted)
+                                        postVote(null)
                                 }}
                             >
                                 {({remainingTime}) => {

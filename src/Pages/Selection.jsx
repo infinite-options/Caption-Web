@@ -482,7 +482,11 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                     console.log("Timed out: Cookies vote status ", cookies.userData["voteStatus"])
                                     if(!cookies.userData["voteStatus"])
                                         postVote(null)
-                                    // postVote(null)
+                        
+                                    setCookie("userData", {
+                                        ...cookies.userData,
+                                        "voteStatus": false
+                                    })
                                 }}
                             >
                                 {({remainingTime}) => {

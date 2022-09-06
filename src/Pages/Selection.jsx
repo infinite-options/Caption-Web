@@ -257,9 +257,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         console.log("Only caption passed in: ", onlyCaption)
         console.log("selectedCaption ", selectedCaption)
 
-        // voteStatus = true
-        // console.log("In Post vote, vote status set to true: ", voteStatus)
-
 
         // POST voteCaption
         let payload = {
@@ -302,8 +299,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // FUNCTION: renderCaptions()
     // DESCRIPTION: renders captions as buttons
     function renderCaptions() {
-        // voteStatus = true
-        // console.log("RenderCaptions voteStatus: ", voteStatus)
 
         var captions = [];
         
@@ -437,12 +432,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     <></>
                     : selectedCaption ?
                         <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ e => {
-                            // setLocalUserVoted(true);
-                            // console.log("Onclick vote status before ", voteStatus)
-                            // voteStatus = true
-                            // console.log("Vote Status set to true: ", voteStatus)
+                            
                             postVote()
-                            console.log("Vote status after post vote is ", voteStatus)
 
                             setCookie("userData", {
                                 ...cookies.userData,
@@ -488,8 +479,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 duration={userData.roundDuration}
                                 colors="#000000"
                                 onComplete={() => {
-                                    // console.log("Local user voted: ", localUserVoted)
-                                    console.log("Vote Status in Timer: ", voteStatus)
                                     console.log("Timed out: Cookies vote status ", cookies.userData["voteStatus"])
                                     if(!cookies.userData["voteStatus"])
                                         postVote(null)

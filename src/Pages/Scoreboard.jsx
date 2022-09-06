@@ -101,7 +101,8 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                             setCookie("userData", {
                                 ...cookies.userData,
                                 "imageURL": roundStarted.data.currentImage,
-                                "roundNumber": userData.roundNumber + 1
+                                "roundNumber": userData.roundNumber + 1,
+                                "voteStatus": false
                             })
 
                             history.push('page/')
@@ -222,6 +223,7 @@ function Scoreboard({ channel, channel_waiting, channel_joining}) {
                 ...cookies.userData,
                 "imageURL": nextUrl,
                 "roundNumber": nextRound,
+                "voteStatus": false
             })
 
             history.push("/page");

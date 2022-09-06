@@ -440,6 +440,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 "voteStatus": true
                             })
 
+                            voteStatus = cookies.userData["voteStatus"]
+
 
                             console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
                         }}
@@ -448,7 +450,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 }
 
                 {
-                    ...cookies.userData["voteStatus"] ?
+                    voteStatus ?
                         <p>User voted:{cookies.userData["voteStatus"]}</p> :
                         <p>Haven't voted: {cookies.userData["voteStatus"]}</p>
                 }

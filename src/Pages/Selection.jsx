@@ -257,6 +257,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         console.log("Only caption passed in: ", onlyCaption)
         console.log("selectedCaption ", selectedCaption)
 
+        // voteStatus = true
+        // console.log("In Post vote, vote status set to true: ", voteStatus)
+
+
         // POST voteCaption
         let payload = {
             user_id: userData.playerUID,
@@ -279,6 +283,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         console.log("In postVote()")
         // setLocalUserVoted(true);
 
+
         console.log("Payload before post vote caption", payload)
 
 
@@ -298,6 +303,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // DESCRIPTION: renders captions as buttons
     function renderCaptions() {
         // voteStatus = true
+        // console.log("RenderCaptions voteStatus: ", voteStatus)
+
         var captions = [];
         
         for (var index = 0; index < playersArr.length; index++) {
@@ -431,9 +438,18 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     : selectedCaption ?
                         <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ e => {
                             // setLocalUserVoted(true);
-                            voteStatus = true
-                            console.log("Vote Status set to true: ", voteStatus)
+                            // console.log("Onclick vote status before ", voteStatus)
+                            // voteStatus = true
+                            // console.log("Vote Status set to true: ", voteStatus)
                             postVote()
+                            console.log("Vote status after post vote is ", voteStatus)
+                            
+                            setCookie("userData", {
+                                ...cookies.userData,
+                                voteStatus: true
+                            })
+
+                            console.log("In vote button: Cookies vote status ", cookies.userData.voteStatus)
                         }}
                             conditionalLink={true}/>
                         : <></>
@@ -474,7 +490,8 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                 onComplete={() => {
                                     // console.log("Local user voted: ", localUserVoted)
                                     console.log("Vote Status in Timer: ", voteStatus)
-                                    if(!voteStatus)
+                                    console.log("Cookies vote status: ", cookies.userData.voteStatus)
+                                    if(!cookies.userData.voteStatus)
                                         postVote(null)
                                     // postVote(null)
                                 }}

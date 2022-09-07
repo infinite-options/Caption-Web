@@ -439,7 +439,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             
                             postVote()
 
-                            let voteStatus = true
+                            // let voteStatus = true
+                            voteStatus = true
+
 
                             // setUserData({
                             //     ...userData,
@@ -542,7 +544,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             </CountdownCircleTimer> : <></>
                         } */}
 
-                        {userData.roundDuration !== "" && localUserVoted === false ?
+                        {console.log("local user voted: ", localUserVoted)}
+
+                        {/* {userData.roundDuration !== "" && localUserVoted === false ? */}
+                        {userData.roundDuration !== "" ?
                                 <CountdownCircleTimer
                                     background="red"
                                     size={60}

@@ -90,7 +90,7 @@ export default function Nav() {
 
 
                         <Route exact path='/scoreboard'>
-                            <Scoreboard channel = {channel_scoreboard} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
+                            <Scoreboard channel_scoreboard = {channel_scoreboard} channel_waiting = {channel_waiting} channel_joining = {channel_joining} />
                         </Route>
 
                         <Route exact path='/endgame'>

@@ -14,6 +14,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
 import { CookieHelper } from "../Components/CookieHelper"
 
+// let voteStatus
+
 
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
     const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
@@ -437,7 +439,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             
                             postVote()
 
-                            // voteStatus = true
+                            let voteStatus = true
 
                             // setUserData({
                             //     ...userData,
@@ -452,11 +454,11 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                             // voteStatus = cookies.userData["voteStatus"]
 
-                            // console.log("votestatus changed in timer", voteStatus)
+                            console.log("votestatus changed in vote button", voteStatus)
                             // console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
                             // console.log("UserData status: ", userData.voteStatus)
 
-                            console.log("**** Local User Voted in vote button", localUserVoted)
+                            // console.log("**** Local User Voted in vote button", localUserVoted)
                         }}
                             conditionalLink={true}/>
                         : <></>
@@ -487,7 +489,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             width: "60px",
                         }}
                     >
-                        {userData.roundDuration !== ""  ? <CountdownCircleTimer
+                        {/* {userData.roundDuration !== ""  ? <CountdownCircleTimer
                                 background="red"
                                 size={60}
                                 strokeWidth={5}
@@ -538,6 +540,61 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                     }
                                 }
                             </CountdownCircleTimer> : <></>
+                        } */}
+
+                        {userData.roundDuration !== "" && localUserVoted === false ?
+                                <CountdownCircleTimer
+                                    background="red"
+                                    size={60}
+                                    strokeWidth={5}
+                                    isPlaying
+                                    duration={userData.roundDuration}
+                                    colors="#000000"
+                                    onComplete={() => {
+                                        // console.log("Timed out: Cookies vote status ", cookies.userData["voteStatus"])
+                                        // if(!cookies.userData["voteStatus"])
+                                        //     postVote(null)
+
+                                        // console.log("VoteStatus in timer: ", voteStatus)
+
+                                        // console.log("UserData status in timer: ", userData.voteStatus)
+
+                                        console.log("*** localUserVoted in timer", localUserVoted)
+
+                                        // if(voteStatus === false)
+                                        //     postVote(null)
+
+                                        // if(userData.voteStatus === false)
+                                        //     postVote(null)
+                            
+                                        if(localUserVoted === false) {
+                                            postVote(null)
+                                        }
+                                        
+                                        setLocalUserVoted(false)
+
+                                        // setUserData({
+                                        //     ...userData,
+                                        //     voteStatus: false
+                                        // })
+
+                                        // setCookie("userData", {
+                                        //     ...cookies.userData,
+                                        //     "voteStatus": false
+                                        // })
+
+                                        // console.log("Reset userData votestatus: ", userData.voteStatus)
+                                        // console.log("Reset cookies after timeout", cookies.userData["voteStatus"])
+                                        console.log("**** Local User Voted after condition", localUserVoted)
+
+                                    }}
+                                >
+                                    {({remainingTime}) => {
+                                            return (<div className="countdownText">{remainingTime}</div>)
+                                        }
+                                    }
+                                </CountdownCircleTimer> 
+                            : <></>
                         }
                     </div>
                 </div>

@@ -10,7 +10,7 @@ import {LandingContext} from "../App";
 import {CookieHelper} from "../Components/CookieHelper"
 
 
-function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
+function Scoreboard({ channel, channel_waiting, channel_joining}) {
     const history = useHistory();
     const { cookies, setCookie, userData, setUserData } = useContext(LandingContext);
     const {getCookies} = CookieHelper()
@@ -46,15 +46,22 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
     // HOOK: useEffect()
     // DESCRIPTION: If not host, listen on ably for round started signal. Get next round image on receiving signal.
     useEffect(() => {
-        // If game code exists and the user is a guest
         if(userData.code !== "" &&  !userData.host) {
-            
+            // DONT INCREMENT EVERY TIME
+            // setUserData({
+            //     ...userData,
+            //     roundNumber: userData.roundNumber + 1,
+            // })
+            // setCookie("userData", {
+            //     ...cookies.userData,
+            //     "roundNumber": userData.roundNumber + 1,
+            // })
 
             // FUNCTION: subscribe()
             // DESCRIPTION: Listen for roundStarted signal on ably. When round has started, load next round's image url and transition to next page.
             async function subscribe() 
             {
-                await channel_scoreboard.subscribe(roundStarted => {
+                await channel.subscribe(roundStarted => {
 
                     if (roundStarted.data.roundStarted) {
                         // Database Deck
@@ -108,10 +115,9 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
             subscribe();
         
             return function cleanup() {
-                channel_scoreboard.unsubscribe();
+                channel.unsubscribe();
             };
         }
-
 
 
         // FUNCTION: subscribeWaiting()
@@ -139,7 +145,6 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
     }, [userData.scoreboardInfo]);
 
 
-    
     // FUNCTION: renderReports()
     // DESCRIPTION: Renders scoreboard
     function renderReports() {
@@ -165,7 +170,6 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
             </div>
         );
     }
-
 
     // FUNCTION: startNextRound()
     // DESCRIPTION: Runs on clicking "next round"
@@ -373,14 +377,14 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
     const pub = (apiURL) => {
         if(userData.isApi){
             console.log("pub() using api deck: ", apiURL)
-            channel_scoreboard.publish({data: {
+            channel.publish({data: {
                 roundStarted: true,
                 currentImage: apiURL,
             }});
         }
         else{
             console.log("pub() using database deck")
-            channel_scoreboard.publish({data: {
+             channel.publish({data: {
                 roundStarted: true,
                 currentImage: "",
             }});

@@ -33,7 +33,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // Determine if we should display landing page (true) or loading icon (false)
     const [displayHtml, setDisplayHtml] = useState(false)
 
-    // Used to indicate if user voted yet
+    // THIS RESETS TO FALSE EVERY TIME THE PAGE RENDERS
     // let voteStatus = false
 
 
@@ -254,6 +254,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // FUNCTION: postVote()
     // DESCRIPTION: posts user's vote on clicking submit
     async function postVote(onlyCaption) {
+
+        setLocalUserVoted(true);
+
         console.log("Only caption passed in: ", onlyCaption)
         console.log("selectedCaption ", selectedCaption)
 
@@ -278,7 +281,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         }
 
         console.log("In postVote()")
-        // setLocalUserVoted(true);
 
 
         console.log("Payload before post vote caption", payload)
@@ -446,7 +448,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             //     ...cookies.userData,
                             //     "voteStatus": true
                             // })
-                            setLocalUserVoted(true)
+                            // setLocalUserVoted(true)
 
                             // voteStatus = cookies.userData["voteStatus"]
 

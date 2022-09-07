@@ -440,7 +440,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             postVote()
 
                             // let voteStatus = true
-                            voteStatus = true
+                            // voteStatus = true
 
 
                             // setUserData({
@@ -456,7 +456,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
                             // voteStatus = cookies.userData["voteStatus"]
 
-                            console.log("votestatus changed in vote button", voteStatus)
+                            // console.log("votestatus changed in vote button", voteStatus)
                             // console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
                             // console.log("UserData status: ", userData.voteStatus)
 

@@ -29,7 +29,6 @@ export default function App() {
             albumId: "",
             accessToken: ""
         },
-        voteStatus: false
     })
 
     const [cookies, setCookie, removeCookie] = useCookies(['userData'])

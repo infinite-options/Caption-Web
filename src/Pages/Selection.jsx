@@ -14,8 +14,6 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
 import { CookieHelper } from "../Components/CookieHelper"
 
-// let voteStatus
-
 
 export default function Scoreboard({channel_host, channel_all, channel_waiting, channel_joining}) {
     const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
@@ -34,9 +32,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
     // Determine if we should display landing page (true) or loading icon (false)
     const [displayHtml, setDisplayHtml] = useState(false)
-
-    // THIS RESETS TO FALSE EVERY TIME THE PAGE RENDERS
-    // let voteStatus = false
 
 
     // Endpoints used in Selection
@@ -422,62 +417,16 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     <ReactBootStrap.Spinner animation="border" role="status"/>
                 )}
 
-                {/* {loading ? (
-                    localUserVoted ?
-                    <></>
-                    : selectedCaption ?
-                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={postVote}
-                            conditionalLink={true}/>
-                        : <></>
-                ) : (
-                    <ReactBootStrap.Spinner animation="border" role="status"/>
-                )} */}
+                
                 {localUserVoted ?
                     <></>
                     : selectedCaption ?
-                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ async (e) => {
-                            
+                        <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ (e) => {
                             postVote()
-
-                            // let voteStatus = true
-                            // voteStatus = true
-
-
-                            // setUserData({
-                            //     ...userData,
-                            //     voteStatus: true
-                            // })
-
-                            // await setCookie("userData", {
-                            //     ...cookies.userData,
-                            //     "voteStatus": true
-                            // })
-                            // setLocalUserVoted(true)
-
-                            // voteStatus = cookies.userData["voteStatus"]
-
-                            // console.log("votestatus changed in vote button", voteStatus)
-                            // console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
-                            // console.log("UserData status: ", userData.voteStatus)
-
-                            // console.log("**** Local User Voted in vote button", localUserVoted)
                         }}
                             conditionalLink={true}/>
                         : <></>
                 }
-
-                {/* {
-                    voteStatus ?
-                        <p>User voted:{cookies.userData["voteStatus"]}</p> :
-                        <p>Haven't voted: {cookies.userData["voteStatus"]}</p>
-                } */}
-
-                {
-                    selectedCaption ?
-                        <p>Caption selected {selectedCaption}</p> :
-                        <p>Caption not selected</p>
-                }
-                
                 
                 <div style = {{
                     display: 'flex', 
@@ -491,63 +440,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             width: "60px",
                         }}
                     >
-                        {/* {userData.roundDuration !== ""  ? <CountdownCircleTimer
-                                background="red"
-                                size={60}
-                                strokeWidth={5}
-                                isPlaying
-                                duration={userData.roundDuration}
-                                colors="#000000"
-                                onComplete={() => {
-                                    // console.log("Timed out: Cookies vote status ", cookies.userData["voteStatus"])
-                                    // if(!cookies.userData["voteStatus"])
-                                    //     postVote(null)
-
-                                    // console.log("VoteStatus in timer: ", voteStatus)
-
-                                    // console.log("UserData status in timer: ", userData.voteStatus)
-
-                                    console.log("*** localUserVoted in timer", localUserVoted)
-
-                                    // if(voteStatus === false)
-                                    //     postVote(null)
-
-                                    // if(userData.voteStatus === false)
-                                    //     postVote(null)
-                        
-                                    if(localUserVoted === false) {
-                                        postVote(null)
-                                    }
-                                    
-                                    setLocalUserVoted(false)
-
-                                    // setUserData({
-                                    //     ...userData,
-                                    //     voteStatus: false
-                                    // })
-
-                                    // setCookie("userData", {
-                                    //     ...cookies.userData,
-                                    //     "voteStatus": false
-                                    // })
-
-                                    // console.log("Reset userData votestatus: ", userData.voteStatus)
-                                    // console.log("Reset cookies after timeout", cookies.userData["voteStatus"])
-                                    console.log("**** Local User Voted after condition", localUserVoted)
-
-                                }}
-                            >
-                                {({remainingTime}) => {
-                                        return (<div className="countdownText">{remainingTime}</div>)
-                                    }
-                                }
-                            </CountdownCircleTimer> : <></>
-                        } */}
 
                         {console.log("local user voted: ", localUserVoted)}
 
-                        {/* {userData.roundDuration !== "" && localUserVoted === false ? */}
-                        {userData.roundDuration !== "" ?
+                        {userData.roundDuration !== "" && localUserVoted === false ?
                                 <CountdownCircleTimer
                                     background="red"
                                     size={60}
@@ -556,41 +452,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                     duration={userData.roundDuration}
                                     colors="#000000"
                                     onComplete={() => {
-                                        // console.log("Timed out: Cookies vote status ", cookies.userData["voteStatus"])
-                                        // if(!cookies.userData["voteStatus"])
-                                        //     postVote(null)
-
-                                        // console.log("VoteStatus in timer: ", voteStatus)
-
-                                        // console.log("UserData status in timer: ", userData.voteStatus)
-
-                                        console.log("*** localUserVoted in timer", localUserVoted)
-
-                                        // if(voteStatus === false)
-                                        //     postVote(null)
-
-                                        // if(userData.voteStatus === false)
-                                        //     postVote(null)
-                            
-                                        if(localUserVoted === false) {
-                                            postVote(null)
-                                        }
-                                        
-                                        setLocalUserVoted(false)
-
-                                        // setUserData({
-                                        //     ...userData,
-                                        //     voteStatus: false
-                                        // })
-
-                                        // setCookie("userData", {
-                                        //     ...cookies.userData,
-                                        //     "voteStatus": false
-                                        // })
-
-                                        // console.log("Reset userData votestatus: ", userData.voteStatus)
-                                        // console.log("Reset cookies after timeout", cookies.userData["voteStatus"])
-                                        console.log("**** Local User Voted after condition", localUserVoted)
+                                        // We suspect that onComplete refreshes the entire screen and resets localUserVoted to false
+                                        // console.log("*** localUserVoted in timer", localUserVoted)
+                                        postVote(null)
 
                                     }}
                                 >

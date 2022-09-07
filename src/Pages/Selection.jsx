@@ -34,7 +34,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     const [displayHtml, setDisplayHtml] = useState(false)
 
     // Used to indicate if user voted yet
-    let voteStatus = false
+    // let voteStatus = false
 
 
     // Endpoints used in Selection
@@ -435,33 +435,36 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             
                             postVote()
 
-                            voteStatus = true
+                            // voteStatus = true
 
-                            setUserData({
-                                ...userData,
-                                voteStatus: true
-                            })
+                            // setUserData({
+                            //     ...userData,
+                            //     voteStatus: true
+                            // })
 
-                            await setCookie("userData", {
-                                ...cookies.userData,
-                                "voteStatus": true
-                            })
+                            // await setCookie("userData", {
+                            //     ...cookies.userData,
+                            //     "voteStatus": true
+                            // })
+                            setLocalUserVoted(true)
 
                             // voteStatus = cookies.userData["voteStatus"]
 
-                            console.log("votestatus changed in timer", voteStatus)
-                            console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
-                            console.log("UserData status: ", userData.voteStatus)
+                            // console.log("votestatus changed in timer", voteStatus)
+                            // console.log("In vote button: Cookies vote status ", cookies.userData["voteStatus"])
+                            // console.log("UserData status: ", userData.voteStatus)
+
+                            console.log("**** Local User Voted in vote button", localUserVoted)
                         }}
                             conditionalLink={true}/>
                         : <></>
                 }
 
-                {
+                {/* {
                     voteStatus ?
                         <p>User voted:{cookies.userData["voteStatus"]}</p> :
                         <p>Haven't voted: {cookies.userData["voteStatus"]}</p>
-                }
+                } */}
 
                 {
                     selectedCaption ?
@@ -494,29 +497,38 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                     // if(!cookies.userData["voteStatus"])
                                     //     postVote(null)
 
-                                    console.log("VoteStatus in timer: ", voteStatus)
+                                    // console.log("VoteStatus in timer: ", voteStatus)
 
-                                    console.log("UserData status in timer: ", userData.voteStatus)
+                                    // console.log("UserData status in timer: ", userData.voteStatus)
+
+                                    console.log("*** localUserVoted in timer", localUserVoted)
 
                                     // if(voteStatus === false)
                                     //     postVote(null)
 
-                                    if(userData.voteStatus === false)
-                                        postVote(null)
+                                    // if(userData.voteStatus === false)
+                                    //     postVote(null)
                         
+                                    if(localUserVoted === false) {
+                                        postVote(null)
+                                    }
                                     
-                                    setUserData({
-                                        ...userData,
-                                        voteStatus: false
-                                    })
+                                    setLocalUserVoted(false)
 
-                                    setCookie("userData", {
-                                        ...cookies.userData,
-                                        "voteStatus": false
-                                    })
+                                    // setUserData({
+                                    //     ...userData,
+                                    //     voteStatus: false
+                                    // })
 
-                                    console.log("Reset userData votestatus: ", userData.voteStatus)
+                                    // setCookie("userData", {
+                                    //     ...cookies.userData,
+                                    //     "voteStatus": false
+                                    // })
+
+                                    // console.log("Reset userData votestatus: ", userData.voteStatus)
                                     // console.log("Reset cookies after timeout", cookies.userData["voteStatus"])
+                                    console.log("**** Local User Voted after condition", localUserVoted)
+
                                 }}
                             >
                                 {({remainingTime}) => {

@@ -185,9 +185,11 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
                         {userData.deckTitle}
                     </h1>
                     <br></br>
-                    <h3>Round: {userData.roundNumber}/{userData.rounds}</h3>
-                    {/* <p>URL: {userData.imageURL}</p>
-                    <p>RoundDuration: {userData.roundDuration}</p> */}
+                    <h3>
+                        Round: {userData.roundNumber}/{userData.rounds}
+                    </h3>
+
+                    
                     <br></br>
                     
                     <img className="centerPic" src={userData.imageURL} alt="Loading Image...."/>

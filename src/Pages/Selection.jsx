@@ -402,6 +402,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 <br></br>
                 <h1>{userData.deckTitle}</h1>
                 <br></br>
+                <h3>
+                    Round: {userData.roundNumber}/{userData.rounds}
+                </h3>
+                <br></br>
 
                 <h4>Pick Your Favorite Caption</h4>
                 <br></br>
@@ -439,38 +443,47 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     paddingBottom: '20px', 
                     paddingTop: selectedCaption ? '20px' : '0px'}}
                 >
-                    <div style={{
+                    {/* <div style={{
                             background: "yellow",
                             borderRadius: "30px",
                             width: "60px",
                         }}
-                    >
+                    > */}
 
                         {/* {console.log("local user voted: ", localUserVoted)} */}
 
                         {userData.roundDuration !== "" && localUserVoted === false ?
-                                <CountdownCircleTimer
-                                    background="red"
-                                    size={60}
-                                    strokeWidth={5}
-                                    isPlaying
-                                    duration={userData.roundDuration}
-                                    colors="#000000"
-                                    onComplete={() => {
-                                        // We suspect that onComplete refreshes the entire screen and resets localUserVoted to false
-                                        // console.log("*** localUserVoted in timer", localUserVoted)
-                                        console.log("Voting page timer complete")
-                                        postVote(null)
-                                    }}
-                                >
-                                    {({remainingTime}) => {
-                                            return (<div className="countdownText">{remainingTime}</div>)
+                                <div style={{
+                                    background: "yellow",
+                                    borderRadius: "30px",
+                                    width: "60px",
+                                }}>
+                                    <CountdownCircleTimer
+                                        background="red"
+                                        size={60}
+                                        strokeWidth={5}
+                                        isPlaying
+                                        duration={userData.roundDuration}
+                                        colors="#000000"
+                                        onComplete={() => {
+                                            // We suspect that onComplete refreshes the entire screen and resets localUserVoted to false
+                                            // console.log("*** localUserVoted in timer", localUserVoted)
+                                            console.log("Voting page timer complete")
+                                            postVote(null)
+                                        }}
+                                    >
+                                        {({remainingTime}) => {
+                                                return (<div className="countdownText">{remainingTime}</div>)
+                                            }
                                         }
-                                    }
-                                </CountdownCircleTimer> 
-                            : <></>
+                                    </CountdownCircleTimer> 
+                                </div>
+                            : 
+                            <p>
+                                <b>Vote submitted.</b> <br /> Waiting for other players to vote...
+                            </p>
                         }
-                    </div>
+                    {/* </div> */}
                 </div>
             </div> :
             // Loading icon HTML

@@ -277,8 +277,14 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
             >
                 <br></br>
                 <h1>{userData.deckTitle}</h1>
+                
+
+                <h2> Scoreboard</h2>
+
+                <h5>
+                    Round: {userData.roundNumber}/{userData.rounds}
+                </h5>
                 <br></br>
-                <h3> Scoreboard</h3>
 
 
                 <img className="centerPic" style={{

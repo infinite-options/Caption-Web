@@ -1,4 +1,4 @@
-import React, {useContext} from 'react'
+import {useContext} from 'react'
 import { LandingContext } from '../App';
 
 export const CookieHelper = () => {
@@ -7,6 +7,7 @@ export const CookieHelper = () => {
     // FUNCTION: InitializeCookies()
     // DESCRIPTION: Sets default cookie values in Landing page
     const initializeCookies = () => {
+        console.log("In initializeCookies()")
         setCookie("userData", {
             ...cookies.userData,
             "code": "",
@@ -26,6 +27,28 @@ export const CookieHelper = () => {
                 "accessToken": ""
             }
         })
+
+        setUserData({
+            name: cookies.userData.name,
+            email: cookies.userData.email,
+            zipCode: cookies.userData.zipCode,
+            alias: cookies.userData.alias,
+            gameUID: "",
+            rounds: "10",
+            roundDuration: "30",
+            host: "",
+            playerUID: "",
+            roundNumber: "",
+            imageURL: "",
+            scoreboardInfo: [],
+            deckSelected: "",
+            deckTitle: "",
+            isApi: false,
+            googlePhotos: {
+                albumId: "",
+                accessToken: ""
+            }
+        })
     }
 
 
@@ -42,24 +65,23 @@ export const CookieHelper = () => {
         console.log("Starting getCookies() in", window.location.href)
         let hooksUpdate = {}
 
-        console.log("Current cookies", cookies.userData)
-        console.log("hooksUpdate: ", hooksUpdate)
-        console.log("hooksNeeded", hooksNeeded)
+        // console.log("Current cookies", cookies.userData)
+        // console.log("hooksNeeded", hooksNeeded)
 
         // If userData has incorrect cookieName value, load value from cookies
         for(let i = 0; i < hooksNeeded.length; i++) {
-            console.log("userData ", hooksNeeded[i], ": ", userData[hooksNeeded[i]])
-            console.log("cookies ", hooksNeeded[i], ": ", cookies.userData[hooksNeeded[i]])
+            // console.log("userData ", hooksNeeded[i], ": ", userData[hooksNeeded[i]])
+            // console.log("cookies ", hooksNeeded[i], ": ", cookies.userData[hooksNeeded[i]])
 
             if(userData[hooksNeeded[i]] !== cookies.userData[hooksNeeded[i]]){
                 hooksUpdate[hooksNeeded[i]] = cookies.userData[hooksNeeded[i]]
-                console.log("Updated: ", hooksNeeded[i])
+                // console.log("Updated: ", hooksNeeded[i])
             }
                 
             
         }
 
-        console.log("hooksUpdate after loop: ", hooksUpdate)
+        // console.log("hooksUpdate after loop: ", hooksUpdate)
 
         let hooksUpdateSize = Object.keys(hooksUpdate).length
 

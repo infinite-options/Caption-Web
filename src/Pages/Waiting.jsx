@@ -10,11 +10,13 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import * as ReactBootStrap from 'react-bootstrap';
 import {Link} from "react-router-dom";
 import { CookieHelper } from "../Components/CookieHelper"
+import { ApiHelper } from '../Components/ApiHelper';
 
 
 export default function Waiting({channel, channel2, channel_joining}) {
     const { userData, setUserData, cookies, setCookie } = useContext(LandingContext);
     const { getCookies } = CookieHelper()
+    const { apiCall } = ApiHelper()
     const history = useHistory();
 
     const [names, setNames] = useState([]);
@@ -30,17 +32,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
     const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
     const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/"
-    const getRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage/"
-    const postRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage"
-
-
-    // 3rd Party API Url's
-    const clevelandURL = "https://openaccess-api.clevelandart.org/api/artworks"
-    const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_id"
-    const giphyURL = "https://api.giphy.com/v1/gifs/trending?api_key=Fo9QcAQLMFI8V6pdWWHWl9qmW91ZBjoK&"
-    const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"
-    const searchGooglePhotosURL = 'https://photoslibrary.googleapis.com/v1/mediaItems:search'
-
+    
 
     // HOOK: useEffect()
     // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not    
@@ -191,7 +183,9 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
     // FUNCTION: startPlaying()
      // DESCRIPTION: Called when clicking "Start Game", splits transition to next page flow for database decks and api decks
-    async function startPlaying() {     
+    async function startPlaying() {  
+        setDisplayHtml(false)
+        
         if(!userData.isApi)
             getDatabaseImage()
         else
@@ -230,141 +224,6 @@ export default function Waiting({channel, channel2, channel_joining}) {
         pub(uniqueImage)
     }
 
-
-    // FUNCTION: apiCall()
-    // DESCRIPTION: Gets a list of previously used images, then list of images from API. Selects/returns a unique url not in previously used images.
-    const apiCall = async () => {
-        let usedUrlArr = []
-        let uniqueUrl = ""
-
-        // Display loading screen while api's are called
-        setDisplayHtml(false)
-
-
-        // GET /getRoundImage gets previously used images
-        await axios.get(getRoundImageURL + userData.code + ",0").then(res => {
-            const result = res.data.result
-            console.log("getRoundImage Result", result)
-            for(let i = 0; i < result.length; i++) {
-                usedUrlArr.push(result[i].round_image_uid)
-            }
-            console.log("usedUrlSet", usedUrlArr)
-        })
-
-        // Get set of photos from URLs, then select a unique image that hasn't been used
-        if(userData.deckSelected === "500-000005"){
-            // Google Photos API Call
-            const body = {
-                "pageSize": "50",
-                "albumId":  userData.googlePhotos.albumId
-            }
-            const headers = {
-                Accept: 'application/json',
-                Authorization: 'Bearer ' + userData.googlePhotos.accessToken ,
-            }
-    
-            await axios.post(searchGooglePhotosURL, body, {headers: headers})
-            .then(res => {
-                // Collect image urls in array
-                let imageUrls = res.data.mediaItems.map(picture => {
-                    return picture.baseUrl
-                })
-
-                while(true) {
-                    // Generate random index number
-                    let randomIndex = (Math.random() * imageUrls.length).toFixed(0)
-
-                    let image = imageUrls[randomIndex]
-                    console.log("used list contains image: ", usedUrlArr.includes(image))
-                    if(!usedUrlArr.includes(image)){
-                        uniqueUrl = image
-                        console.log("unique url found", uniqueUrl)
-                        break
-                    }
-                }
-            })
-
-        } else if (userData.deckSelected === "500-000006") {
-            // Cleveland API Call
-            await axios.get(clevelandURL, {limit : "20"}).then( res => {
-                console.log("Cleveland res", res)
-
-                while(true) {
-                    let randomIndex = (Math.random() * 20).toFixed(0)
-
-                    let image = res.data.data[randomIndex]
-                    if(image.images !== null && image.images.web !== null && !usedUrlArr.includes(image.images.web.url)){
-                        uniqueUrl = image.images.web.url
-                        console.log("unique url found", uniqueUrl)
-                        break
-                    }
-                }
-            })
-        } else if (userData.deckSelected === "500-000007") {
-            // Chicago API Call
-            await axios.get(chicagoURL, {limit : "20"}).then( res => {
-                console.log("Chicago Res", res)
-                while(true) {
-                    let randomIndex = (Math.random() * 12).toFixed(0)
-
-                    let chicagoImage = res.data.data[randomIndex]
-                    console.log("RandomIndex", randomIndex)
-                    console.log("ChicagoImage", chicagoImage)
-
-                    let currentUrl = res.data.config.iiif_url + "/" + chicagoImage.image_id + "/full/843,/0/default.jpg"
-                    if(chicagoImage.image_id !== undefined && !usedUrlArr.includes(currentUrl)){
-                        uniqueUrl = currentUrl
-                        console.log("unique url found", uniqueUrl)
-                        break
-                    }
-                }
-            })
-        } else if (userData.deckSelected === "500-000008") {
-            // Giphy API Call
-            await axios.get(giphyURL, {limit : "20"}).then( res => {
-                while(true) {
-                    let randomIndex = (Math.random() * 20).toFixed(0)
-
-                    let giphyImage = res.data.data[randomIndex]
-                    if(giphyImage.images.original.url !== undefined && !usedUrlArr.includes(giphyImage.images.original.url)){
-                        uniqueUrl = giphyImage.images.original.url
-                        console.log("unique url found", uniqueUrl)
-                        break
-                    }
-                }
-            })
-        } else if (userData.deckSelected === "500-000009") {
-            // Harvard API Call
-            await axios.get(harvardURL, {limit : "20"}).then( res => {
-                while(true) {
-                    let randomIndex = (Math.random() * 10).toFixed(0)
-
-                    let harvardImage = res.data.records[randomIndex]
-                    if(harvardImage.baseimageurl !== undefined && !usedUrlArr.includes(harvardImage.baseimageurl)){
-                        uniqueUrl = harvardImage.baseimageurl
-                        console.log("unique url found", uniqueUrl)
-                        break
-                    }
-                }
-            })
-        }
-
-
-        // POST /postRoundImage posts the current url to used url list in database
-        let payload = {
-            "game_code": userData.code,
-            "round_number": userData.roundNumber.toString(),
-            "image": uniqueUrl
-        }
-        await axios.post(postRoundImageURL, payload).then(res => {
-            console.log("postRoundImage", res)
-        })
-
-        // Remove loading icon
-        setDisplayHtml(true)
-
-        return uniqueUrl
-    }
 
 
     // FUNCTION: getDatabaseImage()

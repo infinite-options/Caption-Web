@@ -1,16 +1,14 @@
 
 import { useHistory } from "react-router-dom";
-import { Button } from "../Components/Button.jsx";
-import React, {useContext, useEffect, useState, Component} from 'react'
+import React, {useContext, useEffect} from 'react'
 import "../Styles/GameRules.css";
-import {useNavigate} from 'react-router-dom';
 import {LandingContext} from "../App";
 import axios from "axios";
 
 
 function GameRules({channel2}) {
     const history = useHistory();
-    const {code, host, rounds, setRounds, roundNumber, setImageURL, alias, photosFromAPI, setPhotosFromAPI, deckSelected, deckTitle, setDeckTitle} = useContext(LandingContext);
+    const {userData, setUserData} = useContext(LandingContext);
     useEffect(() => {
         async function subscribe2() 
         {
@@ -18,15 +16,22 @@ function GameRules({channel2}) {
                 console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
-                    setDeckTitle(newGame.data.deckTitle)
+                    setUserData({
+                        ...userData,
+                        deckTitle: newGame.data.deckTitle
+                    })
 
                     if(newGame.data.currentImage.length === 0) {
                         const getImage = async () => {
                             const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/";
-                            await axios.get(getImageURL + code + "," + roundNumber)
+                            await axios.get(getImageURL + userData.code + "," + userData.roundNumber)
                             .then((res) => {
                                 console.log("GET Get Image For Players", res);
-                                setImageURL(res.data.image_url);
+                                setUserData({
+                                    ...userData,
+                                    deckTitle: newGame.data.deckTitle,
+                                    imageURL: res.data.image_url
+                                })
                             })
 
                             history.push('/page');
@@ -34,18 +39,22 @@ function GameRules({channel2}) {
 
                         getImage();
                     } else {
-                        setImageURL(newGame.data.currentImage)
+                        setUserData({
+                            ...userData,
+                            deckTitle: newGame.data.deckTitle,
+                            imageURL: newGame.data.currentImage
+                        })
                         history.push('/page')
                     }
                     
                 }
             })
         }
-        if(code){
+        if(userData.code){
             subscribe2()
         }
         
-    },[code])
+    },[userData.code])
     
     return (
         <div> 

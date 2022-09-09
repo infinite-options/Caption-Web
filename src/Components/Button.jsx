@@ -1,11 +1,11 @@
-import React, {useState} from "react";
+import React  from "react";
 import "../Styles/Button.css";
 import {Link} from "react-router-dom";
 import {Typography} from '@material-ui/core';
 
-const STYLES = ["btn--primary", "btn--outline", "btn--test"];
+// const STYLES = ["btn--primary", "btn--outline", "btn--test"];
 
-const SIZES = ["btn--medium", "btn--large"];
+// const SIZES = ["btn--medium", "btn--large"];
 
 const Button = ({
                     className,
@@ -19,11 +19,11 @@ const Button = ({
                     conditionalLink,
                     copied,
                 }) => {
-    const checkButtonStyle = STYLES.includes(buttonStyle)
-        ? buttonStyle
-        : STYLES[0];
+    // const checkButtonStyle = STYLES.includes(buttonStyle)
+    //     ? buttonStyle
+    //     : STYLES[0];
 
-    const checkButtonSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0];
+    // const checkButtonSize = SIZES.includes(buttonSize) ? buttonSize : SIZES[0];
 
     return (
         <Link to={conditionalLink ? destination : ""} className="btn-mobile" style = {{textDecoration: 'none'}}>

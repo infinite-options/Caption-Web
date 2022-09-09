@@ -69,7 +69,7 @@ function ScoreType() {
 
             return res.data.game_code
         }).then((gameCode) => {
-            console.log('gameCode', gameCode)
+            // console.log('gameCode', gameCode)
 
             // POST /joinGame to join created game using host's ID, then transition to waiting room
             let payload = {

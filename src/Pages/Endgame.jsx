@@ -10,7 +10,7 @@ import { CookieHelper } from "../Components/CookieHelper"
 export default function Endgame() {
     const [scoreboardInfo, setScoreboardInfo] = useState([]);
     const { getCookies } = CookieHelper()
-    const { userData, setUserData } = useContext(LandingContext);
+    const { userData } = useContext(LandingContext);
 
     // Determine if we should display landing page (true) or loading icon (false)
     const [displayHtml, setDisplayHtml] = useState(false)

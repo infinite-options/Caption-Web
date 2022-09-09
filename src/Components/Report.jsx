@@ -1,6 +1,5 @@
-import { throwStatement } from "@babel/types";
 import React from "react";
-import { Row, Col, Card } from "reactstrap";
+import { Card } from "reactstrap";
 import "../Styles/Report.css";
 import { Typography } from "@material-ui/core";
 

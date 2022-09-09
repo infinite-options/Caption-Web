@@ -65,10 +65,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         // FUNCTION: getCaptions()
         // DESCRIPTION: Gets captions for user to vote on. Transitions to next page if only one caption/player
         async function getCaptions() {
-            if (userData.host) {
-                // Confirms game has started and returns round start time
-                await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber);
-            }
+            // if (userData.host) {
+            //     // Confirms game has started and returns round start time
+            //     await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber);
+            // }
             
             // Returns all submitted captions
             await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
@@ -352,32 +352,32 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     };
 
 
-    // HOOK: useEffect()
-    // DESCRIPTION: we've set timerDuration, immediately set timeLeft (used to signal end of round)
-        // Use for refresh timer reset
-    useEffect(() => timerDuration === -1 ? '' : setTimeLeft(timerDuration), [timerDuration]);
+    // // HOOK: useEffect()
+    // // DESCRIPTION: we've set timerDuration, immediately set timeLeft (used to signal end of round)
+    //     // Use for refresh timer reset
+    // useEffect(() => timerDuration === -1 ? '' : setTimeLeft(timerDuration), [timerDuration]);
 
 
-    // HOOK: useEffect()
-    // DESCRIPTION: Counts down time left until 0
-    useEffect(() => {
-        if (timeLeft > 0 && timeLeft !== Number.POSITIVE_INFINITY)
-            setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-        else if (timeLeft === 0 && !localUserVoted) {
-            console.log("Time ran out and user didn't vote")
-            postVote()
+    // // HOOK: useEffect()
+    // // DESCRIPTION: Counts down time left until 0
+    // useEffect(() => {
+    //     if (timeLeft > 0 && timeLeft !== Number.POSITIVE_INFINITY)
+    //         setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
+    //     else if (timeLeft === 0 && !localUserVoted) {
+    //         console.log("Time ran out and user didn't vote")
+    //         postVote()
 
-            pub_everyoneVoted()
-        }
+    //         pub_everyoneVoted()
+    //     }
             
-    }, [timeLeft]);
+    // }, [timeLeft]);
 
 
-    // HOOK: useEffect()
-    // DESCRIPTION: prints timeLeft on change
-    useEffect(() => {
-        console.log('timeLeft = ', timeLeft);
-    }, [timeLeft]);
+    // // HOOK: useEffect()
+    // // DESCRIPTION: prints timeLeft on change
+    // useEffect(() => {
+    //     console.log('timeLeft = ', timeLeft);
+    // }, [timeLeft]);
 
 
 
@@ -441,7 +441,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         }}
                     >
 
-                        {console.log("local user voted: ", localUserVoted)}
+                        {/* {console.log("local user voted: ", localUserVoted)} */}
 
                         {userData.roundDuration !== "" && localUserVoted === false ?
                                 <CountdownCircleTimer

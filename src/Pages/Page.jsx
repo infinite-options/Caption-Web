@@ -1,6 +1,5 @@
 import React, {useContext, useEffect, useState} from "react";
 import {useHistory} from 'react-router-dom';
-import {Row, Col, Card} from "reactstrap";
 import Form from "../Components/Form";
 import {Button} from "../Components/Button";
 import "../Styles/Page.css";
@@ -16,7 +15,7 @@ import Bubbles from "../Components/Bubbles";
 import { CookieHelper } from "../Components/CookieHelper"
 
 
-export default function Page({ channel, channel_waiting, channel_joining}) {
+export default function Page({ channel_page, channel_waiting, channel_joining}) {
     const { userData, cookies } = useContext(LandingContext);
     const { getCookies } = CookieHelper()
     const history = useHistory();
@@ -24,19 +23,13 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     // Hooks used in page
     const [caption, setCaption] = useState("");
     const [captionSubmitted, setCaptionSubmitted] = useState(false);
-    const [roundHasStarted, setRoundHasStarted] = useState(false);
     const [timeUp, setTimeUp] = useState(false);
-    const [timerDuration, setTimerDuration] = useState(-1);
     const [waitingPlayers, setWaitingPlayers] = useState([]);
-    const [roundStartTime, setRoundStartTime] = useState();
-    const [loading, setLoading] = useState(false);
 
     // Determine if we should display landing page (true) or loading icon (false)
     const [displayHtml, setDisplayHtml] = useState(false)
 
     // Endpoints used in Page
-    const startPlayingURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/startPlaying/";
-    const getTimerURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/gameTimer/";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
     const getAllSubmittedCaptionsURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
 
@@ -54,24 +47,6 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     }, [])
 
 
-    // HOOK: useEffect()
-    // DESCRIPTION: On first render/start of round, host gets current round's start time. Also logs start time for round in database simultaneously
-    useEffect(() => {
-        async function pageAsyc(){
-            if (userData.host) {
-                // Host gets start of new round/time started from backend
-                await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber).then((res) => {
-                    console.log("GET startPlaying", res);
-                    setRoundStartTime(res.data.round_start_time);
-                    setRoundHasStarted(true);
-                })
-            }
-        }
-
-        pageAsyc();
-    }, []);
-
-
 
     // HOOK: useEffect()
     // DESCRIPTION: Processes how many players voted in subscribePlayersLeft(). Deals with new joining players while in round in subscribeNewPlayers()
@@ -80,9 +55,10 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
         // DESCRIPTION: Listens on ably channel for players who have voted. If new player voted, add to waitingPlayers array. If no players left to vote, transition to selection page.
         async function subscribePlayersLeft() 
         {
-            await channel.subscribe(newVote => {
+            await channel_page.subscribe(newVote => {
                 console.log('Countdown on submit-caption screen: PlayersLeft = ', newVote.data.playersLeft);
                 const newWaitingPlayers = [];
+
                 for (let i = 0; i < waitingPlayers.length; i++)
                     if (waitingPlayers[i] !== newVote.data.userWhoVoted)
                         newWaitingPlayers.push(waitingPlayers[i]);
@@ -126,7 +102,7 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     
 
         return function cleanup() {
-            channel.unsubscribe();
+            channel_page.unsubscribe();
             channel_waiting.unsubscribe();
         };
     }, [waitingPlayers, userData.code]);
@@ -151,7 +127,6 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
         });
 
         setCaptionSubmitted(true);
-        setLoading(true)
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
             caption: caption,
@@ -185,7 +160,7 @@ export default function Page({ channel, channel_waiting, channel_joining}) {
     // Publish amount of players who haven't submitted, and who voted
     const pub = (playerCount) => {
         console.log('In pub function with playerCount == ', playerCount);
-        channel.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
+        channel_page.publish({data: {playersLeft: playerCount, userWhoVoted: userData.alias}});
     };
 
     

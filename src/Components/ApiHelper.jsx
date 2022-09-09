@@ -132,7 +132,7 @@ export const ApiHelper = () => {
         let payload = {
             "game_code": userData.code,
             // "round_number": userData.roundNumber.toString(),
-            "round_number": nextRound === undefined ? userData.roundNumber.toString() : nextRound,
+            "round_number": nextRound === undefined ? userData.roundNumber.toString() : nextRound.toString(),
             "image": nextRoundUrl
         }
         await axios.post(postRoundImageURL, payload).then(res => {

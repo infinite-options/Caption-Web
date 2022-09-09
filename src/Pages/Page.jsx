@@ -33,16 +33,20 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersRemainingToSubmitCaption/";
     const getAllSubmittedCaptionsURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/";
 
+
     
     // HOOK: useEffect()
     // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
-        console.log("Page cookies", cookies.userData)
+        console.log("Captions page cookies: ", cookies.userData)
+        console.log("Captions page hooks: ", userData)
+
          // Check if userData is empty (after refresh/new user)
          if(userData.host === "" || userData.roundNumber === "" || userData.playerUID === "" || userData.rounds === "" || userData.roundDuration === "" || userData.code === "" || userData.deckTitle === "" || userData.imageURL === "") {
             getCookies(["host", "roundNumber", "playerUID", "deckSelected", "rounds", "roundDuration", "code", "deckTitle", "imageURL", "isApi"], setDisplayHtml)
         } else
             setDisplayHtml(true)
+        
         
     }, [])
 

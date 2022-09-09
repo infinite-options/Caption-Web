@@ -48,6 +48,9 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
     // HOOK: useEffect()
     // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
+        console.log("Voting page cookies: ", cookies.userData)
+        console.log("Voting page hooks: ", userData)
+
         // Check if userData is empty (after refresh/new user)
         if(userData.host === "" || userData.roundNumber === "" || userData.name === "" || userData.alias === "" || userData.playerUID === "" || userData.rounds === "" || userData.roundDuration === "" || userData.code === "" || userData.deckTitle === "" || userData.imageURL === "" || userData.scoreBoardInfo === "") {
             getCookies(["host", "roundNumber", "name", "alias", "deckSelected", "playerUID", "rounds", "roundDuration", "code", "deckTitle", "imageURL", "scoreboardInfo", "isApi"], setDisplayHtml)

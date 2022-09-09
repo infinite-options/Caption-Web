@@ -32,12 +32,15 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
     // HOOK: useEffect()
     // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
+        console.log("Scoreboard page cookies: ", cookies.userData)
+        console.log("Scoreboard page hooks: ", userData)
+
         // Check if userData is empty (on refresh/new user)
-            if(userData.code === "" || userData.roundNumber === "" || userData.imageUrl === "" || userData.scoreboardInfo === [] || userData.playerUID === "") {
-                getCookies(["host", "roundNumber", "playerUID", "rounds", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"], setDisplayHtml)
-            }
-            else
-                setDisplayHtml(true)
+        if(userData.code === "" || userData.roundNumber === "" || userData.imageUrl === "" || userData.scoreboardInfo === [] || userData.playerUID === "") {
+            getCookies(["host", "roundNumber", "playerUID", "rounds", "code", "deckTitle", "deckSelected", "imageURL", "scoreboardInfo", "isApi", "googlePhotos"], setDisplayHtml)
+        }
+        else
+            setDisplayHtml(true)
     }, [])
 
 

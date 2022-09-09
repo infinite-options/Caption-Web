@@ -232,13 +232,17 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
                                         // duration={userData.roundDuration}
                                         colors="#000000"
                                         onComplete={() => {
+                                            console.log("Caption Timer Complete")
                                             toggleTimeUp()
                                             pub(0)
                                         }}
                                     >
                                         {({remainingTime}) => {
-                                                if (remainingTime === 0)
+                                                if (remainingTime === 0) {
+                                                    console.log("Caption Remaining Time = 0")
                                                     pub(0);
+                                                } 
+                                                    
                                                 return (<div className="countdownText">{remainingTime}</div>);
                                             }
                                         }

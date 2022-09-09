@@ -454,6 +454,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                     onComplete={() => {
                                         // We suspect that onComplete refreshes the entire screen and resets localUserVoted to false
                                         // console.log("*** localUserVoted in timer", localUserVoted)
+                                        console.log("Voting page timer complete")
                                         postVote(null)
 
                                     }}

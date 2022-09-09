@@ -237,12 +237,7 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
                                             pub(0)
                                         }}
                                     >
-                                        {({remainingTime}) => {
-                                                if (remainingTime === 0) {
-                                                    console.log("Caption Remaining Time = 0")
-                                                    pub(0);
-                                                } 
-                                                    
+                                        {({remainingTime}) => {  
                                                 return (<div className="countdownText">{remainingTime}</div>);
                                             }
                                         }

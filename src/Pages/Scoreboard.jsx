@@ -98,6 +98,8 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
                                 "voteStatus": false
                             })
 
+                            console.log("")
+
                             history.push('page/')
                         }
 
@@ -204,7 +206,12 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
             } 
             // API deck: call apiCall() to set next round's image url to nextUrl
             else {
-                nextUrl = await apiCall(nextRound)
+                setUserData({
+                    ...userData,
+                    roundNumber: nextRound
+                })
+                
+                nextUrl = await apiCall()
 
                 pub(nextUrl)
             }

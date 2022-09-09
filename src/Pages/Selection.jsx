@@ -456,7 +456,6 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                                         // console.log("*** localUserVoted in timer", localUserVoted)
                                         console.log("Voting page timer complete")
                                         postVote(null)
-
                                     }}
                                 >
                                     {({remainingTime}) => {

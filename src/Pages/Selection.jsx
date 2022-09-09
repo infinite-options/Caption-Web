@@ -214,8 +214,10 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
 
         // Call functions defined above
-
-        getCaptions();
+        if(userData.code !== "" && userData.roundNumber !== ""){
+            getCaptions();
+        }
+            
 
         if (userData.host) {
             subscribeNewPlayer();

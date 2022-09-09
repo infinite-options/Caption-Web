@@ -205,6 +205,8 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
             // API deck: call apiCall() to set next round's image url to nextUrl
             else {
                 nextUrl = await apiCall(nextRound)
+
+                pub(nextUrl)
             }
 
             console.log("nextPub(): next url", nextUrl)

@@ -25,7 +25,7 @@ export const ApiHelper = () => {
         // Step 2: Get API images
         // Step 3: Subtract out used and undefined images
         // Step 4: Select random image that hasn't been used
-    const apiCall = async () => {
+    const apiCall = async (nextRound) => {
         let usedUrls = []
         let allImageUrls = []
         let nextRoundUrl = ""
@@ -126,10 +126,13 @@ export const ApiHelper = () => {
         nextRoundUrl = uniqueUrls[Math.floor(Math.random() * uniqueUrls.length)]
 
 
+        console.log("Round number before post round image: ", userData.roundNumber)
+
         // POST /postRoundImage saves the current url we are using in the database
         let payload = {
             "game_code": userData.code,
-            "round_number": userData.roundNumber.toString(),
+            // "round_number": userData.roundNumber.toString(),
+            "round_number": nextRound === undefined ? userData.roundNumber.toString() : nextRound,
             "image": nextRoundUrl
         }
         await axios.post(postRoundImageURL, payload).then(res => {

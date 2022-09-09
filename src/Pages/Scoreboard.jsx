@@ -206,12 +206,12 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
             } 
             // API deck: call apiCall() to set next round's image url to nextUrl
             else {
-                setUserData({
-                    ...userData,
-                    roundNumber: nextRound
-                })
-                
-                nextUrl = await apiCall()
+                // userData({
+                //     ...userData,
+                //     roundNumber: nextRound
+                // })
+
+                nextUrl = await apiCall(nextRound)
 
                 pub(nextUrl)
             }
@@ -249,7 +249,7 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
                 currentImage: apiURL,
             }});
         }
-        else{
+        else {
             console.log("pub() using database deck")
             channel_scoreboard.publish({data: {
                 roundStarted: true,

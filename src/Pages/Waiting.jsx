@@ -133,7 +133,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                                     ...cookies.userData,
                                     "imageURL": res.data.image_url,
                                     "deckTitle": newGame.data.deckTitle
-                                })
+                                }, { path: '/' })
                                 console.log("Set Cookies in waiting: 139", cookies.userData)
 
                             })
@@ -155,7 +155,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                             ...cookies.userData,
                             "imageURL": newGame.data.currentImage,
                             "deckTitle": newGame.data.deckTitle
-                        })
+                        }, { path: '/' })
                         console.log("Set Cookies in waiting: 158 ", cookies.userData)
 
                         history.push('/page')
@@ -216,7 +216,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
         setCookie("userData", {
             ...cookies.userData,
             "imageURL": uniqueImage
-        })
+        }, { path: '/' })
         console.log("Set Cookies in waiting: 219", cookies.userData)
 
 
@@ -250,7 +250,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
             setCookie("userData", {
                 ...cookies.userData,
                 "imageURL": res.data.image_url
-            })
+            }, { path: '/' })
             console.log("Set Cookies in waiting: 385", cookies.userData)
 
 

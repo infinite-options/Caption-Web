@@ -175,7 +175,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             setCookie("userData", {
                                 ...cookies.userData,
                                 "scoreboardInfo": res.data.scoreboard
-                            })
+                            }, { path: '/' })
                         });
 
                         if (userData.rounds <= userData.roundNumber)

@@ -81,7 +81,7 @@ export default function Rounds() {
             ...cookies.userData,
             "rounds": userData.rounds,
             "roundDuration": userData.roundDuration
-        })
+        }, { path: '/' })
 
         history.push("/scoretype")
     }

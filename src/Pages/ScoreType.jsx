@@ -65,7 +65,7 @@ function ScoreType() {
             setCookie("userData",{
                 ...cookies.userData,
                 "code": res.data.game_code
-            })
+            }, { path: '/' })
 
             return res.data.game_code
         }).then((gameCode) => {

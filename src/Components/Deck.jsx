@@ -33,7 +33,7 @@ export default function DeckCard({googlePhotos, cleveland, chicago, giphy, harva
             setCookie("userData", {
                 ...cookies.userData,
                 "isApi": true
-            })
+            }, { path: '/' })
             return
         }
         else if(title === "Cleveland Gallery" || title === "Chicago Gallery" || title === "Giphy Gallery" || title === "Harvard Gallery"){
@@ -63,7 +63,7 @@ export default function DeckCard({googlePhotos, cleveland, chicago, giphy, harva
             "deckSelected": id,
             "deckTitle": title,
             "isApi": apiStatus
-        })
+        }, { path: '/' })
     }
   
     return (

@@ -152,7 +152,7 @@ const GooglePhotos = () => {
                 "deckSelected": "500-000005",
                 "deckTitle": "Google Photos: " + selectedAlbum,
                 "googlePhotos": userData.googlePhotos
-            })
+            }, { path: '/' })
 
             // alert user max images less than original rounds
         } else {
@@ -166,7 +166,7 @@ const GooglePhotos = () => {
                 "deckSelected": "500-000005",
                 "deckTitle": "Google Photos: " + selectedAlbum,
                 "googlePhotos": userData.googlePhotos
-            })
+            }, { path: '/' })
         }
 
         const payload = {

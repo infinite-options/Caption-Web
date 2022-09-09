@@ -26,7 +26,9 @@ export const CookieHelper = () => {
                 "albumId": "",
                 "accessToken": ""
             }
-        })
+        },
+        { path: '/' }
+    )
 
         setUserData({
             name: cookies.userData.name,

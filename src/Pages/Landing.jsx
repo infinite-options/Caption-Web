@@ -38,7 +38,7 @@ export default function Landing({client, channel_waiting}) {
                 "alias": "",
                 "zipCode": "",
                 "email": ""
-            })
+            }, { path: '/' })
         }
 
         // Reset/Initialize Cookies
@@ -97,7 +97,7 @@ export default function Landing({client, channel_waiting}) {
                     "playerUID": pUID,
                     "host": true,
                     "roundNumber": 1,
-                })
+                }, { path: '/' })
 
 
                 // If email is validated transition to waiting room, else transition to confirmation page
@@ -183,7 +183,7 @@ export default function Landing({client, channel_waiting}) {
                             "code": userData.code,
                             "rounds": res.data.num_rounds, 
                             "roundDuration": duration
-                        })
+                        }, { path: '/' })
                         
                         console.log("Publishing guest player to waiting/", userData.code)
 

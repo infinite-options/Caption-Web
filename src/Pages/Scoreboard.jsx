@@ -79,7 +79,7 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
                                         ...cookies.userData,
                                         "imageURL": res.data.image_url,
                                         "roundNumber": nextRound
-                                    })
+                                    }, { path: '/' })
 
                                 })
 
@@ -99,7 +99,7 @@ function Scoreboard({ channel_scoreboard, channel_waiting, channel_joining}) {
                                 "imageURL": roundStarted.data.currentImage,
                                 "roundNumber": userData.roundNumber + 1,
                                 "voteStatus": false
-                            })
+                            }, { path: '/' })
 
                             console.log("")
 

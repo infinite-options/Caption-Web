@@ -194,6 +194,16 @@ export default function Landing({client, channel_waiting}) {
                         history.push("/waiting")
                     })
                 } else {
+                    setCookie("userData", {
+                        ...cookies.userData,
+                        "name": userData.name,
+                        "email": userData.email,
+                        "zipCode": userData.zipCode,
+                        "alias": userData.alias,
+                        "host": false,
+                        "roundNumber": 1,
+                        "playerUID": pUID,
+                    }, { path: '/' })
                     history.push('/confirmation')
                 }
             })

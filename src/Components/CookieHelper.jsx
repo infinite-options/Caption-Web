@@ -30,27 +30,29 @@ export const CookieHelper = () => {
         { path: '/' }
     )
 
-        setUserData({
-            name: cookies.userData.name,
-            email: cookies.userData.email,
-            zipCode: cookies.userData.zipCode,
-            alias: cookies.userData.alias,
-            gameUID: "",
-            rounds: "10",
-            roundDuration: "30",
-            host: "",
-            playerUID: "",
-            roundNumber: "",
-            imageURL: "",
-            scoreboardInfo: [],
-            deckSelected: "",
-            deckTitle: "",
-            isApi: false,
-            googlePhotos: {
-                albumId: "",
-                accessToken: ""
-            }
-        })
+        if(cookies.userData != undefined){
+            setUserData({
+                name: cookies.userData.name,
+                email: cookies.userData.email,
+                zipCode: cookies.userData.zipCode,
+                alias: cookies.userData.alias,
+                gameUID: "",
+                rounds: "10",
+                roundDuration: "30",
+                host: "",
+                playerUID: "",
+                roundNumber: "",
+                imageURL: "",
+                scoreboardInfo: [],
+                deckSelected: "",
+                deckTitle: "",
+                isApi: false,
+                googlePhotos: {
+                    albumId: "",
+                    accessToken: ""
+                }
+            })
+        }
     }
 
 

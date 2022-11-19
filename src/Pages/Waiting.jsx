@@ -114,6 +114,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
+                    // Check if round number is an empty string otherwise first round image will not display when game starts
                     if(userData.roundNumber === "")
                         userData.roundNumber = "1"
                     // Host did not send image URL over ably => get url from database and transition to page

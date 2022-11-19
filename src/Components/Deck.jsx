@@ -36,7 +36,7 @@ export default function DeckCard({googlePhotos, cleveland, chicago, giphy, harva
             }, { path: '/' })
             return
         }
-        else if(title === "Cleveland Gallery" || title === "Chicago Gallery" || title === "Giphy Gallery" || title === "Harvard Gallery"){
+        else if(title === "Cleveland Gallery" || title === "Chicago Gallery" || title === "Giphy Gallery" || title === "Harvard Gallery" || title === "CNN Gallery"){
             console.log("API Deck Selected: ", title) 
             apiStatus = true;
         }

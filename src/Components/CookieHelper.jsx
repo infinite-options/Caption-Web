@@ -29,7 +29,7 @@ export const CookieHelper = () => {
         },
         { path: '/' }
     )
-
+        // DESCRIPTION: Check if cookie user data is undefined otherwise application will crash on launch and must refresh to fix it
         if(cookies.userData != undefined){
             setUserData({
                 name: cookies.userData.name,

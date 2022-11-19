@@ -1,6 +1,7 @@
 import {useContext} from 'react'
 import { LandingContext } from '../App';
 import axios from 'axios';
+import cheerio from "cheerio";
 
 export const ApiHelper = () => {
     const {userData} = useContext(LandingContext);
@@ -15,7 +16,7 @@ export const ApiHelper = () => {
     const giphyURL = "https://api.giphy.com/v1/gifs/trending?api_key=Fo9QcAQLMFI8V6pdWWHWl9qmW91ZBjoK&"
     const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"
     const searchGooglePhotosURL = 'https://photoslibrary.googleapis.com/v1/mediaItems:search'
-
+    const cnnURL = "https://www.cnn.com/2022/11/17/world/gallery/photos-this-week-november-10-november-17"
 
 
     // FUNCTION: apiCall()
@@ -30,6 +31,20 @@ export const ApiHelper = () => {
         let allImageUrls = []
         let nextRoundUrl = ""
 
+        // FUNCTION: getCnnImgURLs
+        // DESCRIPTION: Gets a list of img URLs from web scraping script tags of the page source
+        async function getCnnImgURLs(URL){
+            const htmlString = await axios.get(URL).then(response => response.data)
+            const $ = cheerio.load(htmlString)
+            const scriptString = $("script")
+            const scriptObj = JSON.parse($(scriptString[3]).text())
+            const imgItems = scriptObj.hasPart.mainEntity.itemListElement
+            let imgURLs = []
+            for (let i = 0; i < imgItems.length; i++){
+                imgURLs.push(imgItems[i].item.url)
+            }
+            return imgURLs
+        }
 
         // Step 1: GET /getRoundImage gets previously used images
         await axios.get(getRoundImageURL + userData.code + ",0").then(res => {
@@ -116,6 +131,10 @@ export const ApiHelper = () => {
 
                 console.log("HARVARD all images: ", allImageUrls)
             })
+        } else if (userData.deckSelected === "500-000010") {
+            // CNN API Call
+            allImageUrls = await getCnnImgURLs(cnnURL)
+            console.log("CNN all images: " + allImageUrls)
         }
 
         // 3. Subtract out used and undefined images

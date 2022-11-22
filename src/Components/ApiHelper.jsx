@@ -32,7 +32,7 @@ export const ApiHelper = () => {
 
 
         // FUNCTION: getCnnImgURLs
-        // DESCRIPTION: Gets a list of img URLs from web scraping script tags of the page source
+        // DESCRIPTION: Web scrapes the URL page source for <script> tag then adds img URLs to list
         async function getCnnImgURLs(URL){
             const htmlString = await axios.get(URL).then(response => response.data)
             const $ = cheerio.load(htmlString)
@@ -44,6 +44,28 @@ export const ApiHelper = () => {
                 imgURLs.push(imgItems[i].item.url)
             }
             return imgURLs
+        }
+
+        // FUNCTION: getCurrentCnnURL
+        // DESCRIPTION: Starting from today, iterates through the past seven days for the most current valid CNN URL
+        async function getCurrentCnnURL() {
+            const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
+            let cnnURL = ""
+            let beginDate = new Date()
+            let endDate = new Date()
+            beginDate.setDate(endDate.getDate() - 7)
+            for (let i = 0; i <= 7; i++) {
+                let beginDay = beginDate.getDate(), beginMonth = beginDate.getMonth()
+                let endDay = endDate.getDate(), endMonth = endDate.getMonth(), endYear = endDate.getFullYear()
+                let potentialCnnURL = `https://www.cnn.com/${endYear}/${endMonth + 1}/${endDay}/world/gallery/photos-this-week-${months[beginMonth]}-${beginDay}-${months[endMonth]}-${endDay}`
+                try {
+                    cnnURL = await axios.get(potentialCnnURL).then(response => response.config.url)
+                } catch (error) {
+                    beginDate.setDate(beginDate.getDate() - 1)
+                    endDate.setDate(endDate.getDate() - 1)
+                }
+            }
+            return getCnnImgURLs(cnnURL)
         }
 
         // Step 1: GET /getRoundImage gets previously used images
@@ -133,7 +155,7 @@ export const ApiHelper = () => {
             })
         } else if (userData.deckSelected === "500-000010") {
             // CNN API Call
-            allImageUrls = await getCnnImgURLs(cnnURL)
+            allImageUrls = await getCurrentCnnURL()
             console.log("CNN all images: " + allImageUrls)
         }
 

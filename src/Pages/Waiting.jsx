@@ -110,35 +110,44 @@ export default function Waiting({channel, channel2, channel_joining}) {
         // DESCRIPTION: Listens for start game signal from host. 
         // Upon receiving signal, loads first round's image URL and transitions to page.
         async function subscribeStartGame() {
-            await channel2.subscribe(newGame => {
+            await channel2.subscribe(async newGame => {
                 console.log("In subscribe 2")
-                if(newGame.data.gameStarted) {
+                // TESTING EMAIL FUNCTION BY FORCING BLANK ROUND NUMBER
+                //userData.roundNumber = ""
+                if (newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
                     // Check if round number is an empty string otherwise first round image will not display when game starts
-                    if(userData.roundNumber === "")
+                    if (userData.roundNumber === "") {
+                        //console.log("EMAIL SHOULD BE SENT")
+                        let code1 = "Game Code was " + userData.code + ", " + "Round Number was " + userData.roundNumber
+                        //console.log("CODE 1: " + code1)
+                        let code2 = "Player ID was " + userData.playerUID + "," + "Cookies was " + JSON.stringify(cookies.userData).substring(0,120)
+                        //console.log("CODE 2: " + code2)
+                        await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
                         userData.roundNumber = "1"
+                    }
                     // Host did not send image URL over ably => get url from database and transition to page
-                    if(newGame.data.currentImage.length === 0) {
+                    if (newGame.data.currentImage.length === 0) {
                         const getImage = async () => {
 
                             await axios.get(getImageURL + userData.code + "," + userData.roundNumber)
-                            .then((res) => {
-                                console.log("GET Get Image For Players", res)
+                                .then((res) => {
+                                    console.log("GET Get Image For Players", res)
 
-                                setUserData({
-                                    ...userData,
-                                    imageURL: res.data.image_url,
-                                    deckTitle: newGame.data.deckTitle
+                                    setUserData({
+                                        ...userData,
+                                        imageURL: res.data.image_url,
+                                        deckTitle: newGame.data.deckTitle
+                                    })
+                                    console.log("cookies before setCookies waiting: 139 ", cookies.userData)
+                                    setCookie("userData", {
+                                        ...cookies.userData,
+                                        "imageURL": res.data.image_url,
+                                        "deckTitle": newGame.data.deckTitle
+                                    }, {path: '/'})
+                                    console.log("Set Cookies in waiting: 139", cookies.userData)
+
                                 })
-                                console.log("cookies before setCookies waiting: 139 ", cookies.userData)
-                                setCookie("userData",{
-                                    ...cookies.userData,
-                                    "imageURL": res.data.image_url,
-                                    "deckTitle": newGame.data.deckTitle
-                                }, { path: '/' })
-                                console.log("Set Cookies in waiting: 139", cookies.userData)
-
-                            })
 
                             history.push('/page');
                         };
@@ -157,12 +166,12 @@ export default function Waiting({channel, channel2, channel_joining}) {
                             ...cookies.userData,
                             "imageURL": newGame.data.currentImage,
                             "deckTitle": newGame.data.deckTitle
-                        }, { path: '/' })
+                        }, {path: '/'})
                         console.log("Set Cookies in waiting: 158 ", cookies.userData)
 
                         history.push('/page')
                     }
-                    
+
                 }
             })
         }

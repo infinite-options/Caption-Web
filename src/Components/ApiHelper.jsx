@@ -47,14 +47,14 @@ export const ApiHelper = () => {
         }
 
         // FUNCTION: getCurrentCnnURL
-        // DESCRIPTION: Starting from today, iterates through the past seven days for the most current valid CNN URL
+        // DESCRIPTION: Starting from today, iterates through the past 365 days for the most current valid CNN URL
         async function getCurrentCnnURL() {
             const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
             let cnnURL = ""
             let beginDate = new Date()
             let endDate = new Date()
             beginDate.setDate(endDate.getDate() - 7)
-            for (let i = 0; i <= 7; i++) {
+            for (let i = 0; i <= 365; i++) {
                 let beginDay = beginDate.getDate(), beginMonth = beginDate.getMonth()
                 let endDay = endDate.getDate(), endMonth = endDate.getMonth(), endYear = endDate.getFullYear()
                 let potentialCnnURL = `https://www.cnn.com/${endYear}/${endMonth + 1}/${endDay}/world/gallery/photos-this-week-${months[beginMonth]}-${beginDay}-${months[endMonth]}-${endDay}`

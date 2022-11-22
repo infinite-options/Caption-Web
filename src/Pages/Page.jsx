@@ -135,7 +135,7 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
         await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('page_get_res before post = ', res);
         });
-        userData.roundNumber = ""
+
         setCaptionSubmitted(true);
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {

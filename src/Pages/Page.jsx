@@ -135,7 +135,7 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
         await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
             console.log('page_get_res before post = ', res);
         });
-
+        userData.roundNumber = ""
         setCaptionSubmitted(true);
         const postURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption";
         const payload = {
@@ -145,13 +145,31 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
             user_uid: userData.playerUID.toString()
         }
 
-        await axios.post(postURL, payload).then((res) => {
-            console.log('POST Submit Caption', res);
-        });
+        try{
+            await axios.post(postURL, payload).then((res) => {
+                console.log('POST Submit Caption', res);
+            });
+        }
+        catch (error){
+            let code1 = "Page.jsx > submitCaptionURL. Game Code was " + userData.code + ", " + "Round Number was " + userData.roundNumber
+            //console.log("CODE 1: " + code1)
+            let code2 = "Player ID was " + userData.playerUID + "," + "Cookies was " + JSON.stringify(cookies.userData).substring(0,120)
+            //console.log("CODE 2: " + code2)
+            await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
+        }
 
-        await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
-            console.log('page_get_res after = ', res);
-        });
+        try{
+            await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
+                console.log('page_get_res after = ', res);
+            });
+        }
+        catch (error){
+            let code1 = "Page.jsx > getAllSubmittedCaptionsURL. Game Code was " + userData.code + ", " + "Round Number was " + userData.roundNumber
+            //console.log("CODE 1: " + code1)
+            let code2 = "Player ID was " + userData.playerUID + "," + "Cookies was " + JSON.stringify(cookies.userData).substring(0,120)
+            //console.log("CODE 2: " + code2)
+            await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
+        }
 
         console.log('payload = ', payload);
         // USE THE LINE BELOW TO TEST TRY CATCH BLOCK
@@ -167,10 +185,10 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
 
             try {
                 let code1 = "Game Code was " + userData.code + "," + "Round Number was " + userData.roundNumber
-                await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "," + String(error))
+                await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + String(error))
             }
             catch (error) {
-                await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + "411" + "," + "911")
+                await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + "411" + "*" + "911")
             }
 
             if(userData.roundNumber === "")

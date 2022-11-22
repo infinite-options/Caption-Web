@@ -119,7 +119,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                     // Check if round number is an empty string otherwise first round image will not display when game starts
                     if (userData.roundNumber === "") {
                         //console.log("EMAIL SHOULD BE SENT")
-                        let code1 = "Game Code was " + userData.code + ", " + "Round Number was " + userData.roundNumber
+                        let code1 = "FROM START GAME. Game Code was " + userData.code + ", " + "Round Number was " + userData.roundNumber
                         //console.log("CODE 1: " + code1)
                         let code2 = "Player ID was " + userData.playerUID + "," + "Cookies was " + JSON.stringify(cookies.userData).substring(0,120)
                         //console.log("CODE 2: " + code2)
@@ -130,24 +130,33 @@ export default function Waiting({channel, channel2, channel_joining}) {
                     if (newGame.data.currentImage.length === 0) {
                         const getImage = async () => {
 
-                            await axios.get(getImageURL + userData.code + "," + userData.roundNumber)
-                                .then((res) => {
-                                    console.log("GET Get Image For Players", res)
+                            try{
+                                await axios.get(getImageURL + userData.code + "," + userData.roundNumber)
+                                    .then((res) => {
+                                        console.log("GET Get Image For Players", res)
 
-                                    setUserData({
-                                        ...userData,
-                                        imageURL: res.data.image_url,
-                                        deckTitle: newGame.data.deckTitle
+                                        setUserData({
+                                            ...userData,
+                                            imageURL: res.data.image_url,
+                                            deckTitle: newGame.data.deckTitle
+                                        })
+                                        console.log("cookies before setCookies waiting: 139 ", cookies.userData)
+                                        setCookie("userData", {
+                                            ...cookies.userData,
+                                            "imageURL": res.data.image_url,
+                                            "deckTitle": newGame.data.deckTitle
+                                        }, {path: '/'})
+                                        console.log("Set Cookies in waiting: 139", cookies.userData)
+
                                     })
-                                    console.log("cookies before setCookies waiting: 139 ", cookies.userData)
-                                    setCookie("userData", {
-                                        ...cookies.userData,
-                                        "imageURL": res.data.image_url,
-                                        "deckTitle": newGame.data.deckTitle
-                                    }, {path: '/'})
-                                    console.log("Set Cookies in waiting: 139", cookies.userData)
-
-                                })
+                            }
+                            catch (error){
+                                let code1 = "NO IMAGE RECEIVED. Game Code was " + userData.code + ", " + "Round Number was " + userData.roundNumber
+                                //console.log("CODE 1: " + code1)
+                                let code2 = "Player ID was " + userData.playerUID + "," + "Cookies was " + JSON.stringify(cookies.userData).substring(0,120)
+                                //console.log("CODE 2: " + code2)
+                                await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
+                            }
 
                             history.push('/page');
                         };

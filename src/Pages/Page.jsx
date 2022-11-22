@@ -116,6 +116,12 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
     // FUNCTION: postSubmitCaption()
     // DESCRIPTION: On clicking submit or time running out, submits user caption
     async function postSubmitCaption() {
+        // 11/21/2022: OUR HYPOTHESIS IS THAT ON ROUND ONE THE ROUND NUMBER SHOWS UP AS EMPTY STRING THIS CODE FORCES IT TO ROUND ONE
+        // if(userData.roundNumber === ""){
+        //     userData.roundNumber = 1
+        //     alert("PLEASE LET HOST KNOW YOU RECEIVED THIS ALERT. CODE 411")
+        // }
+
         if(caption === "" && !timeUp){
             alert("Please enter a caption.")
             return
@@ -148,11 +154,29 @@ export default function Page({ channel_page, channel_waiting, channel_joining}) 
         });
 
         console.log('payload = ', payload);
+        // USE THE LINE BELOW TO TEST TRY CATCH BLOCK
+        //userData.roundNumber = ""
+        try{
+            await axios.get(getPlayersURL + userData.code + "," + userData.roundNumber).then((res) => {
+                console.log('res.data.players = ', res.data.players);
+                pub(res.data.players.length);
+            })
+        }
+        catch (error){
+            console.log(error)
 
-        await axios.get(getPlayersURL + userData.code + "," + userData.roundNumber).then((res) => {
-            console.log('res.data.players = ', res.data.players);
-            pub(res.data.players.length);
-        })
+            try {
+                let code1 = "Game Code was " + userData.code + "," + "Round Number was " + userData.roundNumber
+                await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "," + String(error))
+            }
+            catch (error) {
+                await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + "411" + "," + "911")
+            }
+
+            if(userData.roundNumber === "")
+                userData.roundNumber = "BLANK"
+            alert("CAPTION SUBMITTED. PLEASE LET HOST KNOW YOU RECEIVED THIS ALERT. THIS IS THE ROUND NUMBER: " + userData.roundNumber)
+        }
     }
 
 

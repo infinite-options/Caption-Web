@@ -18,7 +18,6 @@ export const ApiHelper = () => {
     const searchGooglePhotosURL = 'https://photoslibrary.googleapis.com/v1/mediaItems:search'
     const cnnURL = "https://www.cnn.com/2022/11/17/world/gallery/photos-this-week-november-10-november-17"
 
-
     // FUNCTION: apiCall()
     // DESCRIPTION: Gets a list of previously used images, then list of images from API. 
     // Selects/returns a unique url not in previously used images.
@@ -30,6 +29,7 @@ export const ApiHelper = () => {
         let usedUrls = []
         let allImageUrls = []
         let nextRoundUrl = ""
+
 
         // FUNCTION: getCnnImgURLs
         // DESCRIPTION: Gets a list of img URLs from web scraping script tags of the page source

@@ -30,44 +30,6 @@ export const ApiHelper = () => {
         let allImageUrls = []
         let nextRoundUrl = ""
 
-
-        // FUNCTION: getCnnImgURLs
-        // DESCRIPTION: Web scrapes the URL page source for <script> tag then adds img URLs to list
-        async function getCnnImgURLs(URL){
-            const htmlString = await axios.get(URL).then(response => response.data)
-            const $ = cheerio.load(htmlString)
-            const scriptString = $("script")
-            const scriptObj = JSON.parse($(scriptString[3]).text())
-            const imgItems = scriptObj.hasPart.mainEntity.itemListElement
-            let imgURLs = []
-            for (let i = 0; i < imgItems.length; i++){
-                imgURLs.push(imgItems[i].item.url)
-            }
-            return imgURLs
-        }
-
-        // FUNCTION: getCurrentCnnURL
-        // DESCRIPTION: Starting from today, iterates through the past 365 days for the most current valid CNN URL
-        async function getCurrentCnnURL() {
-            const months = ["january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december"]
-            let cnnURL = ""
-            let beginDate = new Date()
-            let endDate = new Date()
-            beginDate.setDate(endDate.getDate() - 7)
-            for (let i = 0; i <= 365; i++) {
-                let beginDay = beginDate.getDate(), beginMonth = beginDate.getMonth()
-                let endDay = endDate.getDate(), endMonth = endDate.getMonth(), endYear = endDate.getFullYear()
-                let potentialCnnURL = `https://www.cnn.com/${endYear}/${endMonth + 1}/${endDay}/world/gallery/photos-this-week-${months[beginMonth]}-${beginDay}-${months[endMonth]}-${endDay}`
-                try {
-                    cnnURL = await axios.get(potentialCnnURL).then(response => response.config.url)
-                } catch (error) {
-                    beginDate.setDate(beginDate.getDate() - 1)
-                    endDate.setDate(endDate.getDate() - 1)
-                }
-            }
-            return getCnnImgURLs(cnnURL)
-        }
-
         // Step 1: GET /getRoundImage gets previously used images
         await axios.get(getRoundImageURL + userData.code + ",0").then(res => {
             const result = res.data.result
@@ -155,7 +117,7 @@ export const ApiHelper = () => {
             })
         } else if (userData.deckSelected === "500-000010") {
             // CNN API Call
-            allImageUrls = await getCurrentCnnURL()
+            allImageUrls = await userData.deckImgURLs
             console.log("CNN all images: " + allImageUrls)
         }
 

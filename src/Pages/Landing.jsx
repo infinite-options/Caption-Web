@@ -99,10 +99,12 @@ export default function Landing({client, channel_waiting}) {
                     "roundNumber": 1,
                 }, { path: '/' })
 
-
+                console.log("User Data Player ID 1: " + userData.playerUID)
+                
                 // If email is validated transition to waiting room, else transition to confirmation page
                 if(res.data.user_code === "TRUE") {
                     console.log("User exists and email validated. Transition to waiting.")
+                    console.log("User Data Player ID 2: " + userData.playerUID)
                     history.push("/rounds")
                 } else {
                     history.push('/confirmation')
@@ -116,7 +118,9 @@ export default function Landing({client, channel_waiting}) {
     // DESCRIPTION: On clicking "Join Game"-- validates user input and checks if game code exists in database. If so, post new player to backend and add player to game.
     async function joinGame() {
         console.log("Starting joinGame()");
-
+        
+        
+        console.log("Captions LANDING hooks: ", userData)
         // Check if input formatted correctly
         if (checkGuestInput()) {
             // Save data in hooks
@@ -126,6 +130,7 @@ export default function Landing({client, channel_waiting}) {
                 roundNumber: 1
             })
 
+            console.log("Captions LANDING hooks 1: ", userData)
             // Show loading screen while making post request
             setDisplayHtml(false)
 
@@ -136,11 +141,22 @@ export default function Landing({client, channel_waiting}) {
                 user_email: userData.email,
                 user_zip: userData.zipCode,
             }
-            await axios.post(addUserURL, payload).then((res) => {
+            await axios.post(addUserURL, payload).then(async (res) => {
                 console.log("POST /addUser (guest)", res);
-                
+
+                console.log("User Data Player ID 5: " + res.data.user_uid)
+                if (res.data.user_uid === "") {
+                    console.log("EMAIL SHOULD BE SENT")
+                    let code1 = "Landing.jsx > joinGame 5. User Player UID: " + res.data.user_uid
+                    //console.log("CODE 1: " + code1)
+                    let code2 = "Cookies Player UID: " + cookies.playerUID 
+                    //console.log("CODE 2: " + code2)
+                    await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
+                    userData.roundNumber = "1"
+                }
                 // Save to hooks/cookies 
                 let pUID = res.data.user_uid
+                console.log("Landing.jsx > Before User Data PARSE: " + JSON.stringify(userData))
                 setUserData({
                     ...userData, 
                     playerUID: pUID
@@ -148,6 +164,20 @@ export default function Landing({client, channel_waiting}) {
 
                 console.log("user_code", res.data.user_code)
 
+                console.log("User Data Player ID 6: " + res.data.user_uid)
+                console.log("User Data Player ID 6A: " + pUID)
+                console.log("User Data Player ID 6B: " + JSON.stringify(userData.playerUID))
+
+
+                if (res.data.user_uid === "") {
+                    console.log("EMAIL SHOULD BE SENT")
+                    let code1 = "Landing.jsx > joinGame 6. User Player UID: " + res.data.user_uid
+                    //console.log("CODE 1: " + code1)
+                    let code2 = "Cookies Player UID: " + cookies.playerUID 
+                    //console.log("CODE 2: " + code2)
+                    await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
+                    userData.roundNumber = "1"
+                }
                 // If email is validated, join game and transition to waiting room. Else, transition to confirmation page
                 if(res.data.user_code === "TRUE") {
                     console.log("User exists and email validated. Transition to waiting.")
@@ -157,9 +187,20 @@ export default function Landing({client, channel_waiting}) {
                         game_code: userData.code,
                         user_uid: res.data.user_uid
                     }
-                    axios.post(joinGameURL, payload).then((res) => {
+                    axios.post(joinGameURL, payload).then(async (res) => {
                         console.log("POST /joinGame (guest)", res)
 
+                        console.log("User Data Player ID 7: " + res.data.user_uid)
+                        console.log("User Data Player ID 7B: " + JSON.stringify(userData))
+                        if (res.data.user_uid === "") {
+                            console.log("EMAIL SHOULD BE SENT")
+                            let code1 = "Landing.jsx > joinGame 7. User Player UID: " + res.data.user_uid
+                            //console.log("CODE 1: " + code1)
+                            let code2 = "Cookies Player UID: " + cookies.playerUID 
+                            //console.log("CODE 2: " + code2)
+                            await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
+                            userData.roundNumber = "1"
+                        }
                         // Convert roundDuration time format (min:sec) into seconds
                         const duration_secs = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 2));
                         const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));

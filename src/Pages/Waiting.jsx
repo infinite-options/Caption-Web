@@ -37,6 +37,8 @@ export default function Waiting({channel, channel2, channel_joining}) {
     // HOOK: useEffect()
     // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not    
     useEffect(() => {
+        console.log("Captions WAITING cookies: ", cookies.userData)
+        console.log("Captions WAITING hooks: ", userData)
         // Check if userData is empty (after refresh/new user)
         if(userData.host === "" || userData.roundNumber === "" || userData.playerUID === "" || userData.code === "" || userData.deckTitle === "" || userData.deckSelected === "" || userData.isApi === "" || userData.googlePhotos === "") {
             getCookies(["host", "roundNumber", "playerUID", "code", "deckTitle", "deckSelected", "isApi", "googlePhotos", "rounds", "roundDuration"], setDisplayHtml)
@@ -118,7 +120,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                     console.log("newGame data", newGame.data)
                     // Check if round number is an empty string otherwise first round image will not display when game starts
                     if (userData.roundNumber === "") {
-                        //console.log("EMAIL SHOULD BE SENT")
+                        console.log("EMAIL SHOULD BE SENT")
                         let code1 = "FROM START GAME. Game Code was " + userData.code + ", " + "Round Number was " + userData.roundNumber
                         //console.log("CODE 1: " + code1)
                         let code2 = "Player ID was " + userData.playerUID + "," + "Cookies was " + JSON.stringify(cookies.userData).substring(0,120)
@@ -171,13 +173,14 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                         })
                         console.log("cookies before setCookies waiting: 158 ", cookies.userData)
+                        console.log("cookies before setCookies waiting: 158 USERDATA 1: ", userData)
                         setCookie("userData", {
                             ...cookies.userData,
                             "imageURL": newGame.data.currentImage,
                             "deckTitle": newGame.data.deckTitle
                         }, {path: '/'})
                         console.log("Set Cookies in waiting: 158 ", cookies.userData)
-
+                        console.log("Set Cookies in waiting: 158 USERDATA 2: ", userData)
                         history.push('/page')
                     }
 

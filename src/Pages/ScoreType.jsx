@@ -54,8 +54,19 @@ function ScoreType() {
             round_time: "00:00:" + userData.roundDuration,
             scoring_scheme: buttonType=== "votes" ? "V" : "R",
         }
-        axios.post(createGameURL, payload).then((res) => {
+        axios.post(createGameURL, payload).then(async (res) => {
             console.log("POST createGame", res)
+
+            console.log("User Data Player ID 3: " + userData.playerUID)
+            if (userData.playerUID === "") {
+                console.log("EMAIL SHOULD BE SENT")
+                let code1 = "ScoreType.jsx > createGame 3. User Player UID: " + userData.playerUID
+                //console.log("CODE 1: " + code1)
+                let code2 = "Cookies Player UID: " + cookies.userData.playerUID 
+                //console.log("CODE 2: " + code2)
+                await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
+                userData.roundNumber = "1"
+            }
 
             // Save to hooks and cookies
             setUserData({
@@ -76,8 +87,19 @@ function ScoreType() {
                 game_code: gameCode,
                 user_uid: userData.playerUID
             }
-            axios.post(joinGameURL, payload).then((res) => {
+            axios.post(joinGameURL, payload).then(async (res) => {
                 console.log("POST joinGame", res)
+
+                console.log("User Data Player ID 4: " + userData.playerUID)
+                if (userData.playerUID === "") {
+                    console.log("EMAIL SHOULD BE SENT")
+                    let code1 = "ScoreType.jsx > createGame 4. User Player UID: " + userData.playerUID
+                    //console.log("CODE 1: " + code1)
+                    let code2 = "Cookies Player UID: " + cookies.userData.playerUID 
+                    //console.log("CODE 2: " + code2)
+                    await axios.get("https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/" + code1 + "*" + code2)
+                    userData.roundNumber = "1"
+                }
 
                 history.push("/waiting")
             })

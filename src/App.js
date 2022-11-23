@@ -30,7 +30,9 @@ export default function App() {
             accessToken: ""
         },
     })
-
+    //console.log("Captions APP cookies: ", cookies.userData)
+    console.log("Captions APP hooks: ", userData)
+    
     const [cookies, setCookie, removeCookie] = useCookies(['userData'])
 
 

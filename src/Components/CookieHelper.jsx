@@ -30,7 +30,6 @@ export const CookieHelper = () => {
         { path: '/' }
     )
 
-        if(cookies.userData != undefined){
             setUserData({
                 name: cookies.userData.name,
                 email: cookies.userData.email,
@@ -52,7 +51,6 @@ export const CookieHelper = () => {
                     accessToken: ""
                 }
             })
-        }
     }
 
 

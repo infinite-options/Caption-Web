@@ -120,11 +120,12 @@ export default function Landing({client, channel_waiting}) {
         // Check if input formatted correctly
         if (checkGuestInput()) {
             // Save data in hooks
-            setUserData({
-                ...userData, 
-                host: false,
-                roundNumber: 1
-            })
+            //SAIR
+            // setUserData({
+            //     ...userData,
+            //     host: false,
+            //     roundNumber: 1
+            // })
 
             // Show loading screen while making post request
             setDisplayHtml(false)
@@ -139,12 +140,13 @@ export default function Landing({client, channel_waiting}) {
             await axios.post(addUserURL, payload).then((res) => {
                 console.log("POST /addUser (guest)", res);
                 
-                // Save to hooks/cookies 
+                // Save to hooks/cookies
+                //SAIR
                 let pUID = res.data.user_uid
-                setUserData({
-                    ...userData, 
-                    playerUID: pUID
-                })
+                // setUserData({
+                //     ...userData,
+                //     playerUID: pUID
+                // })
 
                 console.log("user_code", res.data.user_code)
 
@@ -165,11 +167,15 @@ export default function Landing({client, channel_waiting}) {
                         const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
                         let duration = duration_mins * 60 + duration_secs;
 
+                        //SAIR - modified final setUserData because other setUserData functions do not carry over variable data and reset
                         // Save to hooks/cookies
                         setUserData({
-                            ...userData, 
+                            ...userData,
                             rounds: res.data.num_rounds,
-                            roundDuration: duration
+                            roundDuration: duration,
+                            host: false,
+                            roundNumber: 1,
+                            playerUID: pUID
                         })
                         setCookie("userData", {
                             ...cookies.userData,

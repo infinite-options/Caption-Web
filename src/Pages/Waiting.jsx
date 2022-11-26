@@ -32,10 +32,10 @@ export default function Waiting({channel, channel2, channel_joining}) {
     const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck";
     const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/";
     const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/"
-    
+
 
     // HOOK: useEffect()
-    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not    
+    // DESCRIPTION: On first render, check if hooks are updated, load data from cookies if not
     useEffect(() => {
         // Check if userData is empty (after refresh/new user)
         if(userData.host === "" || userData.roundNumber === "" || userData.playerUID === "" || userData.code === "" || userData.deckTitle === "" || userData.deckSelected === "" || userData.isApi === "" || userData.googlePhotos === "") {
@@ -56,87 +56,87 @@ export default function Waiting({channel, channel2, channel_joining}) {
             const names_db = [];
 
             await axios.get(getPlayersURL + userData.code)
-            .then((res) => {
-                for (var index = 0; index < res.data.players_list.length; index++) {
-                    names_db.push(res.data.players_list[index].user_alias);
-                }
-                
-                setNames(names_db);
-                setPlayersLoaded(true);
-            })
-            .catch(err => console.error('error = ', err));
+                .then((res) => {
+                    for (var index = 0; index < res.data.players_list.length; index++) {
+                        names_db.push(res.data.players_list[index].user_alias);
+                    }
+
+                    setNames(names_db);
+                    setPlayersLoaded(true);
+                })
+                .catch(err => console.error('error = ', err));
         }
 
 
         // FUNCTION: subscribeNewPlayers()
         // DESCRIPTION: Continually get players in waiting after each player joins
-        async function subscribeNewPlayers() 
+        async function subscribeNewPlayers()
         {
             // Listen on ably channel for new players
             await channel.subscribe(newPlayer => {
                 async function getPlayers () {
                     const names_db = [];
-                    
+
                     await axios.get(getPlayersURL + userData.code)
-                    .then((res) => {
-                        for (var index = 0; index < res.data.players_list.length; index++) {
-                            names_db.push(res.data.players_list[index].user_alias);
-                        }
-                       
-                        setNames(names_db);
-                       
-                        console.log('Before channeljoining')
-                        channel_joining.publish({
-                            data: {
-                                roundNumber: userData.roundNumber, 
-                                path: window.location.pathname, 
-                                alias: newPlayer.data.newPlayerName
+                        .then((res) => {
+                            for (var index = 0; index < res.data.players_list.length; index++) {
+                                names_db.push(res.data.players_list[index].user_alias);
                             }
+
+                            setNames(names_db);
+
+                            console.log('Before channeljoining')
+                            channel_joining.publish({
+                                data: {
+                                    roundNumber: userData.roundNumber,
+                                    path: window.location.pathname,
+                                    alias: newPlayer.data.newPlayerName
+                                }
+                            })
+
+                            console.log('After channeljoining')
+
+
                         })
-                        
-                        console.log('After channeljoining')
-                       
-                        
-                    })
-                    .catch(err => console.error('error = ', err));
+                        .catch(err => console.error('error = ', err));
                 }
-               
+
                 getPlayers();
             });
         }
 
 
         // FUNCTION: subscribeStartGame()
-        // DESCRIPTION: Listens for start game signal from host. 
+        // DESCRIPTION: Listens for start game signal from host.
         // Upon receiving signal, loads first round's image URL and transitions to page.
         async function subscribeStartGame() {
             await channel2.subscribe(newGame => {
                 console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
-
+                    console.log("Waiting.jsx > userData: " + JSON.stringify(userData))
                     // Host did not send image URL over ably => get url from database and transition to page
                     if(newGame.data.currentImage.length === 0) {
                         const getImage = async () => {
 
                             await axios.get(getImageURL + userData.code + "," + userData.roundNumber)
-                            .then((res) => {
-                                console.log("GET Get Image For Players", res)
+                                .then((res) => {
+                                    console.log("GET Get Image For Players", res)
 
-                                setUserData({
-                                    ...userData,
-                                    imageURL: res.data.image_url,
-                                    deckTitle: newGame.data.deckTitle
+                                    setUserData({
+                                        ...userData,
+                                        imageURL: res.data.image_url,
+                                        deckTitle: newGame.data.deckTitle
+                                    })
+                                    console.log("cookies before setCookies waiting: 139 ", cookies.userData)
+                                    setCookie("userData",{
+                                        ...cookies.userData,
+                                        "imageURL": res.data.image_url,
+                                        "deckTitle": newGame.data.deckTitle
+                                    }, { path: '/' })
+                                    console.log("Set Cookies in waiting: 139", cookies.userData)
+
                                 })
-                                console.log("cookies before setCookies waiting: 139 ", cookies.userData)
-                                setCookie("userData",{
-                                    ...cookies.userData,
-                                    "imageURL": res.data.image_url,
-                                    "deckTitle": newGame.data.deckTitle
-                                }, { path: '/' })
-                                console.log("Set Cookies in waiting: 139", cookies.userData)
-
-                            })
 
                             history.push('/page');
                         };
@@ -160,19 +160,19 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                         history.push('/page')
                     }
-                    
+
                 }
             })
         }
-        
-        
+
+
         if (userData.code) {
             subscribeNewPlayers();
             subscribeStartGame();
             getPlayersInitial()
         }
 
-        
+
         return function cleanup() {
             channel.unsubscribe();
             channel2.unsubscribe();
@@ -182,10 +182,10 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
 
     // FUNCTION: startPlaying()
-     // DESCRIPTION: Called when clicking "Start Game", splits transition to next page flow for database decks and api decks
-    async function startPlaying() {  
+    // DESCRIPTION: Called when clicking "Start Game", splits transition to next page flow for database decks and api decks
+    async function startPlaying() {
         setDisplayHtml(false)
-        
+
         if(!userData.isApi)
             getDatabaseImage()
         else
@@ -265,17 +265,17 @@ export default function Waiting({channel, channel2, channel_joining}) {
     const pub = (apiURL)=> {
         if(userData.isApi){
             channel2.publish({data: {
-                gameStarted: true,
-                currentImage: apiURL,
-                deckTitle: userData.deckTitle
-            }});
+                    gameStarted: true,
+                    currentImage: apiURL,
+                    deckTitle: userData.deckTitle
+                }});
         }
         else
             channel2.publish({data: {
-                gameStarted: true,
-                currentImage: "",
-                deckTitle: userData.deckTitle
-            }});
+                    gameStarted: true,
+                    currentImage: "",
+                    deckTitle: userData.deckTitle
+                }});
 
         history.push("/page");
     };
@@ -289,11 +289,11 @@ export default function Waiting({channel, channel2, channel_joining}) {
             }, 10000);
         }
     }, [copied])
-    
+
 
 
     return (
-        displayHtml ? 
+        displayHtml ?
             // Waiting page HTML
             <div
                 style={{
@@ -327,21 +327,21 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 </Link>
                 <h4>Waiting for all players to join</h4>
                 {/* Add spinner */}
-                
-                
+
+
                 <ul className="flex-container">
-                {playersLoaded ? (
-                    names.map((value) => (
-                        <li className="flex-item">
-                            {value !== "" ? <i className="fas fa-circle fa-3x" style={{
-                                height: "200px",
-                                color: "purple"
-                            }}/> : ""}
-                            {value}
-                        </li>
-                    ))
-                
-                ): (<ReactBootStrap.Spinner animation="border" role="status"/>)}
+                    {playersLoaded ? (
+                        names.map((value) => (
+                            <li className="flex-item">
+                                {value !== "" ? <i className="fas fa-circle fa-3x" style={{
+                                    height: "200px",
+                                    color: "purple"
+                                }}/> : ""}
+                                {value}
+                            </li>
+                        ))
+
+                    ): (<ReactBootStrap.Spinner animation="border" role="status"/>)}
                 </ul>
 
                 {/* Game Code */}
@@ -352,7 +352,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                     conditionalLink={true}
                 />
                 <br></br>
-                
+
 
                 <Button
                     className="landing"
@@ -368,25 +368,25 @@ export default function Waiting({channel, channel2, channel_joining}) {
 
                 <br></br>
 
-                
-                {userData.host && userData.deckSelected === "" ? <Button
-                    className="landing"
-                    children="Select Deck"
-                    destination="/collections"
-                    conditionalLink={true}  
-                />
-                : <></>}
 
-                {userData.host && userData.deckSelected !== "" ? 
+                {userData.host && userData.deckSelected === "" ? <Button
+                        className="landing"
+                        children="Select Deck"
+                        destination="/collections"
+                        conditionalLink={true}
+                    />
+                    : <></>}
+
+                {userData.host && userData.deckSelected !== "" ?
                     <Button
                         className="landing"
                         children="Start Game"
                         onClick={() => startPlaying()}
-                        conditionalLink={true}  
+                        conditionalLink={true}
                     />
                     : <></>
                 }
-            </div> : 
+            </div> :
             // Loading icon HTML
             <div>
                 <h1>Loading game data...</h1>

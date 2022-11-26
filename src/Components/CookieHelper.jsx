@@ -30,6 +30,10 @@ export const CookieHelper = () => {
         { path: '/' }
     )
 
+        //SAIR - added conditional otherwise application crashes on launch
+        if(cookies.userData === undefined)
+            return
+
             setUserData({
                 name: cookies.userData.name,
                 email: cookies.userData.email,

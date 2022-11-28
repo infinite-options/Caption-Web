@@ -32,7 +32,7 @@ export default function App() {
     })
 
     const [cookies, setCookie, removeCookie] = useCookies(['userData'])
-
+    console.log("App.js > userData: " + JSON.stringify(userData))
 
     return (
         <div className="App">

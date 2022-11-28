@@ -25,7 +25,8 @@ export const CookieHelper = () => {
             "googlePhotos": {
                 "albumId": "",
                 "accessToken": ""
-            }
+            },
+            "deckImgURLs": []
         },
         { path: '/' }
     )
@@ -53,7 +54,8 @@ export const CookieHelper = () => {
                 googlePhotos: {
                     albumId: "",
                     accessToken: ""
-                }
+                },
+                deckImgURLs: []
             })
     }
 
@@ -98,10 +100,12 @@ export const CookieHelper = () => {
             setDisplayHtml(true)
         } else {
             console.log("UserData updated with the following cookies:", hooksUpdate)
+            console.log("CookieHelper.jsx > BEFORE setUserData: " + JSON.stringify(userData))
             setUserData({
                 ...userData,
                 ...hooksUpdate
             })
+            console.log("CookieHelper.jsx > AFTER setUserData: " + JSON.stringify(userData))
             setDisplayHtml(true)
         }
     }

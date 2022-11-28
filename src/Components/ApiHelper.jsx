@@ -116,6 +116,10 @@ export const ApiHelper = () => {
 
                 console.log("HARVARD all images: ", allImageUrls)
             })
+        } else if (userData.deckSelected === "500-000010") {
+            // CNN API Call
+            allImageUrls = await userData.deckImgURLs
+            console.log("CNN all images: " + allImageUrls)
         }
 
         // 3. Subtract out used and undefined images

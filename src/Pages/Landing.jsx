@@ -116,17 +116,8 @@ export default function Landing({client, channel_waiting}) {
     // DESCRIPTION: On clicking "Join Game"-- validates user input and checks if game code exists in database. If so, post new player to backend and add player to game.
     async function joinGame() {
         console.log("Starting joinGame()");
-
         // Check if input formatted correctly
-        if (checkGuestInput()) {
-            // Save data in hooks
-            //SAIR
-            // setUserData({
-            //     ...userData,
-            //     host: false,
-            //     roundNumber: 1
-            // })
-
+        if (await checkGuestInput()) {
             // Show loading screen while making post request
             setDisplayHtml(false)
 
@@ -139,14 +130,8 @@ export default function Landing({client, channel_waiting}) {
             }
             await axios.post(addUserURL, payload).then((res) => {
                 console.log("POST /addUser (guest)", res);
-                
-                // Save to hooks/cookies
-                //SAIR
+
                 let pUID = res.data.user_uid
-                // setUserData({
-                //     ...userData,
-                //     playerUID: pUID
-                // })
 
                 console.log("user_code", res.data.user_code)
 
@@ -167,7 +152,6 @@ export default function Landing({client, channel_waiting}) {
                         const duration_mins = parseInt(res.data.round_duration.substring(res.data.round_duration.length - 4, res.data.round_duration.length - 2));
                         let duration = duration_mins * 60 + duration_secs;
 
-                        //SAIR - modified final setUserData because other setUserData functions do not carry over variable data and reset
                         // Save to hooks/cookies
                         setUserData({
                             ...userData,
@@ -243,12 +227,14 @@ export default function Landing({client, channel_waiting}) {
     // FUNCTION: validateGuest():
     // DESCRIPTION: Validates joining guest's input. Also validates entered game code with database
     const checkGuestInput = async () => {
+        let guestInput = true
+
         if(!checkPlayerInput())
-            return false
+            guestInput = false
         
         if(userData.code === "") {
             alert("Please enter a game code before proceeding.")
-            return false
+            guestInput = false
         }
         
         // Check if game code exists in database
@@ -257,10 +243,10 @@ export default function Landing({client, channel_waiting}) {
 
             if(res.data.warning === "Invalid game code") {
                 alert("Game code does not exist. Please enter a valid game code.")
-                return false
+                guestInput = false
             }
         })
-        return true
+        return guestInput
     }
 
 

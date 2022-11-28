@@ -31,7 +31,6 @@ export const CookieHelper = () => {
         { path: '/' }
     )
 
-        //SAIR - added conditional otherwise application crashes on launch
         if(cookies.userData === undefined)
             return
 
@@ -100,12 +99,10 @@ export const CookieHelper = () => {
             setDisplayHtml(true)
         } else {
             console.log("UserData updated with the following cookies:", hooksUpdate)
-            console.log("CookieHelper.jsx > BEFORE setUserData: " + JSON.stringify(userData))
             setUserData({
                 ...userData,
                 ...hooksUpdate
             })
-            console.log("CookieHelper.jsx > AFTER setUserData: " + JSON.stringify(userData))
             setDisplayHtml(true)
         }
     }

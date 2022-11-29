@@ -114,7 +114,7 @@ export default function Waiting({channel, channel2, channel_joining}) {
                 console.log("In subscribe 2")
                 if(newGame.data.gameStarted) {
                     console.log("newGame data", newGame.data)
-                    console.log("Waiting.jsx > userData: " + JSON.stringify(userData))
+
                     // Host did not send image URL over ably => get url from database and transition to page
                     if(newGame.data.currentImage.length === 0) {
                         const getImage = async () => {

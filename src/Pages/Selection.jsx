@@ -72,7 +72,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             //     // Confirms game has started and returns round start time
             //     await axios.get(startPlayingURL + userData.code + "," + userData.roundNumber);
             // }
-            
+
             // Returns all submitted captions
             await axios.get(getAllSubmittedCaptionsURL + userData.code + "," + userData.roundNumber).then((res) => {
                 console.log('GET Get All Submitted Caption', res);
@@ -96,14 +96,14 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     if (res.data.players.length === 1){
                         console.log("Only one caption submitted")
                         noPlayersThenSubmit(res);
-                    } 
+                    }
                     // If no caption submitted
                     else if(userData.host){
                         console.log("No one submitted a vote")
                         pub_playerVote(0);
                     }
                 }
-                
+
 
                 /**
                  * Initialize the toggle array with the correct size and populate the array with all false values
@@ -120,13 +120,13 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
         // FUNCTION: subscribeNewPlayer()
         // DESCRIPTION: Host listens for new players joining. If new players joined, post current round info to channel_joining for new player.
-        async function subscribeNewPlayer() 
+        async function subscribeNewPlayer()
         {
             await channel_waiting.subscribe(newPlayer => {
                 async function getPlayers () {
                     channel_joining.publish({data: {roundNumber: userData.roundNumber, path: window.location.pathname}})
                 }
-        
+
                 getPlayers();
             });
         }
@@ -134,7 +134,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
         // FUNCTION: subscribe_host()
         // DESCRIPTION: Listens on ably channel. If receives signal that all players voted, host gets updated scores from backend and publishes that everyone voted
-        async function subscribe_host() 
+        async function subscribe_host()
         {
             await channel_host.subscribe(newVote => {
                 if (newVote.data.playersLeft <= 0) {
@@ -167,7 +167,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                             res.data.scoreboard.sort((a, b) => (
                                 b.score === a.score ? b.game_score - a.game_score : b.score - a.score
                             ));
-            
+
                             setUserData({
                                 ...userData,
                                 scoreboardInfo: res.data.scoreboard
@@ -194,15 +194,15 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
             // Check if it is someone else's caption
             if (res.data.players[0].round_user_uid !== userData.playerUID) {
                 console.log('Default vote for user ', userData.alias);
-                
-                // If it is not current user's caption, 
+
+                // If it is not current user's caption,
                 console.log("Only submitted caption is: ", res.data.players[0].caption)
                 setSelectedCaption(res.data.players[0].caption)
 
                 // postVote()
                 postVote(res.data.players[0].caption)
 
-            } 
+            }
             // if the caption is the current user's caption
             else {
                 setSelectedCaption(null)
@@ -217,15 +217,15 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         if(userData.code !== "" && userData.roundNumber !== ""){
             getCaptions();
         }
-            
+
 
         if (userData.host) {
             subscribeNewPlayer();
             subscribe_host();
         }
-        
+
         subscribe_all();
-    
+
         return function cleanup() {
             channel_host.unsubscribe();
             channel_all.unsubscribe();
@@ -272,7 +272,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         };
 
         // if there is an argument (caption)
-            // payload includes 
+        // payload includes
         if(onlyCaption !== undefined) {
             payload = {
                 user_id: userData.playerUID,
@@ -291,21 +291,21 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
         await axios.post(postVoteCaptionURL, payload).then((res) => {
             console.log("POST voteCaption", res);
         });
-        
+
 
         await axios.get(getPlayersWhoHaventVotedURL + userData.code + "," + userData.roundNumber).then((res) => {
             // console.log('publishing with res.data.players_count = ', res.data.players_count);
             pub_playerVote(res.data.players_count);
         });
     }
-    
+
 
     // FUNCTION: renderCaptions()
     // DESCRIPTION: renders captions as buttons
     function renderCaptions() {
 
         var captions = [];
-        
+
         for (var index = 0; index < playersArr.length; index++) {
             /**
              * The value of index continues to increment due to the loop,
@@ -327,13 +327,13 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                 />
             </div>);
         }
-      
+
         return <div style = {{display: 'flex', flexDirection: 'column', alignItems: 'center'}}>{captions}</div>;
     }
 
 
     // FUNCTION: shuffleArray()
-    // DESCRIPTION: shuffles inputted array 
+    // DESCRIPTION: shuffles inputted array
     function shuffleArray(array) {
         for (let i = array.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
@@ -374,7 +374,7 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
 
     //         pub_everyoneVoted()
     //     }
-            
+
     // }, [timeLeft]);
 
 
@@ -426,21 +426,21 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                     <ReactBootStrap.Spinner animation="border" role="status"/>
                 )}
 
-                
+
                 {localUserVoted ?
                     <></>
                     : selectedCaption ?
                         <Button style = {{border: '10px solid red'}} className="fat" children="Vote" onClick={ (e) => {
                             postVote()
                         }}
-                            conditionalLink={true}/>
+                                conditionalLink={true}/>
                         : <></>
                 }
-                
+
                 <div style = {{
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    paddingBottom: '20px', 
+                    display: 'flex',
+                    justifyContent: 'center',
+                    paddingBottom: '20px',
                     paddingTop: selectedCaption ? '20px' : '0px'}}
                 >
                     {/* <div style={{
@@ -450,39 +450,41 @@ export default function Scoreboard({channel_host, channel_all, channel_waiting, 
                         }}
                     > */}
 
-                        {/* {console.log("local user voted: ", localUserVoted)} */}
+                    {/* {console.log("local user voted: ", localUserVoted)} */}
 
-                        {userData.roundDuration !== "" && localUserVoted === false ?
-                                <div style={{
-                                    background: "yellow",
-                                    borderRadius: "30px",
-                                    width: "60px",
-                                }}>
-                                    <CountdownCircleTimer
-                                        background="red"
-                                        size={60}
-                                        strokeWidth={5}
-                                        isPlaying
-                                        duration={userData.roundDuration}
-                                        colors="#000000"
-                                        onComplete={() => {
-                                            // We suspect that onComplete refreshes the entire screen and resets localUserVoted to false
-                                            // console.log("*** localUserVoted in timer", localUserVoted)
-                                            console.log("Voting page timer complete")
-                                            postVote(null)
-                                        }}
-                                    >
-                                        {({remainingTime}) => {
-                                                return (<div className="countdownText">{remainingTime}</div>)
-                                            }
-                                        }
-                                    </CountdownCircleTimer> 
-                                </div>
-                            : 
-                            <p>
-                                <b>Vote submitted.</b> <br /> Waiting for other players to vote...
-                            </p>
-                        }
+                    {userData.roundDuration !== "" && localUserVoted === false ?
+                        <div style={{
+                            background: "yellow",
+                            borderRadius: "30px",
+                            width: "60px",
+                        }}>
+                            <CountdownCircleTimer
+                                background="red"
+                                size={60}
+                                strokeWidth={5}
+                                isPlaying
+                                duration={userData.roundDuration}
+                                colors="#000000"
+                                onComplete={() => {
+                                    // We suspect that onComplete refreshes the entire screen and resets localUserVoted to false
+                                    // console.log("*** localUserVoted in timer", localUserVoted)
+                                    console.log("Voting page timer complete")
+                                    postVote(null)
+                                }}
+                            >
+                                {({remainingTime}) => {
+                                    if(remainingTime === 0)
+                                        postVote(null)
+                                    return (<div className="countdownText">{remainingTime}</div>)
+                                }
+                                }
+                            </CountdownCircleTimer>
+                        </div>
+                        :
+                        <p>
+                            <b>Vote submitted.</b> <br /> Waiting for other players to vote...
+                        </p>
+                    }
                     {/* </div> */}
                 </div>
             </div> :

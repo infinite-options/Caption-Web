@@ -25,8 +25,7 @@ export const CookieHelper = () => {
             "googlePhotos": {
                 "albumId": "",
                 "accessToken": ""
-            },
-            "deckImgURLs": []
+            }
         },
         { path: '/' }
     )
@@ -53,8 +52,7 @@ export const CookieHelper = () => {
                 googlePhotos: {
                     albumId: "",
                     accessToken: ""
-                },
-                deckImgURLs: []
+                }
             })
     }
 

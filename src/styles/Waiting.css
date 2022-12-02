@@ -1,0 +1,20 @@
+.waiting {
+    max-width: 375px;
+    height: 812px;
+    background-image: url("../assets/landing.png");
+}
+.gameRulesWaiting {
+    display: inline-block;
+    position: absolute;
+    margin-top: 98px;
+    margin-left: 30px;
+    margin-bottom: 20px;
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    color: blue;
+    text-decoration: none;
+}
+.oneWaiting {
+    padding-top: 38%;
+    text-align: center;
+}

@@ -1,0 +1,56 @@
+.selectDeck {
+    maxWidth: 375px;
+    height: 812px;
+}
+.gameRulesSelectDeck {
+    display: inline-block;
+    position: absolute;
+    margin-top: 52px;
+    margin-left: 30px;
+    margin-bottom: 20px;
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    color: blue;
+    text-decoration: none;
+}
+.oneSelectDeck {
+    padding-top: 93px;
+    margin-left: 115px;
+}
+.deck-container {
+    max-width: 375px;
+    height: 812px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    padding: 0;
+    list-style: none;
+}
+.deck {
+    cursor: pointer;
+    font-weight: bold;
+    color: black;
+    margin: 10px;
+}
+.deck-background {
+    height: 160px;
+    width: 160px;
+    background-color: yellow;
+}
+.deck-image {
+    object-fit: cover;
+    height: 146px;
+    width: 146px;
+    position: relative;
+    top: 50%;
+    margin-left: 4.5%;
+    transform: translateY(-50%);
+    border-radius: 40px;
+}
+.deckText {
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: 15px;
+    text-align: center;
+}

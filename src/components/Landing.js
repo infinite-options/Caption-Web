@@ -82,6 +82,7 @@ export default function Landing(){
         //Need a new variable to immediately pass updated data to the next page. Cannot use setState()
         const updatedUserData = {
             ...userData,
+            roundNumber: 1,
             host: true,
             playerUID: playerUID
         }
@@ -97,6 +98,7 @@ export default function Landing(){
         //Need a new variable to immediately pass updated data to the next page. Cannot use setState()
         const updatedUserData = {
             ...userData,
+            roundNumber: 1,
             host: false,
             playerUID: playerUID
         }

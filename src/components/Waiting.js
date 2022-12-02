@@ -6,8 +6,23 @@ import "../styles/Waiting.css"
 export default function Waiting(){
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
+    const [buttonText, setButtonText] = useState("Share with other players")
+    const [deckSelected, setDeckSelected] = useState(false)
 
     console.log("Waiting userData: " + JSON.stringify(userData))
+
+    function handleClick(){
+        navigator.clipboard.writeText(userData.gameCode)
+        setButtonText("Copied!")
+        setTimeout(() => {
+            setButtonText("Share with other players")
+        }, 2000)
+    }
+
+    function selectDeck(){
+        setDeckSelected(true)
+        navigate("/SelectDeck", { state: userData })
+    }
 
     return(
         <div className="waiting">
@@ -21,14 +36,19 @@ export default function Waiting(){
             <button className="gameCodeWaiting">Game Code: {userData.gameCode}</button>
             <br/>
             <br/>
-            <button className="buttonRoundType" >
-                Share with other players
+            <button className="buttonRoundType" onClick={handleClick}>
+                {buttonText}
             </button>
             <br/>
             <br/>
-            {userData.host &&
-                <button className="buttonRoundType" >
+            {userData.host && !deckSelected &&
+                <button className="buttonRoundType" onClick={selectDeck}>
                     Select Deck
+                </button>
+            }
+            {userData.host && deckSelected &&
+                <button className="buttonRoundType" >
+                    Start Game
                 </button>
             }
         </div>

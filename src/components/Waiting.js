@@ -1,15 +1,18 @@
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
+import { ablyStartGame } from "../util/Api"
 import "../styles/Waiting.css"
+import axios from "axios";
 
 export default function Waiting(){
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
+    const [cookies, setCookie] = useCookies(["userData"])
     const [buttonText, setButtonText] = useState("Share with other players")
     const [deckSelected, setDeckSelected] = useState(false)
 
-    console.log("Waiting userData: " + JSON.stringify(userData))
+    //console.log("Waiting userData: " + JSON.stringify(userData))
 
     function handleClick(){
         navigator.clipboard.writeText(userData.gameCode)
@@ -22,6 +25,10 @@ export default function Waiting(){
     function selectDeck(){
         setDeckSelected(true)
         navigate("/SelectDeck", { state: userData })
+    }
+
+    async function startGame() {
+
     }
 
     return(
@@ -47,7 +54,7 @@ export default function Waiting(){
                 </button>
             }
             {userData.host && deckSelected &&
-                <button className="buttonRoundType" >
+                <button className="buttonRoundType" onClick={startGame}>
                     Start Game
                 </button>
             }

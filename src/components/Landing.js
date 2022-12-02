@@ -11,7 +11,7 @@ export default function Landing(){
     const [cookies, setCookie] = useCookies(["userData"])
     const [userData, setUserData] = useState({name: "", email: "", zipCode: "", alias: ""})
 
-    console.log("Landing userData: " + JSON.stringify(userData))
+    //console.log("Landing userData: " + JSON.stringify(userData))
 
     if(cookies.userData != undefined){
         userData.name = cookies.userData.name

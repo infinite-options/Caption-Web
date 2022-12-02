@@ -1,13 +1,16 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { getDecks, getDatabaseImages, getApiImages }from "../util/Api.js"
+import { getDecks, postDatabaseImages, postApiImages }from "../util/Api.js"
 import "../styles/SelectDeck.css"
 
 export default function SelectDeck(){
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
+    const [cookies, setCookie] = useCookies(["userData"])
     const [decksInfo, setDecksInfo] = useState([])
+
+    //console.log("Waiting userData: " + JSON.stringify(userData))
 
     useEffect( () => {
         async function getDecksInfo(){
@@ -30,9 +33,24 @@ export default function SelectDeck(){
             // }, { path: '/' })
             // return
         } else if (deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
-            const apiImages = await getApiImages()
-        } else {
-            getDatabaseImages(deckUID, userData)
+            await postApiImages(deckUID, userData)
+            const updatedUserData = {
+                ...userData,
+                isApi: true
+            }
+            setUserData(updatedUserData)
+            setCookie("userData", updatedUserData, {path: '/'})
+            navigate("/Waiting", {state: updatedUserData})
+        }
+        else {
+            await postDatabaseImages(deckUID, userData)
+            const updatedUserData = {
+                ...userData,
+                isApi: false
+            }
+            setUserData(updatedUserData)
+            setCookie("userData", updatedUserData, {path: '/'})
+            navigate("/Waiting", {state: updatedUserData})
         }
 
         // POST /selectDeck selects deck for current game in database

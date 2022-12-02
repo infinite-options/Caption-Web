@@ -10,7 +10,7 @@ export default function RoundType(props){
     const [cookies, setCookie] = useCookies(["userData"])
     const [roundInfo, setRoundInfo] = useState({numOfRounds: 10, roundTime: 30})
 
-    console.log("RoundType userData: " + JSON.stringify(userData))
+    //console.log("RoundType userData: " + JSON.stringify(userData))
 
     function handleChange(event){
         if(event.target.name === "numOfRounds"){

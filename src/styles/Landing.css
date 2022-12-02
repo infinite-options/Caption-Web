@@ -14,7 +14,7 @@
     color: blue;
     text-decoration: none;
 }
-.userDataForm {
+.userDataFormLanding {
     padding-top: 60%;
     margin-bottom: 12%;
 }
@@ -30,7 +30,7 @@
     padding-left: 25px;
     margin-left: 12px;
 }
-.inputLanding::placeholder {
+.inputLanding::placeholder, .inputGameCode::placeholder {
     color: black;
     font-family: Josefin Sans, sans-serif;
     font-weight: bold;

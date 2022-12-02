@@ -18,3 +18,18 @@
     padding-top: 38%;
     text-align: center;
 }
+.gameCodeWaiting {
+    width: 275px;
+    height: 150px;
+    border-width: 3px;
+    border-radius: 25px;
+    border-color: black;
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: black;
+    background-color: #f9dd25;
+    margin-top: 80%;
+    margin-left: 50px;
+}
+

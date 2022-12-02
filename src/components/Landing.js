@@ -1,7 +1,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCookies } from 'react-cookie'
+import { getPlayerUID } from "../util/Api";
+import axios from "axios"
 import "../styles/Landing.css"
+import api from "../util/Api";
 
 export default function Landing(){
     const navigate = useNavigate()
@@ -72,29 +75,34 @@ export default function Landing(){
         return true
     }
 
-    function createNewGame(){
-        if(!validateUserData())
+    async function createNewGame() {
+        if (!validateUserData())
             return
+        const playerUID = await getPlayerUID(userData)
         //Need a new variable to immediately pass updated data to the next page. Cannot use setState()
         const updatedUserData = {
             ...userData,
-            host: true
+            host: true,
+            playerUID: playerUID
         }
         setUserData(updatedUserData)
-        setCookie("userData", updatedUserData, { path: '/' })
-        navigate("/RoundType", { state: updatedUserData })
+        setCookie("userData", updatedUserData, {path: '/'})
+        navigate("/RoundType", {state: updatedUserData})
     }
 
-    function joinGame(){
-        if(!validateUserData())
+    async function joinGame() {
+        if (!validateUserData())
             return
-        const newUserData = {
+        const playerUID = await getPlayerUID(userData)
+        //Need a new variable to immediately pass updated data to the next page. Cannot use setState()
+        const updatedUserData = {
             ...userData,
-            host: false
+            host: false,
+            playerUID: playerUID
         }
-        setUserData(newUserData)
-        setCookie("userData", newUserData, { path: '/' })
-        navigate("/Waiting", { state: newUserData })
+        setUserData(updatedUserData)
+        setCookie("userData", updatedUserData, {path: '/'})
+        navigate("/Waiting", {state: updatedUserData})
     }
 
     return(
@@ -104,7 +112,7 @@ export default function Landing(){
                 Game Rules
             </a>
             {cookies.userData != undefined ?
-                <form className="userDataForm" onChange={handleChange}>
+                <form className="userDataFormLanding" onChange={handleChange}>
                     <input className="inputLanding" type="text" name="name" defaultValue={cookies.userData.name}/>
                     <br/>
                     <br/>
@@ -116,7 +124,7 @@ export default function Landing(){
                     <br/>
                     <input className="inputLanding" type="text" name="alias" defaultValue={cookies.userData.alias}/>
                 </form> :
-                <form className="userDataForm" onChange={handleChange}>
+                <form className="userDataFormLanding" onChange={handleChange}>
                     <input className="inputLanding" type="text" name="name" placeholder="Your Name"/>
                     <br/>
                     <br/>

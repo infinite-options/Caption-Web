@@ -18,6 +18,19 @@ export default function Waiting(){
             <h4 className="oneWaiting">
                 Waiting for all players to join
             </h4>
+            <button className="gameCodeWaiting">Game Code: {userData.gameCode}</button>
+            <br/>
+            <br/>
+            <button className="buttonRoundType" >
+                Share with other players
+            </button>
+            <br/>
+            <br/>
+            {userData.host &&
+                <button className="buttonRoundType" >
+                    Select Deck
+                </button>
+            }
         </div>
     )
 }

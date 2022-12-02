@@ -1,6 +1,7 @@
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
+import { getGameCode }from "../util/Api.js"
 import "../styles/RoundType.css"
 
 export default function RoundType(props){
@@ -38,16 +39,19 @@ export default function RoundType(props){
         return true
     }
 
-    function continueButton(){
-        if(!validateRoundInfo())
+    async function continueButton() {
+        if (!validateRoundInfo())
             return
+        const gameInfo = await getGameCode(userData, roundInfo.numOfRounds.toString(), roundInfo.roundTime.toString())
         const updatedUserData = {
             ...userData,
             numOfRounds: roundInfo.numOfRounds,
-            roundTime: roundInfo.roundTime
+            roundTime: roundInfo.roundTime,
+            gameUID: gameInfo.game_uid,
+            gameCode: gameInfo.game_code
         }
         setUserData(updatedUserData)
-        setCookie("userData", updatedUserData, { path: '/' })
+        setCookie("userData", updatedUserData, {path: '/'})
         navigate("/Waiting", { state: updatedUserData })
     }
 

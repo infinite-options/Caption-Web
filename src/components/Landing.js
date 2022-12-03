@@ -1,10 +1,10 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { getPlayerUID } from "../util/Api";
+import { getPlayerUID } from "../util/Api"
 import axios from "axios"
 import "../styles/Landing.css"
-import api from "../util/Api";
+import { joinGame } from "../util/Api"
 
 export default function Landing(){
     const navigate = useNavigate()
@@ -75,7 +75,7 @@ export default function Landing(){
         return true
     }
 
-    async function createNewGame() {
+    async function createNewGameButton() {
         if (!validateUserData())
             return
         const playerUID = await getPlayerUID(userData)
@@ -91,7 +91,7 @@ export default function Landing(){
         navigate("/RoundType", {state: updatedUserData})
     }
 
-    async function joinGame() {
+    async function joinGameButton() {
         if (!validateUserData())
             return
         const playerUID = await getPlayerUID(userData)
@@ -104,6 +104,7 @@ export default function Landing(){
         }
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
+        await joinGame(updatedUserData)
         navigate("/Waiting", {state: updatedUserData})
     }
 
@@ -139,14 +140,14 @@ export default function Landing(){
                     <input className="inputLanding" type="text" name="alias" placeholder="Alias (screen name)"/>
                 </form>
             }
-            <button className="buttonLanding" onClick={createNewGame}>
+            <button className="buttonLanding" onClick={createNewGameButton}>
                 Create New Game
             </button>
             <div className="textLanding">
                 OR
             </div>
             <input className="inputGameCode" onChange={handleChange} type="text" name="gameCode" placeholder="Enter Game Code"/>
-            <button className="buttonLanding" onClick={joinGame}>
+            <button className="buttonLanding" onClick={joinGameButton}>
                 Join Game
             </button>
         </div>

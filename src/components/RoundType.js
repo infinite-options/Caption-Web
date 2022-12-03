@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { getGameCode }from "../util/Api.js"
+import {getGameCode, joinGame} from "../util/Api.js"
 import "../styles/RoundType.css"
 
 export default function RoundType(props){
@@ -52,6 +52,7 @@ export default function RoundType(props){
         }
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
+        await joinGame(updatedUserData)
         navigate("/Waiting", { state: updatedUserData })
     }
 

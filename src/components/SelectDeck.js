@@ -20,64 +20,10 @@ export default function SelectDeck(){
         getDecksInfo()
     }, [userData.playerUID])
 
-    async function deckClicked(deckTitle, deckUID, userData) {
-        if (deckTitle === "Google Photos") {
-            // console.log("Google Photos API selected. Switching to Google Sign-in Page.")
-            // setUserData({
-            //     ...userData,
-            //     isApi: true
-            // })
-            // setCookie("userData", {
-            //     ...cookies.userData,
-            //     "isApi": true
-            // }, { path: '/' })
-            // return
-        } else if (deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
-            await postApiImages(deckUID, userData)
-            const updatedUserData = {
-                ...userData,
-                isApi: true
-            }
-            setUserData(updatedUserData)
-            setCookie("userData", updatedUserData, {path: '/'})
-            navigate("/Waiting", {state: updatedUserData})
-        }
-        else {
-            await postDatabaseImages(deckUID, userData)
-            const updatedUserData = {
-                ...userData,
-                isApi: false
-            }
-            setUserData(updatedUserData)
-            setCookie("userData", updatedUserData, {path: '/'})
-            navigate("/Waiting", {state: updatedUserData})
-        }
-
-        // POST /selectDeck selects deck for current game in database
-        // let payload =  {
-        //     game_code: userData.code,
-        //     deck_uid: id,
-        //     round_number: userData.roundNumber.toString(),
-        // }
-        // await axios.post(selectDeckURL, payload).then(res => console.log("Select Deck", res))
-        //
-        // setUserData({
-        //     ...userData,
-        //     deckSelected: id,
-        //     deckTitle: title,
-        //     isApi: apiStatus
-        // })
-        // setCookie("userData", {
-        //     ...cookies.userData,
-        //     "deckSelected": id,
-        //     "deckTitle": title,
-        //     "isApi": apiStatus
-        // }, { path: '/' })
-    }
-
+    // onClick={deckSelected(deck.title, deck.deck_uid, userData)}
     const deckElements = decksInfo.map((deck, index) => {
         return(
-            <div key={index} onClick={deckClicked(deck.title, deck.deck_uid, userData)} className="deck">
+            <div key={index} className="deck">
                 <div className="deck-background">
                     <img src={deck.deck_thumbnail_url} alt={deck.deck_title} className="deck-image"/>
                     <div className="deckText">
@@ -88,6 +34,34 @@ export default function SelectDeck(){
             </div>
         )
     })
+
+    // async function deckSelected(deckTitle, deckUID, userData) {
+    //     if (deckTitle === "Google Photos") {
+    //
+    //     }
+    //     else if (deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
+    //         const updatedUserData = {
+    //             ...userData,
+    //             isApi: true,
+    //             deckUID: deckUID
+    //         }
+    //         setUserData(updatedUserData)
+    //         setCookie("userData", updatedUserData, {path: '/'})
+    //         await postApiImages(updatedUserData)
+    //         navigate("/Waiting", {state: updatedUserData})
+    //     }
+    //     else {
+    //         const updatedUserData = {
+    //             ...userData,
+    //             isApi: false,
+    //             deckUID: deckUID
+    //         }
+    //         setUserData(updatedUserData)
+    //         setCookie("userData", updatedUserData, {path: '/'})
+    //         await postApiImages(updatedUserData)
+    //         navigate("/Waiting", {state: updatedUserData})
+    //     }
+    // }
 
     return(
         <div className="selectDeck">

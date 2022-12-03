@@ -4,6 +4,7 @@ import axios from "axios";
 
 const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
 const createGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createGame"
+const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
 const decksURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks"
 const selectDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck"
 const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck"
@@ -31,28 +32,50 @@ async function getGameCode(userData, numOfRounds, roundTime){
     return gameInfo
 }
 
+async function joinGame(userData){
+    const payload = {
+        game_code: userData.gameCode,
+        user_uid: userData.playerUID
+    }
+    await axios.post(joinGameURL, payload)
+    return
+}
+
 async function getDecks(playerUID){
     const decksInfo = await axios.get(decksURL + "/" + playerUID + "," + "true").then(response => response.data.decks_info)
     return decksInfo
 }
 
-async function postDatabaseImages(deckUID, userData){
+async function postDatabaseImages(userData){
     const payload = {
-        deck_uid: deckUID,
+        deck_uid: userData.deckUID,
         game_code: userData.gameCode,
     }
+    console.log("DECK UID: " + userData.deckUID)
     await axios.post(postAssignDeckURL, payload)
+    await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then((res) => {
+        console.log('GET Get Unique Image In Round', res)})
+
+        // setUserData({
+        //     ...userData,
+        //     imageURL: res.data.image_url
+        // })
+        // console.log("cookies before setCookies waiting: 385 ", cookies.userData)
+        // setCookie("userData", {
+        //     ...cookies.userData,
+        //     "imageURL": res.data.image_url
+        // }, { path: '/' })
+        // console.log("Set Cookies in waiting: 385", cookies.userData)
+        //pub();
 }
 
-async function postApiImages(deckUID, userData){
+async function postApiImages(userData){
     const payload = {
-        deck_uid: deckUID,
+        deck_uid: userData.deckUID,
         game_code: userData.gameCode
     }
-    // await axios.post(postAssignDeckURL, payload).then((res) => {
-    //     console.log(res)
-    // })
-    //
+    await axios.post(postAssignDeckURL, payload).then((res) => {console.log(res)})
+
     // // Load next round's image URL
     // let uniqueImage = await apiCall()
     //
@@ -66,46 +89,25 @@ async function postApiImages(deckUID, userData){
     //     "imageURL": uniqueImage
     // }, { path: '/' })
     // console.log("Set Cookies in waiting: 219", cookies.userData)
-    //
-    //
-    // // Publish start game signal and imageURL to ably for guest players to use
     // pub(uniqueImage)
 }
 
-async function ablyStartGame() {
-    // await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then((res) => {
-    //     console.log('GET Get Unique Image In Round', res);
-    //     setUserData({
-    //         ...userData,
-    //         imageURL: res.data.image_url
-    //     })
-    //     console.log("cookies before setCookies waiting: 385 ", cookies.userData)
-    //     setCookie("userData", {
-    //         ...cookies.userData,
-    //         "imageURL": res.data.image_url
-    //     }, {path: '/'})
-    //     console.log("Set Cookies in waiting: 385", cookies.userData)
+async function ablyStartGame(){
+    // if(userData.isApi){
+    //     channel2.publish({data: {
+    //             gameStarted: true,
+    //             currentImage: apiURL,
+    //             deckTitle: userData.deckTitle
+    //         }});
+    // }
+    // else
+    //     channel2.publish({data: {
+    //             gameStarted: true,
+    //             currentImage: "",
+    //             deckTitle: userData.deckTitle
+    //         }});
     //
-    //     // Publish start game signal to ably
-    //     if (userData.isApi) {
-    //         channel2.publish({
-    //             data: {
-    //                 gameStarted: true,
-    //                 currentImage: apiURL,
-    //                 deckTitle: userData.deckTitle
-    //             }
-    //         });
-    //     } else
-    //         channel2.publish({
-    //             data: {
-    //                 gameStarted: true,
-    //                 currentImage: "",
-    //                 deckTitle: userData.deckTitle
-    //             }
-    //         });
-    //
-    //     history.push("/page");
-    // })
+    // history.push("/page");
 }
 
-export { getPlayerUID, getGameCode, getDecks, postDatabaseImages, postApiImages }
+export { getPlayerUID, getGameCode, joinGame, getDecks, postDatabaseImages, postApiImages }

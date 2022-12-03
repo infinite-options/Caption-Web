@@ -27,12 +27,12 @@
     list-style: none;
 }
 .deck {
-    cursor: pointer;
     font-weight: bold;
     color: black;
     margin: 10px;
 }
 .deck-background {
+    cursor: pointer;
     height: 160px;
     width: 160px;
     background-color: yellow;

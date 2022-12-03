@@ -25,27 +25,25 @@ export default function SelectDeck(){
 
         }
         else if (deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
-            const imageURL = await postDatabaseImages(deckUID, userData.gameCode, userData.roundNumber)
-            const updatedUserData = {
+            const updateUserData = {
                 ...userData,
                 isApi: true,
-                deckUID: deckUID,
-                imageURL: imageURL
+                deckUID: deckUID
             }
-            //setUserData(updatedUserData)
-            //setCookie("userData", updatedUserData, {path: '/'})
+            const updatedUserData = await postApiImages(updateUserData)
+            console.log("updatedUserData API: ", updateUserData)
+            setCookie("userData", updatedUserData, {path: '/'})
             navigate("/Waiting", {state: updatedUserData})
         }
         else {
-            const imageURL = await postDatabaseImages(deckUID, userData.gameCode, userData.roundNumber)
-            const updatedUserData = {
+            const updateUserData = {
                 ...userData,
                 isApi: false,
-                deckUID: deckUID,
-                imageURL: imageURL
+                deckUID: deckUID
             }
-            //setUserData(updatedUserData)
-            //setCookie("userData", updatedUserData, {path: '/'})
+            const updatedUserData = await postDatabaseImages(updateUserData)
+            console.log("updatedUserData DATABASE: ", updateUserData)
+            setCookie("userData", updatedUserData, {path: '/'})
             navigate("/Waiting", {state: updatedUserData})
         }
     }
@@ -62,7 +60,7 @@ export default function SelectDeck(){
             <ul className="deck-container">
                 {decksInfo.map((deck, index) => {
                     return(
-                        <div key={index} onClick={ deckSelected(deck.title, deck.deck_uid, userData) }className="deck">
+                        <div key={index} onClick={event => deckSelected(deck.deck_title, deck.deck_uid, userData)} className="deck">
                             <div className="deck-background">
                                 <img src={deck.deck_thumbnail_url} alt={deck.deck_title} className="deck-image"/>
                                 <div className="deckText">

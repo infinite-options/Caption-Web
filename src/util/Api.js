@@ -46,14 +46,12 @@ async function getDecks(playerUID){
     return decksInfo
 }
 
-async function postApiImages(deckUID, gameCode, roundNumber){
+async function postApiImages(userData){
     const payload = {
-        deck_uid: deckUID,
-        game_code: gameCode
+        deck_uid: userData.deckUID,
+        game_code: userData.gameCode
     }
-    await axios.post(postAssignDeckURL, payload)
-    const imageURL = await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber).then(response => response.data.image_url)
-    return imageURL
+    await axios.post(postAssignDeckURL, payload).then(response => {console.log("POST ASSIGN DECK URL API: ",response)})
     // // Load next round's image URL
     // let uniqueImage = await apiCall()
     //
@@ -70,14 +68,18 @@ async function postApiImages(deckUID, gameCode, roundNumber){
     // pub(uniqueImage)
 }
 
-async function postDatabaseImages(deckUID, gameCode, roundNumber){
+async function postDatabaseImages(userData){
     const payload = {
-        deck_uid: deckUID,
-        game_code: gameCode
+        deck_uid: userData.deckUID,
+        game_code: userData.gameCode
     }
-    await axios.post(postAssignDeckURL, payload)
-    const imageURL = await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber).then(response => response.data.image_url)
-    return imageURL
+    await axios.post(postAssignDeckURL, payload).then(response => {console.log("POST ASSIGN DECK URL DATABASE: ",response)})
+    const imageURL = await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then(response => {console.log("UNIQUE IMAGE IN ROUND URL DATABASE: ",response)})
+    const updatedUserData = {
+        ...userData,
+        imageURL: imageURL
+    }
+    return updatedUserData
         // setUserData({
         //     ...userData,
         //     imageURL: res.data.image_url
@@ -91,22 +93,35 @@ async function postDatabaseImages(deckUID, gameCode, roundNumber){
         //pub();
 }
 
-async function ablyStartGame(){
+async function ablyStartGame(userData){
     // if(userData.isApi){
-    //     channel2.publish({data: {
-    //             gameStarted: true,
-    //             currentImage: apiURL,
-    //             deckTitle: userData.deckTitle
-    //         }});
+    //     await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then(response => {
+    //         const updatedUserData = {
+    //             ...userData,
+    //             imageURL: response.data.image_url
+    //         }
+    //         channel2.publish({data: {
+    //                 gameStarted: true,
+    //                 currentImage: apiURL,
+    //                 deckTitle: userData.deckTitle
+    //         }})
+    //         return updatedUserData
+    //     })
     // }
-    // else
-    //     channel2.publish({data: {
-    //             gameStarted: true,
-    //             currentImage: "",
-    //             deckTitle: userData.deckTitle
-    //         }});
-    //
-    // history.push("/page");
+    // else{
+    //     await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then(response => {
+    //         const updatedUserData = {
+    //             ...userData,
+    //             imageURL: response.data.image_url
+    //         }
+    //         channel2.publish({data: {
+    //                 gameStarted: true,
+    //                 currentImage: "",
+    //                 deckTitle: userData.deckTitle
+    //         }})
+    //         return updatedUserData
+    //     })
+    // }
 }
 
 export { getPlayerUID, getGameCode, joinGame, getDecks, postDatabaseImages, postApiImages }

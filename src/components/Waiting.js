@@ -28,7 +28,8 @@ export default function Waiting(){
     }
 
     async function startGame() {
-
+        //const updatedUserData = await ablyStartGame(userData)
+        //navigate("/Caption", { state: userData })
     }
 
     return(

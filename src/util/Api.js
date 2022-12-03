@@ -46,36 +46,14 @@ async function getDecks(playerUID){
     return decksInfo
 }
 
-async function postDatabaseImages(userData){
+async function postApiImages(deckUID, gameCode, roundNumber){
     const payload = {
-        deck_uid: userData.deckUID,
-        game_code: userData.gameCode,
+        deck_uid: deckUID,
+        game_code: gameCode
     }
-    console.log("DECK UID: " + userData.deckUID)
     await axios.post(postAssignDeckURL, payload)
-    await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then((res) => {
-        console.log('GET Get Unique Image In Round', res)})
-
-        // setUserData({
-        //     ...userData,
-        //     imageURL: res.data.image_url
-        // })
-        // console.log("cookies before setCookies waiting: 385 ", cookies.userData)
-        // setCookie("userData", {
-        //     ...cookies.userData,
-        //     "imageURL": res.data.image_url
-        // }, { path: '/' })
-        // console.log("Set Cookies in waiting: 385", cookies.userData)
-        //pub();
-}
-
-async function postApiImages(userData){
-    const payload = {
-        deck_uid: userData.deckUID,
-        game_code: userData.gameCode
-    }
-    await axios.post(postAssignDeckURL, payload).then((res) => {console.log(res)})
-
+    const imageURL = await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber).then(response => response.data.image_url)
+    return imageURL
     // // Load next round's image URL
     // let uniqueImage = await apiCall()
     //
@@ -90,6 +68,27 @@ async function postApiImages(userData){
     // }, { path: '/' })
     // console.log("Set Cookies in waiting: 219", cookies.userData)
     // pub(uniqueImage)
+}
+
+async function postDatabaseImages(deckUID, gameCode, roundNumber){
+    const payload = {
+        deck_uid: deckUID,
+        game_code: gameCode
+    }
+    await axios.post(postAssignDeckURL, payload)
+    const imageURL = await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber).then(response => response.data.image_url)
+    return imageURL
+        // setUserData({
+        //     ...userData,
+        //     imageURL: res.data.image_url
+        // })
+        // console.log("cookies before setCookies waiting: 385 ", cookies.userData)
+        // setCookie("userData", {
+        //     ...cookies.userData,
+        //     "imageURL": res.data.image_url
+        // }, { path: '/' })
+        // console.log("Set Cookies in waiting: 385", cookies.userData)
+        //pub();
 }
 
 async function ablyStartGame(){

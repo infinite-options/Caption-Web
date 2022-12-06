@@ -1,16 +1,14 @@
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {getGameCode, joinGame} from "../util/Api.js"
+import { ably, getGameCode, joinGame } from "../util/Api.js"
 import "../styles/RoundType.css"
 
-export default function RoundType(props){
+export default function RoundType() {
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
     const [roundInfo, setRoundInfo] = useState({numOfRounds: 10, roundTime: 30})
-
-    //console.log("RoundType userData: " + JSON.stringify(userData))
 
     function handleChange(event){
         if(event.target.name === "numOfRounds"){
@@ -53,7 +51,9 @@ export default function RoundType(props){
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
         await joinGame(updatedUserData)
-        navigate("/Waiting", { state: updatedUserData })
+        const channel = ably.channels.get(`BizBuz/${updatedUserData.gameCode}`)
+        channel.publish({message: "New Player Joined Game"})
+        navigate("/SelectDeck", { state: updatedUserData })
     }
 
     return(

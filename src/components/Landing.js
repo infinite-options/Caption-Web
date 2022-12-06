@@ -1,23 +1,23 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { getPlayerUID } from "../util/Api"
-import axios from "axios"
+import {ably, ablyStartGame, getPlayerUID} from "../util/Api"
+
 import "../styles/Landing.css"
 import { joinGame } from "../util/Api"
 
 export default function Landing(){
     const navigate = useNavigate()
-    const [cookies, setCookie] = useCookies(["userData"])
     const [userData, setUserData] = useState({name: "", email: "", zipCode: "", alias: ""})
+    const [cookies, setCookie] = useCookies(["userData"])
+    const [cookiesUsed, setCookiesUsed] = useState(false)
 
-    //console.log("Landing userData: " + JSON.stringify(userData))
-
-    if(cookies.userData != undefined){
+    if(!cookiesUsed && cookies.userData != undefined) {
         userData.name = cookies.userData.name
         userData.email = cookies.userData.email
         userData.zipCode = cookies.userData.zipCode
         userData.alias = cookies.userData.alias
+        setCookiesUsed(true)
     }
 
     function handleChange(event){
@@ -105,6 +105,8 @@ export default function Landing(){
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
         await joinGame(updatedUserData)
+        const channel = ably.channels.get(`BizBuz/${updatedUserData.gameCode}`)
+        channel.publish({message: "New Player Joined Game"})
         navigate("/Waiting", {state: updatedUserData})
     }
 

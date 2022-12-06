@@ -1,20 +1,23 @@
-import { useState } from "react"
+import {useEffect, useState} from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ablyStartGame } from "../util/Api"
+import {ably, ablyStartGame, getPlayers } from "../util/Api"
 import "../styles/Waiting.css"
-import axios from "axios";
 
 export default function Waiting(){
     const navigate = useNavigate(), location = useLocation()
-    const [userData, setUserData] = useState(location.state)
-    const [cookies, setCookie] = useCookies(["userData"])
+    const userData = location.state
+    const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [buttonText, setButtonText] = useState("Share with other players")
-    const [deckSelected, setDeckSelected] = useState(false)
+    const [lobby, setLobby] = useState([])
 
-    //console.log("Waiting userData: " + JSON.stringify(userData))
+    async function initializeLobby(){
+        const newLobby = await getPlayers(userData.gameCode)
+        setLobby(newLobby)
+    }
+    initializeLobby()
 
-    function handleClick(){
+    function copyGameCodeButton(){
         navigator.clipboard.writeText(userData.gameCode)
         setButtonText("Copied!")
         setTimeout(() => {
@@ -22,15 +25,15 @@ export default function Waiting(){
         }, 2000)
     }
 
-    function selectDeck(){
-        setDeckSelected(true)
-        navigate("/SelectDeck", { state: userData })
-    }
-
-    async function startGame() {
-        //const updatedUserData = await ablyStartGame(userData)
+    async function startGameButton() {
+        await getPlayers(userData.gameCode)
         //navigate("/Caption", { state: userData })
     }
+
+    channel.subscribe(async event => {
+        const newLobby = await getPlayers(userData.gameCode)
+        setLobby(newLobby)
+    })
 
     return(
         <div className="waiting">
@@ -41,21 +44,26 @@ export default function Waiting(){
             <h4 className="oneWaiting">
                 Waiting for all players to join
             </h4>
+            <ul className="lobbyWaiting">
+                {lobby.map((player, index) => {
+                    return(
+                        <li key={index} className="lobbyPlayerWaiting">
+                            <i className="fas fa-circle fa-3x" style={{color: "purple"}}/>
+                            {player.user_alias}
+                        </li>
+                    )
+                })}
+            </ul>
             <button className="gameCodeWaiting">Game Code: {userData.gameCode}</button>
             <br/>
             <br/>
-            <button className="buttonRoundType" onClick={handleClick}>
+            <button className="buttonRoundType" onClick={copyGameCodeButton}>
                 {buttonText}
             </button>
             <br/>
             <br/>
-            {userData.host && !deckSelected &&
-                <button className="buttonRoundType" onClick={selectDeck}>
-                    Select Deck
-                </button>
-            }
-            {userData.host && deckSelected &&
-                <button className="buttonRoundType" onClick={startGame}>
+            {userData.host &&
+                <button className="buttonRoundType" onClick={startGameButton}>
                     Start Game
                 </button>
             }

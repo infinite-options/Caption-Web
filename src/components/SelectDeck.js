@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { getDecks, postDatabaseImages, postApiImages }from "../util/Api.js"
+import {getDecks, postDatabaseImages, postApiImages, ably} from "../util/Api.js"
 import "../styles/SelectDeck.css"
 
 export default function SelectDeck(){
@@ -9,8 +9,6 @@ export default function SelectDeck(){
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
     const [decksInfo, setDecksInfo] = useState([])
-
-    //console.log("Waiting userData: " + JSON.stringify(userData))
 
     useEffect( () => {
         async function getDecksInfo(){
@@ -20,32 +18,30 @@ export default function SelectDeck(){
         getDecksInfo()
     }, [userData.playerUID])
 
-    async function deckSelected(deckTitle, deckUID, userData) {
+    async function deckSelected(deckTitle, deckUID) {
+        let updatedUserData = {}
         if (deckTitle === "Google Photos") {
 
         }
         else if (deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
-            const updateUserData = {
+            updatedUserData = {
                 ...userData,
                 isApi: true,
                 deckUID: deckUID
             }
-            const updatedUserData = await postApiImages(updateUserData)
-            console.log("updatedUserData API: ", updateUserData)
-            setCookie("userData", updatedUserData, {path: '/'})
-            navigate("/Waiting", {state: updatedUserData})
+            await postApiImages(updatedUserData)
         }
         else {
-            const updateUserData = {
+            updatedUserData = {
                 ...userData,
                 isApi: false,
                 deckUID: deckUID
             }
-            const updatedUserData = await postDatabaseImages(updateUserData)
-            console.log("updatedUserData DATABASE: ", updateUserData)
-            setCookie("userData", updatedUserData, {path: '/'})
-            navigate("/Waiting", {state: updatedUserData})
+            await postDatabaseImages(updatedUserData)
         }
+        setUserData(updatedUserData)
+        setCookie("userData", updatedUserData, {path: '/'})
+        navigate("/Waiting", {state: updatedUserData})
     }
 
     return(
@@ -60,7 +56,7 @@ export default function SelectDeck(){
             <ul className="deck-container">
                 {decksInfo.map((deck, index) => {
                     return(
-                        <div key={index} onClick={event => deckSelected(deck.deck_title, deck.deck_uid, userData)} className="deck">
+                        <div key={index} onClick={event => deckSelected(deck.deck_title, deck.deck_uid)} className="deck">
                             <div className="deck-background">
                                 <img src={deck.deck_thumbnail_url} alt={deck.deck_title} className="deck-image"/>
                                 <div className="deckText">

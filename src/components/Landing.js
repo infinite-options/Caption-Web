@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, ablyStartGame, getPlayerUID} from "../util/Api"
+import {ably, checkGameCode, getPlayerUID} from "../util/Api"
 
 import "../styles/Landing.css"
 import { joinGame } from "../util/Api"
@@ -93,6 +93,8 @@ export default function Landing(){
 
     async function joinGameButton() {
         if (!validateUserData())
+            return
+        if(!await checkGameCode(userData.gameCode))
             return
         const playerUID = await getPlayerUID(userData)
         //Need a new variable to immediately pass updated data to the next page. Cannot use setState()

@@ -4,6 +4,7 @@ import Ably from "ably/callbacks";
 const ably_api_key = "KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF"
 const ably = new Ably.Realtime(ably_api_key)
 
+const checkGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame"
 const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
 const createGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createGame"
 const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
@@ -11,7 +12,17 @@ const decksURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api
 const selectDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck"
 const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck"
 const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/"
+const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/"
 const getUniqueImageInRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
+
+async function checkGameCode(gameCode){
+    const codeStatus = await axios.get(checkGameURL + '/' + gameCode)
+    if(codeStatus.data.warning === "Invalid game code") {
+        alert("Please enter a valid game code.")
+        return false
+    }
+    return true
+}
 
 async function getPlayerUID(userData) {
     const payload = {
@@ -82,23 +93,24 @@ async function postDatabaseImages(userData){
         game_code: userData.gameCode
     }
     await axios.post(postAssignDeckURL, payload)
-    // const imageURL = await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then(response => {console.log("UNIQUE IMAGE IN ROUND URL DATABASE: ",response)})
+    const uniqueImageURL = await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then(response => {console.log("UNIQUE IMAGE IN ROUND URL DATABASE: ",response)})
+    console.log("API UNIQUE IMAGE", uniqueImageURL)
     // const updatedUserData = {
     //     ...userData,
     //     imageURL: imageURL
     // }
     // return updatedUserData
-        // setUserData({
-        //     ...userData,
-        //     imageURL: res.data.image_url
-        // })
-        // console.log("cookies before setCookies waiting: 385 ", cookies.userData)
-        // setCookie("userData", {
-        //     ...cookies.userData,
-        //     "imageURL": res.data.image_url
-        // }, { path: '/' })
-        // console.log("Set Cookies in waiting: 385", cookies.userData)
-        //pub();
+    //     setUserData({
+    //         ...userData,
+    //         imageURL: res.data.image_url
+    //     })
+    //     console.log("cookies before setCookies waiting: 385 ", cookies.userData)
+    //     setCookie("userData", {
+    //         ...cookies.userData,
+    //         "imageURL": res.data.image_url
+    //     }, { path: '/' })
+    //     console.log("Set Cookies in waiting: 385", cookies.userData)
+    //     pub();
 }
 
 async function ablyStartGame(userData){
@@ -132,4 +144,4 @@ async function ablyStartGame(userData){
     // }
 }
 
-export { ably, getPlayerUID, getGameCode, joinGame, getDecks, getPlayers, postDatabaseImages, postApiImages }
+export { ably, checkGameCode, getPlayerUID, getGameCode, joinGame, getDecks, getPlayers, postDatabaseImages, postApiImages }

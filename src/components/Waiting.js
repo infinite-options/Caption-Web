@@ -13,8 +13,6 @@ export default function Waiting(){
     const [lobby, setLobby] = useState([])
     const [initialize, setInitialize] = useState(false)
 
-    console.log("Waiting userData: ", userData)
-
     function copyGameCodeButton(){
         navigator.clipboard.writeText(userData.gameCode)
         setButtonText("Copied!")

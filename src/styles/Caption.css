@@ -1,5 +1,70 @@
 .caption {
     max-width: 375px;
-    height: 812px;
+    height: 100%;
     background-image: url("../assets/caption.png");
+}
+.titleCaption {
+    padding-top: 40px;
+    text-align: center;
+}
+.roundCaption {
+    padding-top: 25px;
+    text-align: center;
+}
+.imgCaption {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: cover;
+    height: 325px;
+    width: 325px;
+    border-radius: 50px;
+}
+.inputCaption {
+    width: 335px;
+    height: 136px;
+    border-radius: 15px;
+    border-color: black;
+    border-width: 1px;
+    background-color: white;
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    font-size: 20px;
+}
+.inputCaption::placeholder {
+    color: black;
+    font-family: Josefin Sans, sans-serif;
+    font-size: 18px;
+    padding: 10px;
+    vertical-align: top;
+    text-align: center;
+    border-radius: 15px;
+}
+.containerCaption {
+    margin-top: 26px;
+    margin-left: auto;
+    margin-right: auto;
+    background: yellow;
+    border-radius: 30px;
+    width: 60px;
+}
+.countdownCaption {
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+}
+.submitCaption {
+    display:block;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 180px;
+    height: 60px;
+    border-radius: 30px;
+    border-color: yellow;
+    border-width: 5px;
+    color: black;
+    font-family: Josefin Sans, sans-serif;
+    font-size: 18px;
 }

@@ -6,7 +6,8 @@ import "../styles/Waiting.css"
 
 export default function Waiting(){
     const navigate = useNavigate(), location = useLocation()
-    const userData = location.state
+    const [userData, setUserData] = useState(location.state)
+    const [cookies, setCookie] = useCookies(["userData"])
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [buttonText, setButtonText] = useState("Share with other players")
     const [selectDeck, setSelectDeck] = useState(false)
@@ -26,6 +27,13 @@ export default function Waiting(){
     }
 
     async function startGameButton() {
+        channel.publish({data: {
+            message: "Game Started",
+            numOfRounds: userData.numOfRounds,
+            roundTime: userData.roundTime,
+            deckTitle: userData.deckTitle,
+            imageURL: userData.imageURL
+        }})
         navigate("/Caption", { state: userData })
     }
 
@@ -39,12 +47,24 @@ export default function Waiting(){
     }
 
     channel.subscribe(async event => {
-        if(event.data.message === "New Player Joined Lobby"){
+        if(event.data.message === "Deck Selected"){
+            setSelectDeck(true)
+        }
+        else if(event.data.message === "New Player Joined Lobby"){
             const newLobby = await getPlayers(userData.gameCode)
             setLobby(newLobby)
         }
-        else if(event.data.message === "Deck Selected"){
-            setSelectDeck(true)
+        else if(event.data.message === "Game Started"){
+            const updatedUserData = {
+                ...userData,
+                numOfRounds: event.data.numOfRounds,
+                roundTime: event.data.roundTime,
+                deckTitle: event.data.deckTitle,
+                imageURL: event.data.imageURL
+            }
+            setUserData(updatedUserData)
+            setCookie("userData", updatedUserData, {path: '/'})
+            navigate("/Caption", {state: updatedUserData})
         }
     })
 

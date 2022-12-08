@@ -108,7 +108,7 @@ export default function Landing(){
         setCookie("userData", updatedUserData, {path: '/'})
         await joinGame(updatedUserData)
         const channel = ably.channels.get(`BizBuz/${updatedUserData.gameCode}`)
-        channel.publish({message: "New Player Joined Game"})
+        channel.publish({data: {message: "New Player Joined Lobby"}})
         navigate("/Waiting", {state: updatedUserData})
     }
 

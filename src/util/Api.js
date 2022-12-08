@@ -35,7 +35,7 @@ async function getPlayerUID(userData) {
     return playerUID
 }
 
-async function getGameCode(userData, numOfRounds, roundTime){
+async function createGame(userData, numOfRounds, roundTime){
     const payload = {
         user_uid: userData.playerUID,
         rounds: numOfRounds,
@@ -65,83 +65,32 @@ async function getPlayers(gameCode){
     return players
 }
 
-async function postApiImages(userData){
+async function selectDeck(deckUID, gameCode, roundNumber){
     const payload = {
-        deck_uid: userData.deckUID,
-        game_code: userData.gameCode
+        game_code: gameCode.toString(),
+        deck_uid: deckUID.toString(),
+        round_number: roundNumber.toString()
+    }
+    await axios.post(selectDeckURL, payload)
+    return
+}
+
+async function assignDeck(deckUID, gameCode){
+    const payload = {
+        deck_uid: deckUID,
+        game_code: gameCode
     }
     await axios.post(postAssignDeckURL, payload)
-    // // Load next round's image URL
-    // let uniqueImage = await apiCall()
-    //
-    // setUserData({
-    //     ...userData,
-    //     imageURL: uniqueImage,
-    // })
-    // console.log("cookies before setCookies waiting: 219 ", cookies.userData)
-    // setCookie("userData", {
-    //     ...cookies.userData,
-    //     "imageURL": uniqueImage
-    // }, { path: '/' })
-    // console.log("Set Cookies in waiting: 219", cookies.userData)
-    // pub(uniqueImage)
+    return
 }
 
-async function postDatabaseImages(userData){
-    const payload = {
-        deck_uid: userData.deckUID,
-        game_code: userData.gameCode
-    }
-    await axios.post(postAssignDeckURL, payload)
-    const uniqueImageURL = await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then(response => {console.log("UNIQUE IMAGE IN ROUND URL DATABASE: ",response)})
-    console.log("API UNIQUE IMAGE", uniqueImageURL)
-    // const updatedUserData = {
-    //     ...userData,
-    //     imageURL: imageURL
-    // }
-    // return updatedUserData
-    //     setUserData({
-    //         ...userData,
-    //         imageURL: res.data.image_url
-    //     })
-    //     console.log("cookies before setCookies waiting: 385 ", cookies.userData)
-    //     setCookie("userData", {
-    //         ...cookies.userData,
-    //         "imageURL": res.data.image_url
-    //     }, { path: '/' })
-    //     console.log("Set Cookies in waiting: 385", cookies.userData)
-    //     pub();
+async function getDatabaseImage(gameCode, roundNumber){
+    const imageURL = await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber).then(response => response.data.image_url)
+    return imageURL
 }
 
-async function ablyStartGame(userData){
-    // if(userData.isApi){
-    //     await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then(response => {
-    //         const updatedUserData = {
-    //             ...userData,
-    //             imageURL: response.data.image_url
-    //         }
-    //         channel2.publish({data: {
-    //                 gameStarted: true,
-    //                 currentImage: apiURL,
-    //                 deckTitle: userData.deckTitle
-    //         }})
-    //         return updatedUserData
-    //     })
-    // }
-    // else{
-    //     await axios.get(getUniqueImageInRoundURL + userData.gameCode + "," + userData.roundNumber).then(response => {
-    //         const updatedUserData = {
-    //             ...userData,
-    //             imageURL: response.data.image_url
-    //         }
-    //         channel2.publish({data: {
-    //                 gameStarted: true,
-    //                 currentImage: "",
-    //                 deckTitle: userData.deckTitle
-    //         }})
-    //         return updatedUserData
-    //     })
-    // }
+async function getApiImage(deckUID, gameCode){
+
 }
 
-export { ably, checkGameCode, getPlayerUID, getGameCode, joinGame, getDecks, getPlayers, postDatabaseImages, postApiImages }
+export { ably, checkGameCode, getPlayerUID, createGame, joinGame, getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImage, getPlayers }

@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, ablyStartGame, getPlayers } from "../util/Api"
+import {ably, getPlayers} from "../util/Api"
 import "../styles/Waiting.css"
 
 export default function Waiting(){
@@ -9,13 +9,11 @@ export default function Waiting(){
     const userData = location.state
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [buttonText, setButtonText] = useState("Share with other players")
+    const [selectDeck, setSelectDeck] = useState(false)
     const [lobby, setLobby] = useState([])
+    const [initialize, setInitialize] = useState(false)
 
-    async function initializeLobby(){
-        const newLobby = await getPlayers(userData.gameCode)
-        setLobby(newLobby)
-    }
-    initializeLobby()
+    console.log("Waiting userData: ", userData)
 
     function copyGameCodeButton(){
         navigator.clipboard.writeText(userData.gameCode)
@@ -25,14 +23,31 @@ export default function Waiting(){
         }, 2000)
     }
 
+    function selectDeckButton() {
+        navigate("/SelectDeck", { state: userData })
+    }
+
     async function startGameButton() {
-        await getPlayers(userData.gameCode)
-        //navigate("/Caption", { state: userData })
+        navigate("/Caption", { state: userData })
+    }
+
+    async function initializeLobby(){
+        const newLobby = await getPlayers(userData.gameCode)
+        setLobby(newLobby)
+    }
+    if(!initialize){
+        initializeLobby()
+        setInitialize(true)
     }
 
     channel.subscribe(async event => {
-        const newLobby = await getPlayers(userData.gameCode)
-        setLobby(newLobby)
+        if(event.data.message === "New Player Joined Lobby"){
+            const newLobby = await getPlayers(userData.gameCode)
+            setLobby(newLobby)
+        }
+        else if(event.data.message === "Deck Selected"){
+            setSelectDeck(true)
+        }
     })
 
     return(
@@ -62,7 +77,12 @@ export default function Waiting(){
             </button>
             <br/>
             <br/>
-            {userData.host &&
+            {userData.host && !selectDeck &&
+                <button className="buttonRoundType" onClick={selectDeckButton}>
+                    Select Deck
+                </button>
+            }
+            {userData.host && selectDeck &&
                 <button className="buttonRoundType" onClick={startGameButton}>
                     Start Game
                 </button>

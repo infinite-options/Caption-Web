@@ -35,6 +35,26 @@ export default function ScoreBoard(){
             <br/>
             <img className="imgScoreBoard" src={userData.imageURL}/>
             <br/>
+            <div className="containerScoreBoard">
+                <div>Alias</div>
+                <div>Caption</div>
+                <div>Points</div>
+                <div>Votes</div>
+                {scoreBoard.map(player => {
+                    return(
+                        <>
+                            <div>{player.user_alias}</div>
+                            <div>{player.caption}</div>
+                            <div>{player.score}</div>
+                            <div>{player.votes}</div>
+                        </>
+                    )})
+                }
+            </div>
+            <br/>
+            <button className="buttonScoreBoard">
+                Next Round
+            </button>
         </div>
     )
 }

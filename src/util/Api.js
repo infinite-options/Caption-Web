@@ -138,8 +138,9 @@ async function getUpdatedScores(userData){
 }
 
 async function getScoreBoard(userData){
-    await axios.get(getScoreBoardURL + userData.gameCode + "," + userData.roundNumber)
+    const scoreBoard = await axios.get(getScoreBoardURL + userData.gameCode + "," + userData.roundNumber)
         .then(response => response.data.scoreboard)
+    return scoreBoard
 }
 
 export { ably, checkGameCode, getPlayerUID, createGame, joinGame,

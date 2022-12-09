@@ -14,6 +14,11 @@ const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.co
 const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/"
 const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/"
 const getUniqueImageInRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
+const submitCaptionURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/submitCaption"
+const getAllSubmittedCaptionsURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getAllSubmittedCaptions/"
+const postVoteCaptionURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/voteCaption"
+const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/"
+const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/";
 
 async function checkGameCode(gameCode){
     const codeStatus = await axios.get(checkGameURL + '/' + gameCode)
@@ -31,7 +36,8 @@ async function getPlayerUID(userData) {
         user_zip: userData.zipCode,
         user_alias: userData.alias
     }
-    const playerUID = await axios.post(addUserURL, payload).then(response => response.data.user_uid)
+    const playerUID = await axios.post(addUserURL, payload)
+        .then(response => response.data.user_uid)
     return playerUID
 }
 
@@ -42,7 +48,8 @@ async function createGame(userData, numOfRounds, roundTime){
         round_time: "00:00:" + roundTime,
         scoring_scheme: "V"
     }
-    const gameInfo = await axios.post(createGameURL, payload).then(response => response.data)
+    const gameInfo = await axios.post(createGameURL, payload)
+        .then(response => response.data)
     return gameInfo
 }
 
@@ -56,12 +63,14 @@ async function joinGame(userData){
 }
 
 async function getDecks(playerUID){
-    const decksInfo = await axios.get(decksURL + "/" + playerUID + "," + "true").then(response => response.data.decks_info)
+    const decksInfo = await axios.get(decksURL + "/" + playerUID + "," + "true")
+        .then(response => response.data.decks_info)
     return decksInfo
 }
 
 async function getPlayers(gameCode){
-    const players = await axios.get(getPlayersURL + gameCode).then(response => response.data.players_list)
+    const players = await axios.get(getPlayersURL + gameCode)
+        .then(response => response.data.players_list)
     return players
 }
 
@@ -85,7 +94,8 @@ async function assignDeck(deckUID, gameCode){
 }
 
 async function getDatabaseImage(gameCode, roundNumber){
-    const imageURL = await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber).then(response => response.data.image_url)
+    const imageURL = await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber)
+        .then(response => response.data.image_url)
     return imageURL
 }
 
@@ -93,4 +103,46 @@ async function getApiImage(deckUID, gameCode){
 
 }
 
-export { ably, checkGameCode, getPlayerUID, createGame, joinGame, getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImage, getPlayers }
+async function submitCaption(caption, userData){
+    const payload = {
+        caption: caption,
+        user_uid: userData.playerUID,
+        game_code: userData.gameCode,
+        round_number: userData.roundNumber.toString()
+    }
+    await axios.post(submitCaptionURL, payload)
+    return
+}
+
+async function getSubmittedCaptions(userData) {
+    const submittedCaptions = await axios.get(getAllSubmittedCaptionsURL + userData.gameCode + "," + userData.roundNumber)
+        .then(response => response.data.players)
+    return submittedCaptions
+}
+
+async function postVote(caption, userData){
+    const payload = {
+        caption: caption,
+        user_id: userData.playerUID,
+        game_code: userData.gameCode,
+        round_number: userData.roundNumber.toString()
+    }
+    console.log("postVote payload: ", payload)
+    await axios.post(postVoteCaptionURL, payload)
+    return
+}
+
+async function getUpdatedScores(userData){
+    await axios.get(getUpdateScoresURL + userData.gameCode + "," + userData.roundNumber)
+    return
+}
+
+async function getScoreBoard(userData){
+    await axios.get(getScoreBoardURL + userData.gameCode + "," + userData.roundNumber)
+        .then(response => response.data.scoreboard)
+}
+
+export { ably, checkGameCode, getPlayerUID, createGame, joinGame,
+    getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImage,
+    getPlayers, submitCaption, getSubmittedCaptions, postVote, getUpdatedScores,
+    getScoreBoard }

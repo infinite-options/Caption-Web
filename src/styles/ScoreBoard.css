@@ -1,0 +1,17 @@
+.scoreboard {
+    max-width: 370px;
+    height: 100%;
+    background-image: url("../assets/scoreboard.png");
+}
+.textScoreBoard {
+    text-align: center;
+}
+.imgScoreBoard {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: cover;
+    height: 255px;
+    width: 255px;
+    border-radius: 50px;
+}

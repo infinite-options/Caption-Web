@@ -1,0 +1,64 @@
+.vote {
+    max-width: 375px;
+    height: 100%;
+    background-image: url("../assets/caption.png");
+}
+.favoriteVote {
+    text-align: center;
+}
+.imgVote {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    object-fit: cover;
+    height: 325px;
+    width: 325px;
+    border-radius: 50px;
+}
+.submitVote {
+    display:block;
+    margin-top: 20px;
+    margin-left: auto;
+    margin-right: auto;
+    width: 180px;
+    height: 60px;
+    border-radius: 30px;
+    border-color: yellow;
+    border-width: 5px;
+    color: black;
+    font-family: Josefin Sans, sans-serif;
+    font-size: 18px;
+}
+.submittedVote {
+    text-align: center;
+}
+.buttonVote {
+    width: 342px;
+    min-height: 60px;
+    border-radius: 25px;
+    border-color: black;
+    border-width: 1px;
+    font-size: 18px;
+    font-weight: normal;
+    line-height: 3;
+}
+.buttonVote:hover {
+    outline:none;
+    border: none;
+}
+.captionsContainerVote {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.timerContainerVote {
+    margin: 0 auto;
+    background: yellow;
+    border-radius: 30px;
+    width: 60px;
+}
+.countdownVote {
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    font-size: 18px;
+}

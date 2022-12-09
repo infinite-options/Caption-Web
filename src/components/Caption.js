@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { CountdownCircleTimer } from "react-countdown-circle-timer";
+import { submitCaption } from "../util/Api"
+import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Caption.css"
 
 export default function Caption(){
@@ -9,13 +10,23 @@ export default function Caption(){
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
     const [caption, setCaption] = useState("")
+    const [captionSubmitted, setCaptionSubmitted] = useState(false)
+    const [timerComplete, setTimerComplete] = useState(false)
 
     function handleChange(event){
         setCaption(event.target.value)
     }
 
-    function submitButton(){
-        //navigate("/Vote", { state: userData })
+    async function submitButton(timerComplete) {
+        if (caption === "" && !timerComplete) {
+            alert("Please enter a valid caption.")
+            return
+        }
+        else if(caption !== ""){
+            setCaptionSubmitted(true)
+            await submitCaption(caption, userData)
+        }
+        navigate("/Vote", { state: userData })
     }
 
     return(
@@ -29,7 +40,9 @@ export default function Caption(){
             <br/>
             <img className="imgCaption" src={userData.imageURL} alt="Loading Image...."/>
             <br/>
-            <input className="inputCaption" onChange={handleChange} type="text" placeholder="Enter your caption here"/>
+            {!captionSubmitted &&
+                <input className="inputCaption" onChange={handleChange} type="text" placeholder="Enter your caption here"/>
+            }
             <div className="containerCaption">
                 <CountdownCircleTimer
                     size={60}
@@ -38,7 +51,7 @@ export default function Caption(){
                     duration={userData.roundTime}
                     colors="#000000"
                     onComplete={() => {
-
+                        submitButton(true)
                     }}
                 >
                     {({remainingTime}) => {
@@ -46,9 +59,20 @@ export default function Caption(){
                     }}
                 </CountdownCircleTimer>
             </div>
-            <button className="submitCaption" onClick={submitButton}>
-                Submit
-            </button>
+            {!captionSubmitted &&
+                <button className="submitCaption" onClick={event => submitButton(false)}>
+                    Submit
+                </button>
+            }
+            {captionSubmitted &&
+                <div className="submittedCaption">
+                    <button className="submitCaption" onClick={submitButton}>
+                        Submitted
+                    </button>
+                    <br/>
+                    Waiting for other players to submit captions...
+                </div>
+            }
             <br/>
             <br/>
         </div>

@@ -39,7 +39,7 @@ export default function Waiting(){
             deckTitle: updatedUserData.deckTitle,
             imageURL: updatedUserData.imageURL
         }})
-        navigate("/Caption", { state: updatedUserData })
+        //navigate("/Caption", { state: updatedUserData })
     }
 
     async function initializeLobby(){

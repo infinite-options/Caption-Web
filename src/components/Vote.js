@@ -16,8 +16,6 @@ export default function Vote(){
     const [voteSubmitted, setVoteSubmitted] = useState(false)
     const backgroundColors = { default: "white", selected: "#f9dd25", myButton: "gray" }
 
-    console.log("Vote.js userData.numOfPlayers: " + userData.numOfPlayers)
-
     function getBackgroundColor(status){
         return backgroundColors[status]
     }

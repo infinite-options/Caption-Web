@@ -20,6 +20,7 @@ const postVoteCaptionURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.c
 const getUpdateScoresURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/updateScores/"
 const getPlayersWhoHaventVotedURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayersWhoHaventVoted/"
 const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScoreBoard/"
+const createNextRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound"
 
 async function checkGameCode(gameCode){
     const codeStatus = await axios.get(checkGameURL + '/' + gameCode)
@@ -115,6 +116,7 @@ async function submitCaption(caption, userData){
     return
 }
 
+//getSubmittedCaptions is returning an empty array when passed round the first round
 async function getSubmittedCaptions(userData) {
     const submittedCaptions = await axios.get(getAllSubmittedCaptionsURL + userData.gameCode + "," + userData.roundNumber)
         .then(response => response.data.players)
@@ -140,7 +142,6 @@ async function getUpdatedScores(userData){
 async function leftOverVotingPlayers(userData){
     const numOfPlayersVoting = await axios.get(getPlayersWhoHaventVotedURL + userData.gameCode + "," + userData.roundNumber)
         .then(response => response.data.players_count)
-    console.log("leftOverVotingPlayers: " + numOfPlayersVoting)
     return numOfPlayersVoting
 }
 
@@ -150,7 +151,16 @@ async function getScoreBoard(userData){
     return scoreBoard
 }
 
+async function createNextRound(userData){
+    const payload = {
+        game_code: userData.gameCode,
+        round_number: userData.roundNumber.toString(),
+    }
+    await axios.post(createNextRoundURL, payload)
+    return
+}
+
 export { ably, checkGameCode, getPlayerUID, createGame, joinGame,
     getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImage,
     getPlayers, submitCaption, getSubmittedCaptions, postVote, getUpdatedScores,
-    leftOverVotingPlayers, getScoreBoard }
+    leftOverVotingPlayers, getScoreBoard, createNextRound }

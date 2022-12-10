@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, getScoreBoard} from "../util/Api"
+import {ably, getScoreBoard, createNextRound, getDatabaseImage} from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){
@@ -20,9 +20,34 @@ export default function ScoreBoard(){
         scoreBoard()
     }, [userData])
 
-    function nextRoundButton(){
-
+    async function nextRoundButton() {
+        const imageURL = await getDatabaseImage(userData.gameCode, userData.roundNumber)
+        const updatedUserData = {
+            ...userData,
+            roundNumber: userData.roundNumber + 1,
+            imageURL: imageURL
+        }
+        await createNextRound(updatedUserData)
+        channel.publish({data: {
+                message: "Start Next Round",
+                roundNumber: updatedUserData.roundNumber,
+                imageURL: updatedUserData.imageURL
+        }})
+        //navigate("/Caption", { state: updatedUserData })
     }
+
+    channel.subscribe( event => {
+        if(event.data.message === "Start Next Round"){
+            const updatedUserData = {
+                ...userData,
+                roundNumber: event.data.roundNumber,
+                imageURL: event.data.imageURL
+            }
+            setUserData(updatedUserData)
+            setCookie("userData", updatedUserData, {path: '/'})
+            navigate("/Caption", { state: updatedUserData })
+        }
+    })
 
     return(
         <div className="scoreboard">
@@ -46,14 +71,14 @@ export default function ScoreBoard(){
                 <div>Caption</div>
                 <div>Points</div>
                 <div>Votes</div>
-                {scoreBoard.map(player => {
+                {scoreBoard.map((player, index) => {
                     return(
-                        <>
+                        <div key={index}>
                             <div>{player.user_alias}</div>
                             <div>{player.caption}</div>
                             <div>{player.score}</div>
                             <div>{player.votes}</div>
-                        </>
+                        </div>
                     )})
                 }
             </div>

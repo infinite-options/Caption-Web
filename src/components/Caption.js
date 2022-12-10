@@ -13,8 +13,6 @@ export default function Caption(){
     const [caption, setCaption] = useState("")
     const [captionSubmitted, setCaptionSubmitted] = useState(false)
 
-    console.log("Vote.js userData.numOfPlayers: " + userData.numOfPlayers)
-
     function handleChange(event){
         setCaption(event.target.value)
     }
@@ -24,8 +22,11 @@ export default function Caption(){
             alert("Please enter a valid caption.")
             return
         }
-        else if(caption !== ""){
+        else if(caption !== "" && !timerComplete){
             setCaptionSubmitted(true)
+            await submitCaption(caption, userData)
+        }
+        else if (timerComplete) {
             await submitCaption(caption, userData)
         }
         const numOfSubmissions = await getSubmittedCaptions(userData).then(response => response.length)

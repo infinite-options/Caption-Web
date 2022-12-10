@@ -21,19 +21,21 @@ export default function ScoreBoard(){
     }, [userData])
 
     async function nextRoundButton() {
-        const imageURL = await getDatabaseImage(userData.gameCode, userData.roundNumber)
+        await createNextRound(userData)
+        const nextRound = userData.roundNumber + 1
+        const imageURL = await getDatabaseImage(userData.gameCode, nextRound)
         const updatedUserData = {
             ...userData,
-            roundNumber: userData.roundNumber + 1,
+            roundNumber: nextRound,
             imageURL: imageURL
         }
-        await createNextRound(updatedUserData)
         channel.publish({data: {
                 message: "Start Next Round",
                 roundNumber: updatedUserData.roundNumber,
                 imageURL: updatedUserData.imageURL
         }})
-        //navigate("/Caption", { state: updatedUserData })
+        setUserData(updatedUserData)
+        setCookie("userData", updatedUserData, {path: '/'})
     }
 
     channel.subscribe( event => {
@@ -73,12 +75,12 @@ export default function ScoreBoard(){
                 <div>Votes</div>
                 {scoreBoard.map((player, index) => {
                     return(
-                        <div key={index}>
+                        <>
                             <div>{player.user_alias}</div>
                             <div>{player.caption}</div>
                             <div>{player.score}</div>
                             <div>{player.votes}</div>
-                        </div>
+                        </>
                     )})
                 }
             </div>

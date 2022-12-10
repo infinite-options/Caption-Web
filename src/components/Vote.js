@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, getSubmittedCaptions, postVote, getUpdatedScores, leftOverVotingPlayers } from "../util/Api"
+import {ably, getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Vote.css"
 
@@ -23,8 +23,6 @@ export default function Vote(){
     useEffect( () => {
         async function getCaptions(){
             const submittedCaptions = await getSubmittedCaptions(userData)
-            if(submittedCaptions.length <= 1)
-                voteButton(true)
             setSubmittedCaptions(submittedCaptions)
             initializeToggleArray(submittedCaptions)
         }
@@ -32,14 +30,20 @@ export default function Vote(){
     }, [userData])
 
     function initializeToggleArray(submittedCaptions){
-        let tempArray = []
+        let tempToggle = []
         for(let i = 0; i < submittedCaptions.length; i++){
-            if(submittedCaptions[i].round_user_uid === userData.playerUID){
+            if(submittedCaptions[i] === ""){
+                continue
+            }
+            else if(submittedCaptions[i].round_user_uid === userData.playerUID){
                 setIsMyIndex(i)
             }
-            tempArray.push(false)
+            tempToggle.push(false)
         }
-        setToggleCaptions(tempArray)
+        setToggleCaptions(tempToggle)
+        if(tempToggle.length <= 1){
+            voteButton(true)
+        }
     }
 
     function updateToggleArray(index){
@@ -102,7 +106,7 @@ export default function Vote(){
             alert("Please vote for a caption.")
             return
         }
-        await getUpdatedScores(userData)
+        await updateScores(userData)
         const numOfPlayersVoting = await leftOverVotingPlayers(userData)
         if(numOfPlayersVoting === 0){
             channel.publish({data: {message: "Start ScoreBoard"}})
@@ -139,7 +143,9 @@ export default function Vote(){
                     duration={userData.roundTime}
                     colors="#000000"
                     onComplete={() => {
-                        voteButton(true)
+                        if(!voteSubmitted){
+                            voteButton(true)
+                        }
                     }}
                 >
                     {({remainingTime}) => {

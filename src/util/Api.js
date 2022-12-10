@@ -116,7 +116,6 @@ async function submitCaption(caption, userData){
     return
 }
 
-//getSubmittedCaptions is returning an empty array when passed round the first round
 async function getSubmittedCaptions(userData) {
     const submittedCaptions = await axios.get(getAllSubmittedCaptionsURL + userData.gameCode + "," + userData.roundNumber)
         .then(response => response.data.players)
@@ -134,7 +133,7 @@ async function postVote(caption, userData){
     return
 }
 
-async function getUpdatedScores(userData){
+async function updateScores(userData){
     await axios.get(getUpdateScoresURL + userData.gameCode + "," + userData.roundNumber)
     return
 }
@@ -154,7 +153,7 @@ async function getScoreBoard(userData){
 async function createNextRound(userData){
     const payload = {
         game_code: userData.gameCode,
-        round_number: userData.roundNumber.toString(),
+        round_number: userData.roundNumber.toString()
     }
     await axios.post(createNextRoundURL, payload)
     return
@@ -162,5 +161,5 @@ async function createNextRound(userData){
 
 export { ably, checkGameCode, getPlayerUID, createGame, joinGame,
     getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImage,
-    getPlayers, submitCaption, getSubmittedCaptions, postVote, getUpdatedScores,
+    getPlayers, submitCaption, getSubmittedCaptions, postVote, updateScores,
     leftOverVotingPlayers, getScoreBoard, createNextRound }

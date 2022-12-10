@@ -63,7 +63,9 @@ export default function Caption(){
                     duration={userData.roundTime}
                     colors="#000000"
                     onComplete={() => {
-                        submitButton(true)
+                        if(!captionSubmitted){
+                            submitButton(true)
+                        }
                     }}
                 >
                     {({remainingTime}) => {

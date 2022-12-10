@@ -32,7 +32,7 @@ export default function Vote(){
     function initializeToggleArray(submittedCaptions){
         let tempToggle = []
         for(let i = 0; i < submittedCaptions.length; i++){
-            if(submittedCaptions[i] === ""){
+            if(submittedCaptions[i].caption === ""){
                 continue
             }
             else if(submittedCaptions[i].round_user_uid === userData.playerUID){

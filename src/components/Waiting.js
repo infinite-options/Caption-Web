@@ -27,14 +27,19 @@ export default function Waiting(){
     }
 
     async function startGameButton() {
+        const updatedUserData = {
+            ...userData,
+            numOfPlayers: lobby.length
+        }
         channel.publish({data: {
-            message: "Game Started",
-            numOfRounds: userData.numOfRounds,
-            roundTime: userData.roundTime,
-            deckTitle: userData.deckTitle,
-            imageURL: userData.imageURL
+            message: "Start Game",
+            numOfPlayers: updatedUserData.numOfPlayers,
+            numOfRounds: updatedUserData.numOfRounds,
+            roundTime: updatedUserData.roundTime,
+            deckTitle: updatedUserData.deckTitle,
+            imageURL: updatedUserData.imageURL
         }})
-        navigate("/Caption", { state: userData })
+        navigate("/Caption", { state: updatedUserData })
     }
 
     async function initializeLobby(){
@@ -54,9 +59,10 @@ export default function Waiting(){
             const newLobby = await getPlayers(userData.gameCode)
             setLobby(newLobby)
         }
-        else if(event.data.message === "Game Started"){
+        else if(event.data.message === "Start Game"){
             const updatedUserData = {
                 ...userData,
+                numOfPlayers: event.data.numOfPlayers,
                 numOfRounds: event.data.numOfRounds,
                 roundTime: event.data.roundTime,
                 deckTitle: event.data.deckTitle,

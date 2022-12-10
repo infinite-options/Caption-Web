@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {getSubmittedCaptions, getUpdatedScores, postVote} from "../util/Api"
+import {ably, getSubmittedCaptions, postVote, getUpdatedScores, leftOverVotingPlayers } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Vote.css"
 
@@ -9,11 +9,14 @@ export default function Vote(){
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
+    const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [submittedCaptions, setSubmittedCaptions] = useState([])
     const [toggleCaptions, setToggleCaptions] = useState([])
     const [isMyIndex, setIsMyIndex] = useState(-1)
     const [voteSubmitted, setVoteSubmitted] = useState(false)
     const backgroundColors = { default: "white", selected: "#f9dd25", myButton: "gray" }
+
+    console.log("Vote.js userData.numOfPlayers: " + userData.numOfPlayers)
 
     function getBackgroundColor(status){
         return backgroundColors[status]
@@ -92,15 +95,27 @@ export default function Vote(){
                 hasVoted = true
                 setVoteSubmitted(true)
                 await postVote(submittedCaptions[i].caption, userData)
-                await getUpdatedScores(userData)
             }
         }
-        if(!hasVoted && !timerComplete){
+        if(!hasVoted && timerComplete){
+            await postVote(null, userData)
+        }
+        else if(!hasVoted && !timerComplete){
             alert("Please vote for a caption.")
             return
         }
-        navigate("/ScoreBoard", { state: userData })
+        await getUpdatedScores(userData)
+        const numOfPlayersVoting = await leftOverVotingPlayers(userData)
+        if(numOfPlayersVoting === 0){
+            channel.publish({data: {message: "Start ScoreBoard"}})
+        }
     }
+
+    channel.subscribe( event => {
+        if(event.data.message === "Start ScoreBoard"){
+            navigate("/ScoreBoard", { state: userData })
+        }
+    })
 
     return(
         <div className="vote">
@@ -126,7 +141,7 @@ export default function Vote(){
                     duration={userData.roundTime}
                     colors="#000000"
                     onComplete={() => {
-                        //voteButton(true)
+                        voteButton(true)
                     }}
                 >
                     {({remainingTime}) => {

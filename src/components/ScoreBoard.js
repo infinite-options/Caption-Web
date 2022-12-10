@@ -1,22 +1,28 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { getScoreBoard } from "../util/Api"
+import {ably, getScoreBoard} from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
+    const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [scoreBoard, setScoreBoard] = useState([])
 
     useEffect(() => {
         async function scoreBoard(){
             const scoreboard = await getScoreBoard(userData)
+            scoreboard.sort((a, b) => b.votes - a.votes)
             setScoreBoard(scoreboard)
         }
         scoreBoard()
     }, [userData])
+
+    function nextRoundButton(){
+
+    }
 
     return(
         <div className="scoreboard">
@@ -52,9 +58,12 @@ export default function ScoreBoard(){
                 }
             </div>
             <br/>
-            <button className="buttonScoreBoard">
-                Next Round
-            </button>
+            {userData.host &&
+                <button className="buttonScoreBoard" onClick={nextRoundButton}>
+                    Next Round
+                </button>
+            }
+            <br/>
         </div>
     )
 }

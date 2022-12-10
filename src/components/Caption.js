@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { submitCaption } from "../util/Api"
+import {ably, getPlayers, getSubmittedCaptions, submitCaption} from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Caption.css"
 
@@ -9,9 +9,11 @@ export default function Caption(){
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
+    const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [caption, setCaption] = useState("")
     const [captionSubmitted, setCaptionSubmitted] = useState(false)
-    const [timerComplete, setTimerComplete] = useState(false)
+
+    console.log("Vote.js userData.numOfPlayers: " + userData.numOfPlayers)
 
     function handleChange(event){
         setCaption(event.target.value)
@@ -26,8 +28,17 @@ export default function Caption(){
             setCaptionSubmitted(true)
             await submitCaption(caption, userData)
         }
-        navigate("/Vote", { state: userData })
+        const numOfSubmissions = await getSubmittedCaptions(userData).then(response => response.length)
+        if(userData.numOfPlayers - numOfSubmissions === 0){
+            channel.publish({data: {message: "Start Vote"}})
+        }
     }
+
+    channel.subscribe( event => {
+        if(event.data.message === "Start Vote"){
+            navigate("/Vote", { state: userData })
+        }
+    })
 
     return(
         <div className="caption">

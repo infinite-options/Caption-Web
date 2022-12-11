@@ -1,3 +1,4 @@
+import React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
@@ -75,12 +76,12 @@ export default function ScoreBoard(){
                 <div>Votes</div>
                 {scoreBoard.map((player, index) => {
                     return(
-                        <>
+                        <React.Fragment key={index}>
                             <div>{player.user_alias}</div>
                             <div>{player.caption}</div>
                             <div>{player.score}</div>
                             <div>{player.votes}</div>
-                        </>
+                        </React.Fragment>
                     )})
                 }
             </div>

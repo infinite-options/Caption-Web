@@ -1,7 +1,8 @@
+import React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers } from "../util/Api"
+import { ably, getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Vote.css"
 
@@ -10,101 +11,72 @@ export default function Vote(){
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
-    const [submittedCaptions, setSubmittedCaptions] = useState([])
-    const [toggleCaptions, setToggleCaptions] = useState([])
-    const [isMyIndex, setIsMyIndex] = useState(-1)
+    const [captions, setCaptions] = useState([])
+    const [toggles, setToggles] = useState([])
+    const [isMyCaption, setIsMyCaption] = useState("")
     const [voteSubmitted, setVoteSubmitted] = useState(false)
-    const backgroundColors = { default: "white", selected: "#f9dd25", myButton: "gray" }
-
-    function getBackgroundColor(status){
-        return backgroundColors[status]
-    }
+    const backgroundColors = { default: "white", selected: "#f9dd25", myCaption: "gray" }
 
     useEffect( () => {
         async function getCaptions(){
             const submittedCaptions = await getSubmittedCaptions(userData)
-            setSubmittedCaptions(submittedCaptions)
-            initializeToggleArray(submittedCaptions)
+            let tempCaptions = []
+            let tempToggles = []
+            let isMyCaption = ""
+            for(let i = 0; i < submittedCaptions.length; i++){
+                if(submittedCaptions[i].caption === "")
+                    continue
+                else if(submittedCaptions[i].round_user_uid === userData.playerUID)
+                    isMyCaption = submittedCaptions[i].caption
+                tempCaptions.push(submittedCaptions[i].caption)
+            }
+            for(let i = 0; i < tempCaptions.length; i++){
+                tempToggles.push(false)
+            }
+            setCaptions(tempCaptions)
+            setToggles(tempToggles)
+            setIsMyCaption(isMyCaption)
+            if(tempCaptions.length === 1 && tempCaptions[0] === isMyCaption){
+                setVoteSubmitted(true)
+                await voteButton(true)
+            }
+            else if(tempCaptions.length === 0){
+                await voteButton(true)
+            }
         }
         getCaptions()
     }, [userData])
 
-    function initializeToggleArray(submittedCaptions){
-        let tempToggle = []
-        for(let i = 0; i < submittedCaptions.length; i++){
-            if(submittedCaptions[i].caption === ""){
-                continue
-            }
-            else if(submittedCaptions[i].round_user_uid === userData.playerUID){
-                setIsMyIndex(i)
-            }
-            tempToggle.push(false)
-        }
-        setToggleCaptions(tempToggle)
-        if(tempToggle.length <= 1){
-            voteButton(true)
-        }
-    }
-
-    function updateToggleArray(index){
-        if(isMyIndex === index)
+    function updateToggles(index){
+        if(captions[index] === isMyCaption)
             return
-        let tempArray = []
-        for(let i = 0; i < submittedCaptions.length; i++){
-            if(i === index){
-                tempArray.push(true)
-            }
-            else{
-                tempArray.push(false)
-            }
+        let tempToggles = []
+        for(let i = 0; i < toggles.length; i++){
+            if(index === i)
+                tempToggles.push(true)
+            else
+                tempToggles.push(false)
         }
-        setToggleCaptions(tempArray)
-    }
-
-    function renderCaptions(){
-        const captionElements = submittedCaptions.map((player, index) => {
-            let status = ""
-            if(player.round_user_uid === userData.playerUID){
-                status = "myButton"
-            }
-            else if(toggleCaptions[index] === true){
-                status = "selected"
-            }
-            else{
-                status = "default"
-            }
-            return(
-                <div key={index}>
-                    <button
-                        style={{backgroundColor: getBackgroundColor(status)}}
-                        className="buttonVote"
-                        onClick={event => updateToggleArray(index)}
-                    >
-                        {player.caption}
-                    </button>
-                    <br/>
-                    <br/>
-                </div>
-            )
-        })
-        return captionElements
+        setToggles(tempToggles)
     }
 
     async function voteButton(timerComplete){
-        let hasVoted = false
-        for(let i = 0; i < toggleCaptions.length; i++){
-            if(toggleCaptions[i] === true){
-                hasVoted = true
+        let votedCaption = ""
+        for(let i = 0; i < toggles.length; i++){
+            if(toggles[i] === true){
                 setVoteSubmitted(true)
-                await postVote(submittedCaptions[i].caption, userData)
+                votedCaption = captions[i]
             }
         }
-        if(!hasVoted && timerComplete){
-            await postVote(null, userData)
-        }
-        else if(!hasVoted && !timerComplete){
+        if(votedCaption === "" && !timerComplete){
             alert("Please vote for a caption.")
             return
+        }
+        else if(votedCaption === "" && timerComplete){
+            await postVote(null, userData)
+        }
+        else if(votedCaption !== ""){
+            await postVote(votedCaption, userData)
         }
         await updateScores(userData)
         const numOfPlayersVoting = await leftOverVotingPlayers(userData)
@@ -118,6 +90,10 @@ export default function Vote(){
             navigate("/ScoreBoard", { state: userData })
         }
     })
+
+    function getBackgroundColor(status){
+        return backgroundColors[status]
+    }
 
     return(
         <div className="vote">
@@ -133,7 +109,28 @@ export default function Vote(){
             <img className="imgVote" src={userData.imageURL}/>
             <br/>
             <div className="captionsContainerVote">
-                {renderCaptions()}
+                {captions.map((caption, index) => {
+                    let status = ""
+                    if(caption === isMyCaption)
+                        status = "myCaption"
+                    else if(toggles[index] === true)
+                        status = "selected"
+                    else
+                        status = "default"
+                    return(
+                        <React.Fragment key={index}>
+                            <button
+                                style={{backgroundColor: getBackgroundColor(status)}}
+                                className="buttonVote"
+                                onClick={event => updateToggles(index)}
+                            >
+                                {caption}
+                            </button>
+                            <br/>
+                            <br/>
+                        </React.Fragment>
+                    )
+                })}
             </div>
             <div className="timerContainerVote">
                 <CountdownCircleTimer

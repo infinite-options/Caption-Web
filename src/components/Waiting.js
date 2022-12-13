@@ -36,6 +36,7 @@ export default function Waiting(){
             numOfPlayers: updatedUserData.numOfPlayers,
             numOfRounds: updatedUserData.numOfRounds,
             roundTime: updatedUserData.roundTime,
+            deckUID: updatedUserData.deckUID,
             deckTitle: updatedUserData.deckTitle,
             imageURL: updatedUserData.imageURL
         }})
@@ -65,6 +66,7 @@ export default function Waiting(){
                 numOfPlayers: event.data.numOfPlayers,
                 numOfRounds: event.data.numOfRounds,
                 roundTime: event.data.roundTime,
+                deckUID: event.data.deckUID,
                 deckTitle: event.data.deckTitle,
                 imageURL: event.data.imageURL
             }

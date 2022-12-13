@@ -24,7 +24,11 @@ export default function ScoreBoard(){
     async function nextRoundButton() {
         await createNextRound(userData)
         const nextRound = userData.roundNumber + 1
-        const imageURL = await getDatabaseImage(userData.gameCode, nextRound)
+        let imageURL = ""
+        if(userData.isApi)
+            imageURL = userData.imageURLs[nextRound]
+        else
+            imageURL = await getDatabaseImage(userData.gameCode, nextRound)
         const updatedUserData = {
             ...userData,
             roundNumber: nextRound,

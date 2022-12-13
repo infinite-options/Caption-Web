@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImage} from "../util/Api.js"
+import { ably, getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImages } from "../util/Api.js"
 import "../styles/SelectDeck.css"
 
 export default function SelectDeck(){
@@ -23,17 +23,15 @@ export default function SelectDeck(){
         await selectDeck(deckUID, userData.gameCode, userData.roundNumber)
         await assignDeck(deckUID, userData.gameCode)
         let updatedUserData = {}
-        if (deckTitle === "Google Photos") {
-
-        }
-        else if (deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
-            //const imageURL = await getApiImage(deckUID, userData.gameCode)
+        if (deckTitle === "Google Photos" || deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
+            const imageURLs = await getApiImages(deckUID, userData.numOfRounds)
             updatedUserData = {
                 ...userData,
                 isApi: true,
                 deckUID: deckUID,
                 deckTitle: deckTitle,
-                //imageURL: imageURL
+                imageURL: imageURLs[0],
+                imageURLs: imageURLs
             }
         }
         else {

@@ -1,5 +1,6 @@
 import axios from "axios"
-import Ably from "ably/callbacks";
+import Ably from "ably/callbacks"
+import { getApiImagesHelper } from "./ApiHelper"
 
 const ably_api_key = "KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF"
 const ably = new Ably.Realtime(ably_api_key)
@@ -101,8 +102,9 @@ async function getDatabaseImage(gameCode, roundNumber){
     return imageURL
 }
 
-async function getApiImage(deckUID, gameCode){
-
+async function getApiImages(deckUID, numOfRounds){
+    const imageURLs = await getApiImagesHelper(deckUID, numOfRounds)
+    return imageURLs
 }
 
 async function submitCaption(caption, userData){
@@ -160,6 +162,6 @@ async function createNextRound(userData){
 }
 
 export { ably, checkGameCode, getPlayerUID, createGame, joinGame,
-    getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImage,
+    getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImages,
     getPlayers, submitCaption, getSubmittedCaptions, postVote, updateScores,
     leftOverVotingPlayers, getScoreBoard, createNextRound }

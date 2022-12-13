@@ -12,6 +12,7 @@ const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/
 const decksURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/decks"
 const selectDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/selectDeck"
 const postAssignDeckURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/assignDeck"
+const postRoundImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/postRoundImage"
 const getPlayersURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getPlayers/"
 const getImageURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getImageForPlayers/"
 const getUniqueImageInRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getUniqueImageInRound/"
@@ -107,6 +108,21 @@ async function getApiImages(deckUID, numOfRounds){
     return imageURLs
 }
 
+async function postRoundImage(userData){
+    const payload = {
+        game_code: userData.gameCode,
+        round_number: userData.roundNumber.toString(),
+        image: userData.imageURL
+    }
+    await axios.post(postRoundImageURL, payload)
+    return
+}
+
+async function getImage(userData){
+    await axios.get(getImageURL + userData.gameCode + "," + userData.roundNumber).then(response => {console.log("getImage: ", response)})
+    return
+}
+
 async function submitCaption(caption, userData){
     const payload = {
         caption: caption,
@@ -163,5 +179,5 @@ async function createNextRound(userData){
 
 export { ably, checkGameCode, getPlayerUID, createGame, joinGame,
     getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImages,
-    getPlayers, submitCaption, getSubmittedCaptions, postVote, updateScores,
-    leftOverVotingPlayers, getScoreBoard, createNextRound }
+    postRoundImage, getImage, getPlayers, submitCaption, getSubmittedCaptions,
+    postVote, updateScores, leftOverVotingPlayers, getScoreBoard, createNextRound }

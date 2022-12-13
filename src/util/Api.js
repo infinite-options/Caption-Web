@@ -119,8 +119,9 @@ async function postRoundImage(userData){
 }
 
 async function getImage(userData){
-    await axios.get(getImageURL + userData.gameCode + "," + userData.roundNumber).then(response => {console.log("getImage: ", response)})
-    return
+    const imageURL = await axios.get(getImageURL + userData.gameCode + "," + userData.roundNumber)
+        .then(response => response.data.image_url)
+    return imageURL
 }
 
 async function submitCaption(caption, userData){

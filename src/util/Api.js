@@ -6,6 +6,7 @@ const ably_api_key = "KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF"
 const ably = new Ably.Realtime(ably_api_key)
 
 const checkGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame"
+const checkEmailCodeURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkEmailValidationCode"
 const addUserURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/addUser"
 const createGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createGame"
 const joinGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/joinGame"
@@ -33,16 +34,26 @@ async function checkGameCode(gameCode){
     return true
 }
 
-async function getPlayerUID(userData) {
+async function checkEmailCode(playerUID, code){
+    const payload = {
+        user_uid: playerUID,
+        code: code
+    }
+    const status = await axios.post(checkEmailCodeURL, payload)
+        .then(response => response.data)
+    return status
+}
+
+async function addUser(userData) {
     const payload = {
         user_name: userData.name,
         user_email: userData.email,
         user_zip: userData.zipCode,
         user_alias: userData.alias
     }
-    const playerUID = await axios.post(addUserURL, payload)
-        .then(response => response.data.user_uid)
-    return playerUID
+    const playerInfo = await axios.post(addUserURL, payload)
+        .then(response => response.data)
+    return playerInfo
 }
 
 async function createGame(userData, numOfRounds, roundTime){
@@ -178,7 +189,18 @@ async function createNextRound(userData){
     return
 }
 
-export { ably, checkGameCode, getPlayerUID, createGame, joinGame,
-    getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImages,
-    postRoundImage, getImage, getPlayers, submitCaption, getSubmittedCaptions,
-    postVote, updateScores, leftOverVotingPlayers, getScoreBoard, createNextRound }
+async function updateDatabase(userData){
+    if(userData.isApi){
+        await postRoundImage(userData.gameCode, userData.roundNumber, userData.imageURL)
+    }
+    else{
+        const imageUID = await getImage(userData)
+        await postRoundImage(userData.gameCode, userData.roundNumber, imageUID)
+    }
+}
+
+export { ably, checkGameCode, checkEmailCode, addUser, createGame,
+    joinGame, getDecks, selectDeck, assignDeck, getDatabaseImage,
+    getApiImages, postRoundImage, getImage, getPlayers, submitCaption,
+    getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers, getScoreBoard,
+    createNextRound, updateDatabase }

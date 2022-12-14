@@ -1,10 +1,8 @@
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, checkGameCode, getPlayerUID} from "../util/Api"
-
+import { ably, addUser, checkGameCode, joinGame } from "../util/Api"
 import "../styles/Landing.css"
-import { joinGame } from "../util/Api"
 
 export default function Landing(){
     const navigate = useNavigate()
@@ -78,17 +76,19 @@ export default function Landing(){
     async function createNewGameButton() {
         if (!validateUserData())
             return
-        const playerUID = await getPlayerUID(userData)
-        //Need a new variable to immediately pass updated data to the next page. Cannot use setState()
+        const playerInfo = await addUser(userData)
         const updatedUserData = {
             ...userData,
             roundNumber: 1,
             host: true,
-            playerUID: playerUID
+            playerUID: playerInfo.user_uid
         }
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
-        navigate("/RoundType", {state: updatedUserData})
+        if(playerInfo.user_code === "TRUE")
+            navigate("/RoundType", {state: updatedUserData})
+        else
+            navigate("/Confirmation", {state: updatedUserData})
     }
 
     async function joinGameButton() {
@@ -96,16 +96,17 @@ export default function Landing(){
             return
         if(!await checkGameCode(userData.gameCode))
             return
-        const playerUID = await getPlayerUID(userData)
-        //Need a new variable to immediately pass updated data to the next page. Cannot use setState()
+        const playerInfo = await addUser(userData)
         const updatedUserData = {
             ...userData,
             roundNumber: 1,
             host: false,
-            playerUID: playerUID
+            playerUID: playerInfo.user_uid
         }
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
+        if(playerInfo.user_code !== "TRUE")
+            navigate("/Confirmation", {state: updatedUserData})
         await joinGame(updatedUserData)
         const channel = ably.channels.get(`BizBuz/${updatedUserData.gameCode}`)
         channel.publish({data: {message: "New Player Joined Lobby"}})

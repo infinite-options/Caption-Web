@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, assignDeck, getImage, getPlayers, postRoundImage } from "../util/Api"
+import {ably, assignDeck, getPlayers, updateDatabase } from "../util/Api"
 import "../styles/Waiting.css"
 
 export default function Waiting(){
@@ -73,13 +73,7 @@ export default function Waiting(){
                 imageURL: event.data.imageURL
             }
             await assignDeck(updatedUserData.deckUID, updatedUserData.gameCode)
-            if(updatedUserData.isApi){
-                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
-            }
-            else{
-                const imageUID = await getImage(updatedUserData)
-                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, imageUID)
-            }
+            await updateDatabase(updatedUserData)
             setUserData(updatedUserData)
             setCookie("userData", updatedUserData, {path: '/'})
             navigate("/Caption", {state: updatedUserData})

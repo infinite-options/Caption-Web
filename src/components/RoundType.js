@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, createGame, joinGame } from "../util/Api.js"
+import { createGame, joinGame } from "../util/Api.js"
 import "../styles/RoundType.css"
 
 export default function RoundType() {

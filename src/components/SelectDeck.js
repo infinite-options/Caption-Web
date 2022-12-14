@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImages } from "../util/Api.js"
+import { ably, getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImages, postRoundImage } from "../util/Api.js"
 import "../styles/SelectDeck.css"
 
 export default function SelectDeck(){
@@ -33,6 +33,7 @@ export default function SelectDeck(){
                 imageURL: imageURLs[0],
                 imageURLs: imageURLs
             }
+            await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
         }
         else {
             const imageURL = await getDatabaseImage(userData.gameCode, userData.roundNumber)

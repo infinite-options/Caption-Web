@@ -1,7 +1,7 @@
 import {useEffect, useState} from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, getPlayers} from "../util/Api"
+import { ably, assignDeck, getImage, getPlayers, postRoundImage } from "../util/Api"
 import "../styles/Waiting.css"
 
 export default function Waiting(){
@@ -33,6 +33,7 @@ export default function Waiting(){
         }
         channel.publish({data: {
             message: "Start Game",
+            isApi: updatedUserData.isApi,
             numOfPlayers: updatedUserData.numOfPlayers,
             numOfRounds: updatedUserData.numOfRounds,
             roundTime: updatedUserData.roundTime,
@@ -40,7 +41,7 @@ export default function Waiting(){
             deckTitle: updatedUserData.deckTitle,
             imageURL: updatedUserData.imageURL
         }})
-        //navigate("/Caption", { state: updatedUserData })
+        navigate("/Caption", { state: updatedUserData })
     }
 
     async function initializeLobby(){
@@ -53,22 +54,31 @@ export default function Waiting(){
     }
 
     channel.subscribe(async event => {
-        if(event.data.message === "Deck Selected"){
+        if(event.data.message === "Deck Selected" && userData.host){
             setSelectDeck(true)
         }
         else if(event.data.message === "New Player Joined Lobby"){
             const newLobby = await getPlayers(userData.gameCode)
             setLobby(newLobby)
         }
-        else if(event.data.message === "Start Game"){
+        else if(event.data.message === "Start Game" && !userData.host){
             const updatedUserData = {
                 ...userData,
+                isApi: event.data.isApi,
                 numOfPlayers: event.data.numOfPlayers,
                 numOfRounds: event.data.numOfRounds,
                 roundTime: event.data.roundTime,
                 deckUID: event.data.deckUID,
                 deckTitle: event.data.deckTitle,
                 imageURL: event.data.imageURL
+            }
+            await assignDeck(updatedUserData.deckUID, updatedUserData.gameCode)
+            if(updatedUserData.isApi){
+                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+            }
+            else{
+                const imageUID = await getImage(updatedUserData)
+                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, imageUID)
             }
             setUserData(updatedUserData)
             setCookie("userData", updatedUserData, {path: '/'})

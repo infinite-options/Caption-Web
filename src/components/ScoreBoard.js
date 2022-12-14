@@ -2,7 +2,7 @@ import React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, getScoreBoard, createNextRound, getDatabaseImage} from "../util/Api"
+import { ably, getScoreBoard, createNextRound, getDatabaseImage, postRoundImage, getImage } from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){
@@ -41,18 +41,25 @@ export default function ScoreBoard(){
         }})
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
+        navigate("/Caption", { state: updatedUserData })
     }
 
-    channel.subscribe( event => {
-        if(event.data.message === "Start Next Round"){
+    channel.subscribe( async event => {
+        if (event.data.message === "Start Next Round" && !userData.host) {
             const updatedUserData = {
                 ...userData,
                 roundNumber: event.data.roundNumber,
                 imageURL: event.data.imageURL
             }
+            if (updatedUserData.isApi) {
+                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+            } else {
+                const imageUID = await getImage(updatedUserData)
+                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, imageUID)
+            }
             setUserData(updatedUserData)
             setCookie("userData", updatedUserData, {path: '/'})
-            navigate("/Caption", { state: updatedUserData })
+            navigate("/Caption", {state: updatedUserData})
         }
     })
 

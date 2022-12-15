@@ -6,6 +6,7 @@ import Caption from "./components/Caption"
 import Vote from "./components/Vote"
 import ScoreBoard from "./components/ScoreBoard"
 import Confirmation from "./components/Confirmation"
+import GameRules from "./components/GameRules"
 import { CookiesProvider } from 'react-cookie'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
 import './App.css'
@@ -24,6 +25,7 @@ export default function App() {
                     <Route path="/Vote" element={<Vote />} />
                     <Route path="/ScoreBoard" element={<ScoreBoard />} />
                     <Route path="/Confirmation" element={<Confirmation />} />
+                    <Route path="/GameRules" element={<GameRules />} />
                 </Routes>
             </Router>
         </CookiesProvider>

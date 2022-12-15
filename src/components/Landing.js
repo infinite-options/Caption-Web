@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate } from "react-router-dom"
+import { useNavigate, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import { ably, addUser, checkGameCode, joinGame } from "../util/Api"
 import "../styles/Landing.css"
@@ -117,10 +117,10 @@ export default function Landing(){
 
     return(
         <div className="landing">
-            <a href="#" className="gameRulesLanding">
+            <Link to="/GameRules" className="gameRulesLanding">
                 <i className="fa fa-info-circle"></i>
                 Game Rules
-            </a>
+            </Link>
             {cookies.userData != undefined ?
                 <form className="userDataFormLanding" onChange={handleChange}>
                     <input className="inputLanding" type="text" name="name" defaultValue={cookies.userData.name}/>

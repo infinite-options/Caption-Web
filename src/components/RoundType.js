@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import {useNavigate, useLocation, Link} from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import { createGame, joinGame } from "../util/Api.js"
 import "../styles/RoundType.css"
@@ -56,10 +56,10 @@ export default function RoundType() {
 
     return(
         <div className="roundType">
-            <a href="#" className="gameRulesRoundType">
+            <Link to="/GameRules" className="gameRulesLanding">
                 <i className="fa fa-info-circle"></i>
                 Game Rules
-            </a>
+            </Link>
             <div className="oneRoundType">
                 <h4>
                     Enter the number of rounds and time for each round

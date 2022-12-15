@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import {useNavigate, useLocation, Link} from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import {ably, assignDeck, getPlayers, updateDatabase } from "../util/Api"
 import "../styles/Waiting.css"
@@ -82,10 +82,10 @@ export default function Waiting(){
 
     return(
         <div className="waiting">
-            <a href="#" className="gameRulesWaiting">
+            <Link to="/GameRules" className="gameRulesLanding">
                 <i className="fa fa-info-circle"></i>
                 Game Rules
-            </a>
+            </Link>
             <h4 className="oneWaiting">
                 Waiting for all players to join
             </h4>

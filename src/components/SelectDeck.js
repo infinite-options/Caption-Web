@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import {useNavigate, useLocation, Link} from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import { ably, getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImages, postRoundImage } from "../util/Api.js"
 import "../styles/SelectDeck.css"
@@ -53,10 +53,10 @@ export default function SelectDeck(){
 
     return(
         <div className="selectDeck">
-            <a href="#" className="gameRulesSelectDeck">
+            <Link to="/GameRules" className="gameRulesLanding">
                 <i className="fa fa-info-circle"></i>
                 Game Rules
-            </a>
+            </Link>
             <h4 className="oneSelectDeck">Select a deck</h4>
             <br/>
             <br/>

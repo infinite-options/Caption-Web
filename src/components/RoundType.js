@@ -56,7 +56,7 @@ export default function RoundType() {
 
     return(
         <div className="roundType">
-            <Link to="/GameRules" className="gameRulesLanding">
+            <Link to="/GameRules" className="gameRulesRoundType">
                 <i className="fa fa-info-circle"></i>
                 Game Rules
             </Link>

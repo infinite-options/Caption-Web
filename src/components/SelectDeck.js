@@ -53,7 +53,7 @@ export default function SelectDeck(){
 
     return(
         <div className="selectDeck">
-            <Link to="/GameRules" className="gameRulesLanding">
+            <Link to="/GameRules" className="gameRulesSelectDeck">
                 <i className="fa fa-info-circle"></i>
                 Game Rules
             </Link>

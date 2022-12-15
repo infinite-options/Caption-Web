@@ -82,7 +82,7 @@ export default function Waiting(){
 
     return(
         <div className="waiting">
-            <Link to="/GameRules" className="gameRulesLanding">
+            <Link to="/GameRules" className="gameRulesWaiting">
                 <i className="fa fa-info-circle"></i>
                 Game Rules
             </Link>

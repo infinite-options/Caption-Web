@@ -18,7 +18,7 @@ export default function Confirmation(){
 
     async function submitButton(){
         const status = await checkEmailCode(userData.playerUID, code)
-        if(status.email_validated_status === true){
+        if(status.email_validated_status === "TRUE"){
             if(userData.host){
                 navigate("/RoundType", {state: userData})
             }
@@ -33,7 +33,7 @@ export default function Confirmation(){
             setValid(false)
             setTimeout(() => {
                 setValid(true)
-            }, 1500)
+            }, 2500)
         }
     }
 

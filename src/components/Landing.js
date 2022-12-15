@@ -105,12 +105,14 @@ export default function Landing(){
         }
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
-        if(playerInfo.user_code !== "TRUE")
+        if(playerInfo.user_code === "TRUE"){
+            await joinGame(updatedUserData)
+            const channel = ably.channels.get(`BizBuz/${updatedUserData.gameCode}`)
+            channel.publish({data: {message: "New Player Joined Lobby"}})
+            navigate("/Waiting", {state: updatedUserData})
+        }
+        else
             navigate("/Confirmation", {state: updatedUserData})
-        await joinGame(updatedUserData)
-        const channel = ably.channels.get(`BizBuz/${updatedUserData.gameCode}`)
-        channel.publish({data: {message: "New Player Joined Lobby"}})
-        navigate("/Waiting", {state: updatedUserData})
     }
 
     return(

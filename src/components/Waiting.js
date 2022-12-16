@@ -1,5 +1,5 @@
 import {useEffect, useState} from "react"
-import {useNavigate, useLocation, Link} from "react-router-dom"
+import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import {ably, assignDeck, getPlayers, updateDatabase } from "../util/Api"
 import "../styles/Waiting.css"

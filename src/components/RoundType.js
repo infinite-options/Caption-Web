@@ -1,5 +1,5 @@
 import { useState } from "react"
-import {useNavigate, useLocation, Link} from "react-router-dom"
+import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import { createGame, joinGame } from "../util/Api.js"
 import "../styles/RoundType.css"

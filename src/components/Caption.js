@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, getPlayers, getSubmittedCaptions, submitCaption} from "../util/Api"
+import { ably, getPlayers, getSubmittedCaptions, submitCaption } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Caption.css"
 

@@ -33,6 +33,7 @@ export default function ScoreBoard(){
             ...userData,
             roundNumber: nextRound,
             imageURL: imageURL
+
         }
         channel.publish({data: {
                 message: "Start Next Round",
@@ -85,7 +86,7 @@ export default function ScoreBoard(){
                         <React.Fragment key={index}>
                             <div>{player.user_alias}</div>
                             <div>{player.caption}</div>
-                            <div>{player.score}</div>
+                            <div>{player.game_score}</div>
                             <div>{player.votes}</div>
                         </React.Fragment>
                     )})

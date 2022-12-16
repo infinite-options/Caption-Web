@@ -36,12 +36,18 @@ export default function Vote(){
             setCaptions(tempCaptions)
             setToggles(tempToggles)
             setIsMyCaption(isMyCaption)
-            if(tempCaptions.length === 1 && tempCaptions[0] === isMyCaption){
-                setVoteSubmitted(true)
-                await voteButton(true)
-            }
-            else if(tempCaptions.length === 0){
-                await voteButton(true)
+            if(tempCaptions.length <= 1){
+                if(tempCaptions.length === 1 && tempCaptions[0] === isMyCaption){
+                    await postVote(null, userData)
+                }
+                else if(tempCaptions.length === 1 && tempCaptions[0] !== isMyCaption){
+                    await postVote(tempCaptions[0], userData)
+                }
+                else if(tempCaptions.length === 0){
+                    await postVote(null, userData)
+                }
+                await updateScores(userData)
+                channel.publish({data: {message: "Start ScoreBoard"}})
             }
         }
         getCaptions()

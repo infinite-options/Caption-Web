@@ -15,12 +15,24 @@
     width: 255px;
     border-radius: 50px;
 }
-.containerScoreBoard {
-    display: grid;
+.headerScoreBoard {
     text-align: center;
-    grid-template-columns: 84px 84px 84px 84px;
-    grid-gap: 10px;
-    max-width: 500px;
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+    margin-bottom: 10px;
+}
+.valuesScoreBoard {
+    text-align: center;
+    display: grid;
+    grid-template-columns: repeat(4, auto);
+}
+.captionScoreBoard {
+    text-align: center;
+    margin-left: 7%;
+    margin-right: 7%;
+    background-color: yellow;
+    border-radius: 25px;
+    margin-bottom: 10px;
 }
 .buttonScoreBoard {
     display:block;

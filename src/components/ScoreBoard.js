@@ -76,22 +76,25 @@ export default function ScoreBoard(){
             <br/>
             <img className="imgScoreBoard" src={userData.imageURL}/>
             <br/>
-            <div className="containerScoreBoard">
+            <div className="headerScoreBoard">
                 <div>Alias</div>
-                <div>Caption</div>
-                <div>Points</div>
                 <div>Votes</div>
-                {scoreBoard.map((player, index) => {
-                    return(
-                        <React.Fragment key={index}>
-                            <div>{player.user_alias}</div>
-                            <div>{player.caption}</div>
-                            <div>{player.game_score}</div>
-                            <div>{player.votes}</div>
-                        </React.Fragment>
-                    )})
-                }
+                <div>Points</div>
+                <div>Total</div>
             </div>
+            {scoreBoard.map((player, index) => {
+                return(
+                    <div key={index}>
+                        <div className="valuesScoreBoard">
+                            <div>{player.user_alias}</div>
+                            <div>{player.votes}</div>
+                            <div>{player.score}</div>
+                            <div>{player.game_score}</div>
+                        </div>
+                        <div className="captionScoreBoard">{player.caption}</div>
+                    </div>
+                )})
+            }
             <br/>
             {userData.host &&
                 <button className="buttonScoreBoard" onClick={nextRoundButton}>

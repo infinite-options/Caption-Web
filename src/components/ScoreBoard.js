@@ -97,7 +97,12 @@ export default function ScoreBoard(){
                             <div>{player.score}</div>
                             <div>{player.game_score}</div>
                         </div>
-                        <div className="captionScoreBoard">{player.caption}</div>
+                        {player.caption !== "" &&
+                            <div className="captionScoreBoard">{player.caption}</div>
+                        }
+                        {player.caption === "" &&
+                            <div className="captionScoreBoard">&nbsp;</div>
+                        }
                     </div>
                 )})
             }

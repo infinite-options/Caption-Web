@@ -1,0 +1,13 @@
+.endgame {
+    max-width: 370px;
+    height: 100%;
+    background-color: red;
+}
+.headerEndGame, .columnsEndGame {
+    text-align: center;
+}
+.columnsEndGame {
+    display: grid;
+    grid-template-columns: auto auto;
+    margin-top: 30px;
+}

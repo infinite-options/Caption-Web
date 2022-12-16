@@ -47,10 +47,7 @@ export default function Vote(){
                     await postVote(null, userData)
                 }
                 await updateScores(userData)
-                if(userData.roundNumber === userData.numOfRounds)
-                    channel.publish({data: {message: "Start EndGame"}})
-                else
-                    channel.publish({data: {message: "Start ScoreBoard"}})
+                channel.publish({data: {message: "Start ScoreBoard"}})
             }
         }
         getCaptions()
@@ -90,19 +87,13 @@ export default function Vote(){
         await updateScores(userData)
         const numOfPlayersVoting = await leftOverVotingPlayers(userData)
         if(numOfPlayersVoting === 0){
-            if(userData.roundNumber === userData.numOfRounds)
-                channel.publish({data: {message: "Start EndGame"}})
-            else
-                channel.publish({data: {message: "Start ScoreBoard"}})
+            channel.publish({data: {message: "Start ScoreBoard"}})
         }
     }
 
     channel.subscribe( event => {
         if(event.data.message === "Start ScoreBoard"){
             navigate("/ScoreBoard", { state: userData })
-        }
-        else if(event.data.message === "Start EndGame"){
-            navigate("/EndGame", { state: userData })
         }
     })
 

@@ -44,6 +44,10 @@ export default function ScoreBoard(){
         navigate("/Caption", { state: updatedUserData })
     }
 
+    function finalScoresButton(){
+        channel.publish({data: {message: "Start EndGame"}})
+    }
+
     channel.subscribe( async event => {
         if (event.data.message === "Start Next Round" && !userData.host) {
             const updatedUserData = {
@@ -55,6 +59,9 @@ export default function ScoreBoard(){
             setUserData(updatedUserData)
             setCookie("userData", updatedUserData, {path: '/'})
             navigate("/Caption", {state: updatedUserData})
+        }
+        else if(event.data.message === "Start EndGame"){
+            navigate("/EndGame", {state: userData})
         }
     })
 
@@ -95,9 +102,14 @@ export default function ScoreBoard(){
                 )})
             }
             <br/>
-            {userData.host &&
+            {userData.host && userData.roundNumber !== userData.numOfRounds &&
                 <button className="buttonScoreBoard" onClick={nextRoundButton}>
                     Next Round
+                </button>
+            }
+            {userData.host && userData.roundNumber === userData.numOfRounds &&
+                <button className="buttonScoreBoard" onClick={finalScoresButton}>
+                    Show Final Scores
                 </button>
             }
             <br/>

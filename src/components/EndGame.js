@@ -19,6 +19,10 @@ export default function EndGame(){
         scoreBoard()
     }, [userData])
 
+    function landingButton(){
+        navigate("/", { state: userData })
+    }
+
     return(
         <div className="endgame">
             <div className="headerEndGame">
@@ -32,14 +36,17 @@ export default function EndGame(){
             </div>
             {scoreBoard.map((player, index) => {
                 return(
-                    <div key={index}>
-                        <div className="valuesScoreBoard">
-                            <div>{player.user_alias}</div>
-                            <div>{player.game_score}</div>
-                        </div>
+                    <div key={index} className="valuesEndGame">
+                        <div>{player.user_alias}</div>
+                        <div>{player.game_score}</div>
                     </div>
                 )})
             }
+            <br/>
+            <button className="buttonEndGame" onClick={landingButton}>
+                Return to Landing Page
+            </button>
+            <br/>
         </div>
     )
 }

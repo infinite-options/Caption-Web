@@ -7,7 +7,31 @@
     text-align: center;
 }
 .columnsEndGame {
+    text-align: center;
     display: grid;
     grid-template-columns: auto auto;
-    margin-top: 30px;
+    margin-top: 25px;
+    font-family: Josefin Sans, sans-serif;
+    font-size: 18px;
+}
+.valuesEndGame {
+    text-align: center;
+    display: grid;
+    grid-template-columns: auto auto;
+    margin-top: 10px;
+    font-family: Josefin Sans, sans-serif;
+    font-size: 18px;
+}
+.buttonEndGame {
+    display:block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 215px;
+    height: 60px;
+    border-radius: 30px;
+    border-color: yellow;
+    border-width: 5px;
+    color: black;
+    font-family: Josefin Sans, sans-serif;
+    font-size: 18px;
 }

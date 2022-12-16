@@ -6,7 +6,6 @@ const chicagoURL = "https://api.artic.edu/api/v1/artworks?fields=id,title,image_
 const giphyURL = "https://api.giphy.com/v1/gifs/trending?api_key=Fo9QcAQLMFI8V6pdWWHWl9qmW91ZBjoK&"
 const harvardURL= "https://api.harvardartmuseums.org/image?apikey=c10d3ea9-27b1-45b4-853a-3872440d9782"
 const searchGooglePhotosURL = 'https://photoslibrary.googleapis.com/v1/mediaItems:search'
-const cnnURL = "https://www.cnn.com/2022/11/17/world/gallery/photos-this-week-november-10-november-17"
 
 async function getApiImagesHelper(deckUID, numOfRounds){
     if(deckUID === "500-000005"){
@@ -31,7 +30,7 @@ async function getApiImagesHelper(deckUID, numOfRounds){
         const imagesInfo = await axios.get(clevelandURL + "?limit=100").then(response => response.data.data)
         let clevelandImages = []
         for(let i = 0; i < imagesInfo.length; i++){
-            if(imagesInfo[i].images !== null)
+            if(imagesInfo[i].images !== null && imagesInfo[i].images.web !== undefined)
                 clevelandImages.push(imagesInfo[i].images.web.url)
         }
         clevelandImages = randomize(clevelandImages, numOfRounds)

@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getScoreBoard, createNextRound, getDatabaseImage, updateDatabase } from "../util/Api"
+import { ably, getScoreBoard, createNextRound, getDatabaseImage, postRoundImage } from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){
@@ -55,7 +55,7 @@ export default function ScoreBoard(){
                 roundNumber: event.data.roundNumber,
                 imageURL: event.data.imageURL
             }
-            await updateDatabase(updatedUserData)
+            await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
             setUserData(updatedUserData)
             setCookie("userData", updatedUserData, {path: '/'})
             navigate("/Caption", {state: updatedUserData})

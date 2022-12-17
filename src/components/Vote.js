@@ -23,12 +23,15 @@ export default function Vote(){
             let tempCaptions = []
             let tempToggles = []
             let isMyCaption = ""
+            let onlyCaptionSubmitted = ""
             let numOfEmpty = 0
             for(let i = 0; i < submittedCaptions.length; i++){
+                if(submittedCaptions[i].round_user_uid === userData.playerUID)
+                    isMyCaption = submittedCaptions[i].caption
                 if(submittedCaptions[i].caption === "")
                     numOfEmpty++
-                else if(submittedCaptions[i].round_user_uid === userData.playerUID)
-                    isMyCaption = submittedCaptions[i].caption
+                else if(submittedCaptions[i].caption !== "")
+                    onlyCaptionSubmitted = submittedCaptions[i].caption
                 tempCaptions.push(submittedCaptions[i].caption)
             }
             for(let i = 0; i < tempCaptions.length; i++){
@@ -39,11 +42,11 @@ export default function Vote(){
             setIsMyCaption(isMyCaption)
             let numOfCaptions = tempCaptions.length - numOfEmpty
             if(numOfCaptions <= 1){
-                if(numOfCaptions && tempCaptions[0] === isMyCaption){
+                if(numOfCaptions === 1 && onlyCaptionSubmitted === isMyCaption){
                     await postVote(null, userData)
                 }
-                else if(numOfCaptions === 1 && tempCaptions[0] !== isMyCaption){
-                    await postVote(tempCaptions[0], userData)
+                else if(numOfCaptions === 1 && onlyCaptionSubmitted !== isMyCaption){
+                    await postVote(onlyCaptionSubmitted, userData)
                 }
                 else if(numOfCaptions === 0){
                     await postVote(null, userData)

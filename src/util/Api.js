@@ -130,7 +130,7 @@ async function postRoundImage(gameCode, roundNumber, imageURL){
 }
 
 async function getImage(userData){
-    const imageUID = await axios.get(getImageURL + userData.gameCode + "," + userData.roundNumber)
+    const imageUID = await axios.get(getImageURL + userData.gameCode + "," + userData.roundNumber.toString())
         .then(response => response.data.image_uid)
     return imageUID
 }
@@ -189,18 +189,8 @@ async function createNextRound(userData){
     return
 }
 
-async function updateDatabase(userData){
-    if(userData.isApi){
-        await postRoundImage(userData.gameCode, userData.roundNumber, userData.imageURL)
-    }
-    else{
-        const imageUID = await getImage(userData)
-        await postRoundImage(userData.gameCode, userData.roundNumber, imageUID)
-    }
-}
-
 export { ably, checkGameCode, checkEmailCode, addUser, createGame,
     joinGame, getDecks, selectDeck, assignDeck, getDatabaseImage,
     getApiImages, postRoundImage, getImage, getPlayers, submitCaption,
     getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers, getScoreBoard,
-    createNextRound, updateDatabase }
+    createNextRound }

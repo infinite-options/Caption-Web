@@ -25,7 +25,7 @@ export default function ScoreBoard(){
         const nextRound = userData.roundNumber + 1
         let imageURL = ""
         if(userData.isApi)
-            imageURL = userData.imageURLs[nextRound]
+            imageURL = userData.imageURLs[nextRound - 1]
         else
             imageURL = await getDatabaseImage(userData.gameCode, nextRound)
         const updatedUserData = {

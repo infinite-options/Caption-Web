@@ -80,7 +80,7 @@ export default function Caption(){
             }
             {captionSubmitted &&
                 <div className="submittedCaption">
-                    <button className="submitCaption" onClick={submitButton}>
+                    <button className="submitCaption">
                         Submitted
                     </button>
                     <br/>

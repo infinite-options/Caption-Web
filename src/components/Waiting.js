@@ -1,7 +1,7 @@
-import {useEffect, useState} from "react"
+import { useEffect, useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, assignDeck, getPlayers, postRoundImage } from "../util/Api"
+import {ably, assignDeck, getApiImages, getDatabaseImage, getImage, getPlayers, postRoundImage} from "../util/Api"
 import "../styles/Waiting.css"
 
 export default function Waiting(){
@@ -26,31 +26,32 @@ export default function Waiting(){
         navigate("/SelectDeck", { state: userData })
     }
 
-    async function startGameButton() {
-        const updatedUserData = {
-            ...userData,
-            numOfPlayers: lobby.length
-        }
-        channel.publish({data: {
-            message: "Start Game",
-            isApi: updatedUserData.isApi,
-            numOfPlayers: updatedUserData.numOfPlayers,
-            numOfRounds: updatedUserData.numOfRounds,
-            roundTime: updatedUserData.roundTime,
-            deckUID: updatedUserData.deckUID,
-            deckTitle: updatedUserData.deckTitle,
-            imageURL: updatedUserData.imageURL
-        }})
-        navigate("/Caption", { state: updatedUserData })
-    }
-
     async function initializeLobby(){
         const newLobby = await getPlayers(userData.gameCode)
         setLobby(newLobby)
     }
+
     if(!initialize){
         initializeLobby()
         setInitialize(true)
+    }
+
+    async function startGameButton() {
+        await assignDeck(userData.deckUID, userData.gameCode)
+        let imageURLs = []
+        if(userData.isApi)
+            imageURLs = await getApiImages(userData.deckUID, userData.numOfRounds)
+        channel.publish({data: {
+                message: "Start Game",
+                numOfPlayers: lobby.length,
+                isApi: userData.isApi,
+                deckTitle: userData.deckTitle,
+                deckUID: userData.deckUID,
+                gameUID: userData.gameUID,
+                numOfRounds: userData.numOfRounds,
+                roundTime: userData.roundTime,
+                imageURLs: imageURLs
+        }})
     }
 
     channel.subscribe(async event => {
@@ -61,19 +62,33 @@ export default function Waiting(){
             const newLobby = await getPlayers(userData.gameCode)
             setLobby(newLobby)
         }
-        else if(event.data.message === "Start Game" && !userData.host){
-            const updatedUserData = {
+        else if(event.data.message === "Start Game"){
+            let updatedUserData = {
                 ...userData,
-                isApi: event.data.isApi,
                 numOfPlayers: event.data.numOfPlayers,
+                isApi: event.data.isApi,
+                deckTitle: event.data.deckTitle,
+                deckUID: event.data.deckUID,
+                gameUID: event.data.gameUID,
                 numOfRounds: event.data.numOfRounds,
                 roundTime: event.data.roundTime,
-                deckUID: event.data.deckUID,
-                deckTitle: event.data.deckTitle,
-                imageURL: event.data.imageURL
+                imageURLs: event.data.imageURLs
             }
-            await assignDeck(updatedUserData.deckUID, updatedUserData.gameCode)
-            await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+            if (updatedUserData.isApi){
+                updatedUserData = {
+                    ...updatedUserData,
+                    imageURL: updatedUserData.imageURLs[0]
+                }
+                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+            }
+            else {
+                await getDatabaseImage(userData.gameCode, userData.roundNumber)
+                const imageURL = await getImage(updatedUserData)
+                updatedUserData = {
+                    ...updatedUserData,
+                    imageURL: imageURL
+                }
+            }
             setUserData(updatedUserData)
             setCookie("userData", updatedUserData, {path: '/'})
             navigate("/Caption", {state: updatedUserData})

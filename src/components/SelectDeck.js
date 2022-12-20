@@ -21,29 +21,20 @@ export default function SelectDeck(){
 
     async function handleClick(deckTitle, deckUID) {
         await selectDeck(deckUID, userData.gameCode, userData.roundNumber)
-        await assignDeck(deckUID, userData.gameCode)
-        let updatedUserData = {}
-        if (deckTitle === "Google Photos" || deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
-            const imageURLs = await getApiImages(deckUID, userData.numOfRounds)
-            updatedUserData = {
-                ...userData,
-                isApi: true,
-                deckUID: deckUID,
-                deckTitle: deckTitle,
-                imageURL: imageURLs[0],
-                imageURLs: imageURLs
-            }
-            await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+        let isApi
+        if (deckTitle === "Google Photos" || deckTitle === "Cleveland Gallery" ||
+            deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" ||
+            deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
+            isApi = true
         }
         else {
-            const imageURL = await getDatabaseImage(userData.gameCode, userData.roundNumber)
-            updatedUserData = {
-                ...userData,
-                isApi: false,
-                deckUID: deckUID,
-                deckTitle: deckTitle,
-                imageURL: imageURL
-            }
+            isApi = false
+        }
+        const updatedUserData = {
+            ...userData,
+            isApi: isApi,
+            deckTitle: deckTitle,
+            deckUID: deckUID
         }
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})

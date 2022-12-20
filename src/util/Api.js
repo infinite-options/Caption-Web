@@ -109,9 +109,8 @@ async function assignDeck(deckUID, gameCode){
 }
 
 async function getDatabaseImage(gameCode, roundNumber){
-    const imageURL = await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber)
-        .then(response => response.data.image_url)
-    return imageURL
+    await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber)
+    return
 }
 
 async function getApiImages(deckUID, numOfRounds){
@@ -130,9 +129,9 @@ async function postRoundImage(gameCode, roundNumber, imageURL){
 }
 
 async function getImage(userData){
-    const imageUID = await axios.get(getImageURL + userData.gameCode + "," + userData.roundNumber.toString())
-        .then(response => response.data.image_uid)
-    return imageUID
+    const imageURL = await axios.get(getImageURL + userData.gameCode + "," + userData.roundNumber)
+        .then(response => response.data.image_url)
+    return imageURL
 }
 
 async function submitCaption(caption, userData){

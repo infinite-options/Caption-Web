@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getScoreBoard, createNextRound, getDatabaseImage, postRoundImage } from "../util/Api"
+import {
+    ably,
+    getScoreBoard,
+    createNextRound,
+    getDatabaseImage,
+    postRoundImage,
+    getApiImages,
+    getImage
+} from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){
@@ -23,25 +31,10 @@ export default function ScoreBoard(){
     async function nextRoundButton() {
         await createNextRound(userData)
         const nextRound = userData.roundNumber + 1
-        let imageURL = ""
-        if(userData.isApi)
-            imageURL = userData.imageURLs[nextRound - 1]
-        else
-            imageURL = await getDatabaseImage(userData.gameCode, nextRound)
-        const updatedUserData = {
-            ...userData,
-            roundNumber: nextRound,
-            imageURL: imageURL
-
-        }
         channel.publish({data: {
                 message: "Start Next Round",
-                roundNumber: updatedUserData.roundNumber,
-                imageURL: updatedUserData.imageURL
+                roundNumber: nextRound
         }})
-        setUserData(updatedUserData)
-        setCookie("userData", updatedUserData, {path: '/'})
-        navigate("/Caption", { state: updatedUserData })
     }
 
     function finalScoresButton(){
@@ -49,13 +42,26 @@ export default function ScoreBoard(){
     }
 
     channel.subscribe( async event => {
-        if (event.data.message === "Start Next Round" && !userData.host) {
-            const updatedUserData = {
+        if (event.data.message === "Start Next Round") {
+            let updatedUserData = {
                 ...userData,
-                roundNumber: event.data.roundNumber,
-                imageURL: event.data.imageURL
+                roundNumber: event.data.roundNumber
             }
-            await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+            if (updatedUserData.isApi){
+                updatedUserData = {
+                    ...updatedUserData,
+                    imageURL: updatedUserData.imageURLs[updatedUserData.roundNumber - 1]
+                }
+                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+            }
+            else {
+                await getDatabaseImage(updatedUserData.gameCode, updatedUserData.roundNumber)
+                const imageURL = await getImage(updatedUserData)
+                updatedUserData = {
+                    ...updatedUserData,
+                    imageURL: imageURL
+                }
+            }
             setUserData(updatedUserData)
             setCookie("userData", updatedUserData, {path: '/'})
             navigate("/Caption", {state: updatedUserData})

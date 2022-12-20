@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, assignDeck, getApiImages, getDatabaseImage, getImage, getPlayers, postRoundImage} from "../util/Api"
+import { ably, assignDeck, getApiImages, setDatabaseImages, getDatabaseImage, getPlayers, postRoundImage } from "../util/Api"
 import "../styles/Waiting.css"
 
 export default function Waiting(){
@@ -41,6 +41,8 @@ export default function Waiting(){
         let imageURLs = []
         if(userData.isApi)
             imageURLs = await getApiImages(userData.deckUID, userData.numOfRounds)
+        else
+            await setDatabaseImages(userData.gameCode, userData.roundNumber)
         channel.publish({data: {
                 message: "Start Game",
                 numOfPlayers: lobby.length,
@@ -82,8 +84,7 @@ export default function Waiting(){
                 await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
             }
             else {
-                await getDatabaseImage(userData.gameCode, userData.roundNumber)
-                const imageURL = await getImage(updatedUserData)
+                const imageURL = await getDatabaseImage(updatedUserData)
                 updatedUserData = {
                     ...updatedUserData,
                     imageURL: imageURL

@@ -108,7 +108,7 @@ async function assignDeck(deckUID, gameCode){
     return
 }
 
-async function getDatabaseImage(gameCode, roundNumber){
+async function setDatabaseImages(gameCode, roundNumber){
     await axios.get(getUniqueImageInRoundURL + gameCode + "," + roundNumber)
     return
 }
@@ -128,7 +128,7 @@ async function postRoundImage(gameCode, roundNumber, imageURL){
     return
 }
 
-async function getImage(userData){
+async function getDatabaseImage(userData){
     const imageURL = await axios.get(getImageURL + userData.gameCode + "," + userData.roundNumber)
         .then(response => response.data.image_url)
     return imageURL
@@ -189,7 +189,7 @@ async function createNextRound(userData){
 }
 
 export { ably, checkGameCode, checkEmailCode, addUser, createGame,
-    joinGame, getDecks, selectDeck, assignDeck, getDatabaseImage,
-    getApiImages, postRoundImage, getImage, getPlayers, submitCaption,
+    joinGame, getDecks, selectDeck, assignDeck, setDatabaseImages,
+    getApiImages, postRoundImage, getDatabaseImage, getPlayers, submitCaption,
     getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers, getScoreBoard,
     createNextRound }

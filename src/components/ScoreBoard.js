@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {
-    ably,
-    getScoreBoard,
-    createNextRound,
-    getDatabaseImage,
-    postRoundImage,
-    getApiImages,
-    getImage
-} from "../util/Api"
+import { ably, getScoreBoard, createNextRound, setDatabaseImages, postRoundImage, getDatabaseImage } from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){
@@ -31,6 +23,8 @@ export default function ScoreBoard(){
     async function nextRoundButton() {
         await createNextRound(userData)
         const nextRound = userData.roundNumber + 1
+        if(!userData.isApi)
+            await setDatabaseImages(userData.gameCode, nextRound)
         channel.publish({data: {
                 message: "Start Next Round",
                 roundNumber: nextRound
@@ -55,8 +49,7 @@ export default function ScoreBoard(){
                 await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
             }
             else {
-                await getDatabaseImage(updatedUserData.gameCode, updatedUserData.roundNumber)
-                const imageURL = await getImage(updatedUserData)
+                const imageURL = await getDatabaseImage(updatedUserData)
                 updatedUserData = {
                     ...updatedUserData,
                     imageURL: imageURL

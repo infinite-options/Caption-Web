@@ -26,16 +26,6 @@ export default function Waiting(){
         navigate("/SelectDeck", { state: userData })
     }
 
-    async function initializeLobby(){
-        const newLobby = await getPlayers(userData.gameCode)
-        setLobby(newLobby)
-    }
-
-    if(!initialize){
-        initializeLobby()
-        setInitialize(true)
-    }
-
     async function startGameButton() {
         await assignDeck(userData.deckUID, userData.gameCode)
         let imageURLs = []
@@ -53,48 +43,61 @@ export default function Waiting(){
                 numOfRounds: userData.numOfRounds,
                 roundTime: userData.roundTime,
                 imageURLs: imageURLs
-        }})
+            }})
     }
 
-    channel.subscribe(async event => {
-        if(event.data.message === "Deck Selected" && userData.host){
-            setSelectDeck(true)
-        }
-        else if(event.data.message === "New Player Joined Lobby"){
+    useEffect(() => {
+
+        async function initializeLobby(){
             const newLobby = await getPlayers(userData.gameCode)
             setLobby(newLobby)
         }
-        else if(event.data.message === "Start Game"){
-            let updatedUserData = {
-                ...userData,
-                numOfPlayers: event.data.numOfPlayers,
-                isApi: event.data.isApi,
-                deckTitle: event.data.deckTitle,
-                deckUID: event.data.deckUID,
-                gameUID: event.data.gameUID,
-                numOfRounds: event.data.numOfRounds,
-                roundTime: event.data.roundTime,
-                imageURLs: event.data.imageURLs
-            }
-            if (updatedUserData.isApi){
-                updatedUserData = {
-                    ...updatedUserData,
-                    imageURL: updatedUserData.imageURLs[0]
-                }
-                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
-            }
-            else {
-                const imageURL = await getDatabaseImage(updatedUserData)
-                updatedUserData = {
-                    ...updatedUserData,
-                    imageURL: imageURL
-                }
-            }
-            setUserData(updatedUserData)
-            setCookie("userData", updatedUserData, {path: '/'})
-            navigate("/Caption", {state: updatedUserData})
+
+        if(!initialize){
+            initializeLobby()
+            setInitialize(true)
         }
-    })
+
+        channel.subscribe(async event => {
+            if(event.data.message === "Deck Selected" && userData.host){
+                setSelectDeck(true)
+            }
+            else if(event.data.message === "New Player Joined Lobby"){
+                const newLobby = await getPlayers(userData.gameCode)
+                setLobby(newLobby)
+            }
+            else if(event.data.message === "Start Game"){
+                let updatedUserData = {
+                    ...userData,
+                    numOfPlayers: event.data.numOfPlayers,
+                    isApi: event.data.isApi,
+                    deckTitle: event.data.deckTitle,
+                    deckUID: event.data.deckUID,
+                    gameUID: event.data.gameUID,
+                    numOfRounds: event.data.numOfRounds,
+                    roundTime: event.data.roundTime,
+                    imageURLs: event.data.imageURLs
+                }
+                if (updatedUserData.isApi){
+                    updatedUserData = {
+                        ...updatedUserData,
+                        imageURL: updatedUserData.imageURLs[0]
+                    }
+                    await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+                }
+                else {
+                    const imageURL = await getDatabaseImage(updatedUserData)
+                    updatedUserData = {
+                        ...updatedUserData,
+                        imageURL: imageURL
+                    }
+                }
+                setUserData(updatedUserData)
+                setCookie("userData", updatedUserData, {path: '/'})
+                navigate("/Caption", {state: updatedUserData})
+            }
+        })
+    }, [userData])
 
     return(
         <div className="waiting">

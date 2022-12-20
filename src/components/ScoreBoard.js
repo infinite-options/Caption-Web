@@ -35,34 +35,36 @@ export default function ScoreBoard(){
         channel.publish({data: {message: "Start EndGame"}})
     }
 
-    channel.subscribe( async event => {
-        if (event.data.message === "Start Next Round") {
-            let updatedUserData = {
-                ...userData,
-                roundNumber: event.data.roundNumber
-            }
-            if (updatedUserData.isApi){
-                updatedUserData = {
-                    ...updatedUserData,
-                    imageURL: updatedUserData.imageURLs[updatedUserData.roundNumber - 1]
+    useEffect(() => {
+        channel.subscribe( async event => {
+            if (event.data.message === "Start Next Round") {
+                let updatedUserData = {
+                    ...userData,
+                    roundNumber: event.data.roundNumber
                 }
-                await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
-            }
-            else {
-                const imageURL = await getDatabaseImage(updatedUserData)
-                updatedUserData = {
-                    ...updatedUserData,
-                    imageURL: imageURL
+                if (updatedUserData.isApi){
+                    updatedUserData = {
+                        ...updatedUserData,
+                        imageURL: updatedUserData.imageURLs[updatedUserData.roundNumber - 1]
+                    }
+                    await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
                 }
+                else {
+                    const imageURL = await getDatabaseImage(updatedUserData)
+                    updatedUserData = {
+                        ...updatedUserData,
+                        imageURL: imageURL
+                    }
+                }
+                setUserData(updatedUserData)
+                setCookie("userData", updatedUserData, {path: '/'})
+                navigate("/Caption", {state: updatedUserData})
             }
-            setUserData(updatedUserData)
-            setCookie("userData", updatedUserData, {path: '/'})
-            navigate("/Caption", {state: updatedUserData})
-        }
-        else if(event.data.message === "Start EndGame"){
-            navigate("/EndGame", {state: userData})
-        }
-    })
+            else if(event.data.message === "Start EndGame"){
+                navigate("/EndGame", {state: userData})
+            }
+        })
+    }, [userData])
 
     return(
         <div className="scoreboard">

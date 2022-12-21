@@ -59,14 +59,13 @@ export default function Waiting(){
         }
 
         channel.subscribe(async event => {
-            if(event.data.message === "Deck Selected" && userData.host){
+            if(event.data.message === "New Player Joined Lobby"){
+                initializeLobby()
+            }
+            else if(event.data.message === "Deck Selected" && userData.host){
                 setSelectDeck(true)
             }
-            else if(event.data.message === "New Player Joined Lobby"){
-                const newLobby = await getPlayers(userData.gameCode)
-                setLobby(newLobby)
-            }
-            else if(event.data.message === "Start Game"){
+            else if(event.data.message === "Start Game" ){
                 let updatedUserData = {
                     ...userData,
                     numOfPlayers: event.data.numOfPlayers,

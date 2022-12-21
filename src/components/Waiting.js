@@ -29,10 +29,27 @@ export default function Waiting(){
     async function startGameButton() {
         await assignDeck(userData.deckUID, userData.gameCode)
         let imageURLs = []
-        if(userData.isApi)
+        let updatedUserData = {}
+        if(userData.isApi){
             imageURLs = await getApiImages(userData.deckUID, userData.numOfRounds)
-        else
+            updatedUserData = {
+                ...userData,
+                numOfPlayers: lobby.length,
+                imageURL: imageURLs[0],
+                imageURLs: imageURLs
+            }
+            await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+        }
+        else{
             await setDatabaseImages(userData.gameCode, userData.roundNumber)
+            const imageURL = await getDatabaseImage(userData)
+            updatedUserData = {
+                ...userData,
+                numOfPlayers: lobby.length,
+                imageURL: imageURL,
+                imageURLs: imageURLs
+            }
+        }
         channel.publish({data: {
                 message: "Start Game",
                 numOfPlayers: lobby.length,
@@ -43,7 +60,10 @@ export default function Waiting(){
                 numOfRounds: userData.numOfRounds,
                 roundTime: userData.roundTime,
                 imageURLs: imageURLs
-            }})
+        }})
+        setUserData(updatedUserData)
+        setCookie("userData", updatedUserData, {path: '/'})
+        navigate("/Caption", {state: updatedUserData})
     }
 
     useEffect(() => {
@@ -65,7 +85,7 @@ export default function Waiting(){
             else if(event.data.message === "Deck Selected" && userData.host){
                 setSelectDeck(true)
             }
-            else if(event.data.message === "Start Game" ){
+            else if(event.data.message === "Start Game" && !userData.host){
                 let updatedUserData = {
                     ...userData,
                     numOfPlayers: event.data.numOfPlayers,

@@ -1,7 +1,15 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getScoreBoard, createNextRound, setDatabaseImages, postRoundImage, getDatabaseImage } from "../util/Api"
+import {
+    ably,
+    getScoreBoard,
+    createNextRound,
+    setDatabaseImages,
+    postRoundImage,
+    getDatabaseImage,
+    getApiImages
+} from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){
@@ -23,12 +31,31 @@ export default function ScoreBoard(){
     async function nextRoundButton() {
         await createNextRound(userData)
         const nextRound = userData.roundNumber + 1
-        if(!userData.isApi)
+        let updatedUserData = {}
+        if (userData.isApi){
+            updatedUserData = {
+                ...userData,
+                roundNumber: nextRound,
+                imageURL: userData.imageURLs[nextRound - 1]
+            }
+            await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+        }
+        else {
             await setDatabaseImages(userData.gameCode, nextRound)
+            const imageURL = await getDatabaseImage(userData)
+            updatedUserData = {
+                ...userData,
+                roundNumber: nextRound,
+                imageURL: imageURL
+            }
+        }
         channel.publish({data: {
                 message: "Start Next Round",
                 roundNumber: nextRound
         }})
+        setUserData(updatedUserData)
+        setCookie("userData", updatedUserData, {path: '/'})
+        navigate("/Caption", {state: updatedUserData})
     }
 
     function finalScoresButton(){
@@ -37,7 +64,7 @@ export default function ScoreBoard(){
 
     useEffect(() => {
         channel.subscribe( async event => {
-            if (event.data.message === "Start Next Round") {
+            if (event.data.message === "Start Next Round" && !userData.host) {
                 let updatedUserData = {
                     ...userData,
                     roundNumber: event.data.roundNumber

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, assignDeck, getApiImages, setDatabaseImages, getDatabaseImage, getPlayers, postRoundImage } from "../util/Api"
+import { ably, assignDeck, getApiImages, setDatabaseImages, getDatabaseImage, getPlayers, postRoundImage, postCreateRounds } from "../util/Api"
 import "../styles/Waiting.css"
 
 export default function Waiting(){
@@ -27,10 +27,12 @@ export default function Waiting(){
     }
 
     async function startGameButton() {
-        await assignDeck(userData.deckUID, userData.gameCode)
-        let imageURLs = []
-        if(userData.isApi)
-            imageURLs = await getApiImages(userData.deckUID, userData.numOfRounds)
+        //await assignDeck(userData.deckUID, userData.gameCode)
+        let imageURL = ""
+        if(userData.isApi){
+            const imageURLs = await getApiImages(userData.deckUID, userData.numOfRounds)
+            imageURL = await postCreateRounds(userData.gameCode, imageURLs)
+        }
         else
             await setDatabaseImages(userData.gameCode, userData.roundNumber)
         channel.publish({data: {
@@ -42,12 +44,11 @@ export default function Waiting(){
                 gameUID: userData.gameUID,
                 numOfRounds: userData.numOfRounds,
                 roundTime: userData.roundTime,
-                imageURLs: imageURLs
-            }})
+                imageURL: imageURL
+        }})
     }
 
     useEffect(() => {
-
         async function initializeLobby(){
             const newLobby = await getPlayers(userData.gameCode)
             setLobby(newLobby)
@@ -66,7 +67,7 @@ export default function Waiting(){
                 setSelectDeck(true)
             }
             else if(event.data.message === "Start Game" ){
-                let updatedUserData = {
+                const updatedUserData = {
                     ...userData,
                     numOfPlayers: event.data.numOfPlayers,
                     isApi: event.data.isApi,
@@ -75,21 +76,21 @@ export default function Waiting(){
                     gameUID: event.data.gameUID,
                     numOfRounds: event.data.numOfRounds,
                     roundTime: event.data.roundTime,
-                    imageURLs: event.data.imageURLs
+                    imageURL: event.data.imageURL
                 }
                 if (updatedUserData.isApi){
-                    updatedUserData = {
-                        ...updatedUserData,
-                        imageURL: updatedUserData.imageURLs[0]
-                    }
-                    await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
+                    // updatedUserData = {
+                    //     ...updatedUserData,
+                    //     imageURL: updatedUserData.imageURLs[0]
+                    // }
+                    // await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
                 }
                 else {
-                    const imageURL = await getDatabaseImage(updatedUserData)
-                    updatedUserData = {
-                        ...updatedUserData,
-                        imageURL: imageURL
-                    }
+                    // const imageURL = await getDatabaseImage(updatedUserData)
+                    // updatedUserData = {
+                    //     ...updatedUserData,
+                    //     imageURL: imageURL
+                    // }
                 }
                 setUserData(updatedUserData)
                 setCookie("userData", updatedUserData, {path: '/'})

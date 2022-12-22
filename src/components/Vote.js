@@ -25,13 +25,12 @@ export default function Vote(){
             let isMyCaption = ""
             let onlyCaptionSubmitted = ""
             for(let i = 0; i < submittedCaptions.length; i++){
+                if(submittedCaptions[i].caption === "")
+                    continue
                 if(submittedCaptions[i].round_user_uid === userData.playerUID)
                     isMyCaption = submittedCaptions[i].caption
-                else if(submittedCaptions[i].caption !== "")
+                if(submittedCaptions[i].caption !== "")
                     onlyCaptionSubmitted = submittedCaptions[i].caption
-                if(submittedCaptions[i].caption === ""){
-                    continue
-                }
                 tempCaptions.push(submittedCaptions[i].caption)
             }
             for(let i = 0; i < tempCaptions.length; i++){

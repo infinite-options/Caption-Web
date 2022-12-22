@@ -160,8 +160,9 @@ async function postVote(caption, userData){
         game_code: userData.gameCode,
         round_number: userData.roundNumber.toString()
     }
-    await axios.post(postVoteCaptionURL, payload)
-    return
+    const numOfPlayersVoting = await axios.post(postVoteCaptionURL, payload)
+        .then(response => response.data.players_count)
+    return numOfPlayersVoting
 }
 
 async function updateScores(userData){
@@ -195,7 +196,8 @@ async function postCreateRounds(gameCode, imageURLs){
         game_code: gameCode,
         images: imageURLs
     }
-    const imageURL = await axios.post(createRounds, payload).then(response => response.data.image)
+    const imageURL = await axios.post(createRounds, payload)
+        .then(response => response.data.image)
     return imageURL
 }
 
@@ -204,7 +206,8 @@ async function getNextImage(gameCode, roundNumber){
         game_code: gameCode,
         round_number: roundNumber.toString()
     }
-    const imageURL = await axios.post(nextImage, payload).then(response => response.data.image)
+    const imageURL = await axios.post(nextImage, payload)
+        .then(response => response.data.image)
     return imageURL
 }
 

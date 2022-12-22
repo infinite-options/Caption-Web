@@ -71,6 +71,7 @@ export default function Vote(){
 
     async function voteButton(timerComplete){
         let votedCaption = ""
+        let numOfPlayersVoting = -1
         for(let i = 0; i < toggles.length; i++){
             if(toggles[i] === true){
                 setVoteSubmitted(true)
@@ -82,13 +83,13 @@ export default function Vote(){
             return
         }
         else if(votedCaption === "" && timerComplete){
-            await postVote(null, userData)
+            numOfPlayersVoting = await postVote(null, userData)
         }
         else if(votedCaption !== ""){
-            await postVote(votedCaption, userData)
+            numOfPlayersVoting = await postVote(votedCaption, userData)
         }
         await updateScores(userData)
-        const numOfPlayersVoting = await leftOverVotingPlayers(userData)
+        //const numOfPlayersVoting = await leftOverVotingPlayers(userData)
         if(numOfPlayersVoting === 0){
             channel.publish({data: {message: "Start ScoreBoard"}})
         }

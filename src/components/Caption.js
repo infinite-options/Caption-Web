@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getPlayers, getSubmittedCaptions, submitCaption } from "../util/Api"
+import { ably, submitCaption } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Caption.css"
 
@@ -18,19 +18,19 @@ export default function Caption(){
     }
 
     async function submitButton(timerComplete) {
+        let numOfPlayersSubmitting = -1
         if (caption === "" && !timerComplete) {
             alert("Please enter a valid caption.")
             return
         }
         else if(caption !== "" && !timerComplete){
             setCaptionSubmitted(true)
-            await submitCaption(caption, userData)
+            numOfPlayersSubmitting = await submitCaption(caption, userData)
         }
         else if (timerComplete) {
-            await submitCaption(caption, userData)
+            numOfPlayersSubmitting = await submitCaption(caption, userData)
         }
-        const numOfSubmissions = await getSubmittedCaptions(userData).then(response => response.length)
-        if(userData.numOfPlayers - numOfSubmissions === 0){
+        if(numOfPlayersSubmitting === 0){
             channel.publish({data: {message: "Start Vote"}})
         }
     }

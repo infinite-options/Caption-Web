@@ -33,8 +33,9 @@ export default function Waiting(){
             const imageURLs = await getApiImages(userData.deckUID, userData.numOfRounds)
             imageURL = await postCreateRounds(userData.gameCode, imageURLs)
         }
-        else
-            await setDatabaseImages(userData.gameCode, userData.roundNumber)
+        else{
+            //await setDatabaseImages(userData.gameCode, userData.roundNumber)
+        }
         channel.publish({data: {
                 message: "Start Game",
                 numOfPlayers: lobby.length,

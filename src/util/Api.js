@@ -143,8 +143,9 @@ async function submitCaption(caption, userData){
         game_code: userData.gameCode,
         round_number: userData.roundNumber.toString()
     }
-    await axios.post(submitCaptionURL, payload)
-    return
+    const numOfPlayersSubmitting = await axios.post(submitCaptionURL, payload)
+        .then(response => response.data.no_caption_submitted)
+    return numOfPlayersSubmitting
 }
 
 async function getSubmittedCaptions(userData) {

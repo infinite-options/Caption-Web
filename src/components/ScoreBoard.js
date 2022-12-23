@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getScoreBoard, createNextRound, setDatabaseImages, postRoundImage, getDatabaseImage, getNextImage } from "../util/Api"
+import { ably, getScoreBoard, getNextImage } from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){

@@ -1,0 +1,48 @@
+.googlephotos {
+    max-width: 375px;
+    height: 812px;
+}
+.headerGooglePhotos{
+    text-align: center;
+}
+.containerGooglePhotos {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-row-gap: 10px;
+    place-items: center;
+}
+.imageGooglePhotos {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+.selectedGooglePhotos {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 275px;
+    height: 50px;
+    border-width: 3px;
+    border-radius: 25px;
+    border-color: black;
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: black;
+    background-color: #f9dd25;
+}
+.buttonGooglePhotos {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 275px;
+    height: 50px;
+    border-width: 3px;
+    border-radius: 25px;
+    border-color: black;
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: black;
+    background-color: white;
+}

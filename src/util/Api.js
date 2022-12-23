@@ -115,8 +115,8 @@ async function setDatabaseImages(gameCode, roundNumber){
     return
 }
 
-async function getApiImages(deckUID, numOfRounds){
-    const imageURLs = await getApiImagesHelper(deckUID, numOfRounds)
+async function getApiImages(userData){
+    const imageURLs = await getApiImagesHelper(userData)
     return imageURLs
 }
 

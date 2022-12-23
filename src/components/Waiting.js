@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, assignDeck, getApiImages, setDatabaseImages, getDatabaseImage, getPlayers, postRoundImage, postCreateRounds } from "../util/Api"
+import { ably, getApiImages, getPlayers, postCreateRounds } from "../util/Api"
 import "../styles/Waiting.css"
 
 export default function Waiting(){
@@ -10,7 +10,6 @@ export default function Waiting(){
     const [cookies, setCookie] = useCookies(["userData"])
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [buttonText, setButtonText] = useState("Share with other players")
-    const [selectDeck, setSelectDeck] = useState(false)
     const [lobby, setLobby] = useState([])
     const [initialize, setInitialize] = useState(false)
 
@@ -30,7 +29,7 @@ export default function Waiting(){
         //await assignDeck(userData.deckUID, userData.gameCode)
         let imageURL = ""
         if(userData.isApi){
-            const imageURLs = await getApiImages(userData.deckUID, userData.numOfRounds)
+            const imageURLs = await getApiImages(userData)
             imageURL = await postCreateRounds(userData.gameCode, imageURLs)
         }
         else{
@@ -63,9 +62,6 @@ export default function Waiting(){
         channel.subscribe(async event => {
             if(event.data.message === "New Player Joined Lobby"){
                 initializeLobby()
-            }
-            else if(event.data.message === "Deck Selected" && userData.host){
-                setSelectDeck(true)
             }
             else if(event.data.message === "Start Game" ){
                 const updatedUserData = {
@@ -127,12 +123,12 @@ export default function Waiting(){
             </button>
             <br/>
             <br/>
-            {userData.host && !selectDeck &&
+            {userData.host && !userData.deckSelected &&
                 <button className="buttonRoundType" onClick={selectDeckButton}>
                     Select Deck
                 </button>
             }
-            {userData.host && selectDeck &&
+            {userData.host && userData.deckSelected &&
                 <button className="buttonRoundType" onClick={startGameButton}>
                     Start Game
                 </button>

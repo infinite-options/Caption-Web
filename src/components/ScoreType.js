@@ -54,7 +54,7 @@ export default function ScoreType(){
                 2nd place gets 3 points.
             </p>
             <br/>
-            <button className="continueScoreType" onClick={continueButton}>
+            <button className="selectedScoreType" onClick={continueButton}>
                 Continue
             </button>
         </div>

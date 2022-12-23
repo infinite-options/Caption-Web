@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
-import {useNavigate, useLocation, Link} from "react-router-dom"
+import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getDecks, selectDeck, assignDeck, getDatabaseImage, getApiImages, postRoundImage } from "../util/Api.js"
+import { ably, getDecks, selectDeck } from "../util/Api.js"
 import "../styles/SelectDeck.css"
 
 export default function SelectDeck(){
@@ -22,9 +22,13 @@ export default function SelectDeck(){
     async function handleClick(deckTitle, deckUID) {
         await selectDeck(deckUID, userData.gameCode, userData.roundNumber)
         let isApi
-        if (deckTitle === "Google Photos" || deckTitle === "Cleveland Gallery" ||
-            deckTitle === "Chicago Gallery" || deckTitle === "Giphy Gallery" ||
-            deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
+        if(deckTitle === "Google Photos"){
+            channel.publish({data: {message: "Deck Selected"}})
+            navigate("/GooglePhotos", {state: userData})
+            return
+        }
+        else if (deckTitle === "Cleveland Gallery" || deckTitle === "Chicago Gallery" ||
+            deckTitle === "Giphy Gallery" || deckTitle === "Harvard Gallery" || deckTitle === "CNN Gallery") {
             isApi = true
         }
         else {
@@ -33,12 +37,12 @@ export default function SelectDeck(){
         const updatedUserData = {
             ...userData,
             isApi: isApi,
+            deckSelected: true,
             deckTitle: deckTitle,
             deckUID: deckUID
         }
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
-        channel.publish({data: {message: "Deck Selected"}})
         navigate("/Waiting", {state: updatedUserData})
     }
 

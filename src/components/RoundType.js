@@ -43,6 +43,7 @@ export default function RoundType() {
         const gameInfo = await createGame(userData.playerUID, roundInfo.numOfRounds, roundInfo.roundTime, userData.scoreType)
         const updatedUserData = {
             ...userData,
+            deckSelected: false,
             numOfRounds: roundInfo.numOfRounds,
             roundTime: roundInfo.roundTime,
             gameUID: gameInfo.game_uid,

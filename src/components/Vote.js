@@ -49,7 +49,6 @@ export default function Vote(){
                 else if(tempCaptions.length === 0){
                     await postVote(null, userData)
                 }
-                await updateScores(userData)
                 channel.publish({data: {message: "Start ScoreBoard"}})
             }
         }
@@ -88,8 +87,6 @@ export default function Vote(){
         else if(votedCaption !== ""){
             numOfPlayersVoting = await postVote(votedCaption, userData)
         }
-        await updateScores(userData)
-        //const numOfPlayersVoting = await leftOverVotingPlayers(userData)
         if(numOfPlayersVoting === 0){
             channel.publish({data: {message: "Start ScoreBoard"}})
         }

@@ -53,17 +53,19 @@ export default function SelectDeck(){
             <br/>
             <ul className="deck-container">
                 {decksInfo.map((deck, index) => {
-                    return(
-                        <div key={index} onClick={event => handleClick(deck.deck_title, deck.deck_uid)} className="deck">
-                            <div className="deck-background">
-                                <img src={deck.deck_thumbnail_url} alt={deck.deck_title} className="deck-image"/>
-                                <div className="deckText">
-                                    {deck.deck_title} (Free)
+                    if(deck.user_uid !== "PRIVATE"){
+                        return(
+                            <div key={index} onClick={event => handleClick(deck.deck_title, deck.deck_uid)} className="deck">
+                                <div className="deck-background">
+                                    <img src={deck.deck_thumbnail_url} alt={deck.deck_title} className="deck-image"/>
+                                    <div className="deckText">
+                                        {deck.deck_title} (Free)
+                                    </div>
                                 </div>
+                                <br/>
                             </div>
-                            <br/>
-                        </div>
-                    )
+                        )
+                    }
                 })}
             </ul>
         </div>

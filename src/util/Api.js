@@ -58,12 +58,12 @@ async function addUser(userData) {
     return playerInfo
 }
 
-async function createGame(userData, numOfRounds, roundTime){
+async function createGame(playerUID, numOfRounds, roundTime, scoreType){
     const payload = {
-        user_uid: userData.playerUID,
-        rounds: numOfRounds,
-        round_time: "00:00:" + roundTime,
-        scoring_scheme: "V"
+        user_uid: playerUID,
+        rounds: numOfRounds.toString(),
+        round_time: "00:00:" + roundTime.toString(),
+        scoring_scheme: scoreType
     }
     const gameInfo = await axios.post(createGameURL, payload)
         .then(response => response.data)

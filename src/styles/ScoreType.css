@@ -1,0 +1,72 @@
+.scoretype {
+    max-width: 375px;
+    height: 812px;
+    /*background-image: url("../assets/landing.png");*/
+}
+.gameRulesScoreType {
+    display: inline-block;
+    position: absolute;
+    margin-top: 85px;
+    margin-left: 30px;
+    margin-bottom: 20px;
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    color: blue;
+    text-decoration: none;
+}
+.oneScoreType {
+    text-align: center;
+    font-weight: bolder;
+    padding-top: 150px;
+}
+.selectedScoreType {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 342px;
+    height: 60px;
+    border-radius: 25px;
+    border: 3px solid black;
+    background-color: #f9dd25;
+    color: black;
+    font-size: 20pt;
+    font-weight: bolder;
+}
+.buttonScoreType {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 342px;
+    height: 60px;
+    border-radius: 25px;
+    border: 3px solid black;
+    background-color: white;
+    color: black;
+    font-size: 20pt;
+    font-weight: bolder;
+}
+.twoScoreType {
+    padding-top: 10px;
+    text-align: center;
+    font-weight: bold;
+}
+.threeScoreType {
+    text-align: center;
+    font-size: 20pt;
+    font-weight: bolder;
+}
+.continueScoreType {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 275px;
+    height: 50px;
+    border-width: 3px;
+    border-radius: 25px;
+    border-color: black;
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    font-size: 20px;
+    color: black;
+    background-color: #f9dd25;
+}

@@ -86,7 +86,7 @@ export default function Landing(){
         setUserData(updatedUserData)
         setCookie("userData", updatedUserData, {path: '/'})
         if(playerInfo.user_code === "TRUE")
-            navigate("/RoundType", {state: updatedUserData})
+            navigate("/ScoreType", {state: updatedUserData})
         else
             navigate("/Confirmation", {state: updatedUserData})
     }

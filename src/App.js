@@ -2,6 +2,7 @@ import GameRules from "./components/GameRules"
 import Confirmation from "./components/Confirmation"
 import Landing from "./components/Landing"
 import RoundType from "./components/RoundType"
+import ScoreType from "./components/ScoreType"
 import Waiting from "./components/Waiting"
 import SelectDeck from "./components/SelectDeck"
 import Caption from "./components/Caption"
@@ -21,6 +22,7 @@ export default function App() {
                     <Route path="/" element={<Landing />} />
                     <Route path="/GameRules" element={<GameRules />} />
                     <Route path="/Confirmation" element={<Confirmation />} />
+                    <Route path="/ScoreType" element={<ScoreType />} />
                     <Route path="/RoundType" element={<RoundType />} />
                     <Route path="/Waiting" element={<Waiting />} />
                     <Route path="/SelectDeck" element={<SelectDeck />} />

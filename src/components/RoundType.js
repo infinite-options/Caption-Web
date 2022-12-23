@@ -40,7 +40,7 @@ export default function RoundType() {
     async function continueButton() {
         if (!validateRoundInfo())
             return
-        const gameInfo = await createGame(userData, roundInfo.numOfRounds.toString(), roundInfo.roundTime.toString())
+        const gameInfo = await createGame(userData.playerUID, roundInfo.numOfRounds, roundInfo.roundTime, userData.scoreType)
         const updatedUserData = {
             ...userData,
             numOfRounds: roundInfo.numOfRounds,

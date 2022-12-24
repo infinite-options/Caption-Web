@@ -12,12 +12,19 @@ export default function ScoreBoard(){
     const [scoreBoard, setScoreBoard] = useState([])
 
     useEffect(() => {
-        async function scoreBoard(){
-            const scoreboard = await getScoreBoard(userData)
-            scoreboard.sort((a, b) => b.votes - a.votes)
-            setScoreBoard(scoreboard)
+        if(userData.host){
+            async function setScoreBoard() {
+                const scoreBoard = await getScoreBoard(userData)
+                scoreBoard.sort((a, b) => b.votes - a.votes)
+                channel.publish({
+                    data: {
+                        message: "Set ScoreBoard",
+                        scoreBoard: scoreBoard
+                    }
+                })
+            }
+            setScoreBoard()
         }
-        scoreBoard()
     }, [userData])
 
     async function nextRoundButton() {
@@ -39,7 +46,10 @@ export default function ScoreBoard(){
 
     useEffect(() => {
         channel.subscribe( async event => {
-            if (event.data.message === "Start Next Round") {
+            if(event.data.message === "Set ScoreBoard"){
+                setScoreBoard(event.data.scoreBoard)
+            }
+            else if (event.data.message === "Start Next Round") {
                 const updatedUserData = {
                     ...userData,
                     roundNumber: event.data.roundNumber,
@@ -67,7 +77,7 @@ export default function ScoreBoard(){
                 navigate("/EndGame", {state: userData})
             }
         })
-    }, [userData])
+    })
 
     return(
         <div className="scoreboard">

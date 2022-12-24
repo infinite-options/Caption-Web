@@ -11,8 +11,12 @@ export default function ScoreBoard(){
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [scoreBoard, setScoreBoard] = useState([])
 
+    if(scoreBoard.length === 0 && cookies.userData.scoreBoard != undefined){
+        setScoreBoard(cookies.userData.scoreBoard)
+    }
+
     useEffect(() => {
-        if(userData.host){
+        if(userData.host && cookies.userData.scoreBoard === undefined){
             async function setScoreBoard() {
                 const scoreBoard = await getScoreBoard(userData)
                 scoreBoard.sort((a, b) => b.votes - a.votes)
@@ -47,6 +51,11 @@ export default function ScoreBoard(){
     useEffect(() => {
         channel.subscribe( async event => {
             if(event.data.message === "Set ScoreBoard"){
+                const updatedUserData = {
+                    ...userData,
+                    scoreBoard: event.data.scoreBoard
+                }
+                setCookie("userData", updatedUserData, {path: '/'})
                 setScoreBoard(event.data.scoreBoard)
             }
             else if (event.data.message === "Start Next Round") {

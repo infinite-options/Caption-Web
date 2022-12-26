@@ -58,7 +58,7 @@ export default function Vote(){
                 else if(tempCaptions.length === 0){
                     await postVote(null, userData)
                 }
-                channel.publish({data: {message: "Start ScoreBoard"}})
+                navigate("/ScoreBoard", { state: userData })
             }
         }
         getCaptions()

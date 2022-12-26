@@ -2,7 +2,7 @@ import React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers } from "../util/Api"
+import {ably, getSubmittedCaptions, postVote, sendError} from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Vote.css"
 
@@ -16,6 +16,15 @@ export default function Vote(){
     const [isMyCaption, setIsMyCaption] = useState("")
     const [voteSubmitted, setVoteSubmitted] = useState(false)
     const backgroundColors = { default: "white", selected: "#f9dd25", myCaption: "gray" }
+
+    if(cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL){
+        async function sendingError(){
+            let code1 = "Vote Page"
+            let code2 = "userData.imageURL does not match cookies.userData.imageURL"
+            await sendError(code1, code2)
+        }
+        sendingError()
+    }
 
     useEffect( () => {
         async function getCaptions(){

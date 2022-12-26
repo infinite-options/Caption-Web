@@ -26,6 +26,7 @@ const getScoreBoardURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com
 const createNextRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createNextRound"
 const createRounds = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createRounds"
 const nextImage = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getNextImage"
+const errorURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/"
 
 async function checkGameCode(gameCode){
     const codeStatus = await axios.get(checkGameURL + '/' + gameCode)
@@ -212,8 +213,13 @@ async function getNextImage(gameCode, roundNumber){
     return imageURL
 }
 
+async function sendError(code1, code2){
+    await axios.get(errorURL + code1 + "*" + code2).then(res => {console.log(res)})
+    return
+}
+
 export { ably, checkGameCode, checkEmailCode, addUser, createGame,
     joinGame, getDecks, selectDeck, assignDeck, setDatabaseImages,
     getApiImages, postRoundImage, getDatabaseImage, getPlayers, submitCaption,
     getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers, getScoreBoard,
-    createNextRound, postCreateRounds, getNextImage }
+    createNextRound, postCreateRounds, getNextImage, sendError }

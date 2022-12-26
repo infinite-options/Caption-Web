@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, submitCaption } from "../util/Api"
+import { ably, submitCaption, sendError } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Caption.css"
 
@@ -12,6 +12,15 @@ export default function Caption(){
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
     const [caption, setCaption] = useState("")
     const [captionSubmitted, setCaptionSubmitted] = useState(false)
+
+    if(cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL){
+        async function sendingError(){
+            let code1 = "Caption Page"
+            let code2 = "userData.imageURL does not match cookies.userData.imageURL"
+            await sendError(code1, code2)
+        }
+        sendingError()
+    }
 
     function handleChange(event){
         setCaption(event.target.value)

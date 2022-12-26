@@ -24,8 +24,7 @@ export default function ScoreBoard(){
                     data: {
                         message: "Set ScoreBoard",
                         scoreBoard: scoreBoard
-                    }
-                })
+                }})
             }
             setScoreBoard()
         }

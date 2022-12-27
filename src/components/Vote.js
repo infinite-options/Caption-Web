@@ -5,6 +5,7 @@ import { useCookies } from 'react-cookie'
 import { ably, getSubmittedCaptions, postVote, sendError } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Vote.css"
+import * as ReactBootStrap from "react-bootstrap";
 
 export default function Vote(){
     const navigate = useNavigate(), location = useLocation()
@@ -170,7 +171,6 @@ export default function Vote(){
                                 {caption}
                             </button>
                             <br/>
-                            <br/>
                         </React.Fragment>
                     )
                 })}
@@ -204,6 +204,8 @@ export default function Vote(){
                     <b>Vote submitted.</b>
                     <br/>
                     Waiting for other players to submit votes...
+                    <br/>
+                    <ReactBootStrap.Spinner animation="border" role="status"/>
                 </div>
             }
             <br/>

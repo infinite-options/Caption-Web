@@ -3,6 +3,7 @@ import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import { ably, submitCaption, sendError } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
+import * as ReactBootStrap from 'react-bootstrap'
 import "../styles/Caption.css"
 
 export default function Caption(){
@@ -32,8 +33,8 @@ export default function Caption(){
             alert("Please enter a valid caption.")
             return
         }
-        else if(caption !== "" && !timerComplete){
-            setCaptionSubmitted(true)
+        setCaptionSubmitted(true)
+        if(caption !== "" && !timerComplete){
             numOfPlayersSubmitting = await submitCaption(caption, userData)
         }
         else if (timerComplete) {
@@ -94,6 +95,8 @@ export default function Caption(){
                     </button>
                     <br/>
                     Waiting for other players to submit captions...
+                    <br/>
+                    <ReactBootStrap.Spinner animation="border" role="status"/>
                 </div>
             }
             <br/>

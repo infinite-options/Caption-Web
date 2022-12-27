@@ -10,7 +10,7 @@ export default function Vote(){
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
-    const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
+    const channel = ably.channels.get(`BizBuz/${userData.gameCode}/${userData.roundNumber}`)
     const [captions, setCaptions] = useState([])
     const [toggles, setToggles] = useState([])
     const [isMyCaption, setIsMyCaption] = useState("")

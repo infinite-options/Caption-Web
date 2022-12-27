@@ -2,7 +2,7 @@ import React from "react"
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import {ably, getSubmittedCaptions, postVote, sendError} from "../util/Api"
+import { ably, getSubmittedCaptions, postVote, sendError } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Vote.css"
 
@@ -27,7 +27,11 @@ export default function Vote(){
     }
 
     useEffect( () => {
-        if(userData.host){
+        if(captions.length === 0 && cookies.userData.captions != undefined){
+            setSubmittedCaptions(cookies.userData.captions)
+        }
+
+        if(userData.host && cookies.userData.captions === undefined){
             async function getCaptions(){
                 const submittedCaptions = await getSubmittedCaptions(userData)
                 channel.publish({data: {
@@ -48,6 +52,7 @@ export default function Vote(){
             else if(tempCaptions.length === 0){
                 await postVote(null, userData)
             }
+            setCookie("userData", userData, {path: '/'})
             navigate("/ScoreBoard", { state: userData })
         }
 
@@ -71,6 +76,11 @@ export default function Vote(){
             setCaptions(tempCaptions)
             setToggles(tempToggles)
             setIsMyCaption(myCaption)
+            const updatedUserData = {
+                ...userData,
+                captions: submittedCaptions
+            }
+            setCookie("userData", updatedUserData, {path: '/'})
             if(tempCaptions.length <= 1){
                 await skipVote(tempCaptions, onlyCaptionSubmitted, myCaption)
             }
@@ -81,6 +91,7 @@ export default function Vote(){
                 setSubmittedCaptions(event.data.submittedCaptions)
             }
             else if(event.data.message === "Start ScoreBoard"){
+                setCookie("userData", userData, {path: '/'})
                 navigate("/ScoreBoard", { state: userData })
             }
         })

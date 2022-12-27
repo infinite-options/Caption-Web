@@ -26,14 +26,10 @@ export default function Waiting(){
     }
 
     async function startGameButton() {
-        //await assignDeck(userData.deckUID, userData.gameCode)
         let imageURL = ""
         if(userData.isApi){
             const imageURLs = await getApiImages(userData)
             imageURL = await postCreateRounds(userData.gameCode, imageURLs)
-        }
-        else{
-            //await setDatabaseImages(userData.gameCode, userData.roundNumber)
         }
         channel.publish({data: {
                 message: "Start Game",
@@ -74,20 +70,6 @@ export default function Waiting(){
                     numOfRounds: event.data.numOfRounds,
                     roundTime: event.data.roundTime,
                     imageURL: event.data.imageURL
-                }
-                if (updatedUserData.isApi){
-                    // updatedUserData = {
-                    //     ...updatedUserData,
-                    //     imageURL: updatedUserData.imageURLs[0]
-                    // }
-                    // await postRoundImage(updatedUserData.gameCode, updatedUserData.roundNumber, updatedUserData.imageURL)
-                }
-                else {
-                    // const imageURL = await getDatabaseImage(updatedUserData)
-                    // updatedUserData = {
-                    //     ...updatedUserData,
-                    //     imageURL: imageURL
-                    // }
                 }
                 setUserData(updatedUserData)
                 setCookie("userData", updatedUserData, {path: '/'})

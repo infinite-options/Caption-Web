@@ -27,6 +27,17 @@ export default function Vote(){
     }
 
     useEffect( () => {
+        if(userData.host){
+            async function getCaptions(){
+                const submittedCaptions = await getSubmittedCaptions(userData)
+                channel.publish({data: {
+                    message: "Set Vote",
+                    submittedCaptions: submittedCaptions
+                }})
+            }
+            getCaptions()
+        }
+
         async function skipVote(tempCaptions, onlyCaptionSubmitted, myCaption){
             if(tempCaptions.length === 1 && onlyCaptionSubmitted === myCaption){
                 await postVote(null, userData)
@@ -40,8 +51,7 @@ export default function Vote(){
             navigate("/ScoreBoard", { state: userData })
         }
 
-        async function getCaptions(){
-            const submittedCaptions = await getSubmittedCaptions(userData)
+        async function setSubmittedCaptions(submittedCaptions){
             let tempCaptions = []
             let tempToggles = []
             let myCaption = ""
@@ -65,7 +75,15 @@ export default function Vote(){
                 await skipVote(tempCaptions, onlyCaptionSubmitted, myCaption)
             }
         }
-        getCaptions()
+
+        channel.subscribe( event => {
+            if(event.data.message === "Set Vote"){
+                setSubmittedCaptions(event.data.submittedCaptions)
+            }
+            else if(event.data.message === "Start ScoreBoard"){
+                navigate("/ScoreBoard", { state: userData })
+            }
+        })
     }, [userData])
 
     function updateToggles(index){
@@ -104,12 +122,6 @@ export default function Vote(){
             channel.publish({data: {message: "Start ScoreBoard"}})
         }
     }
-
-    channel.subscribe( event => {
-        if(event.data.message === "Start ScoreBoard"){
-            navigate("/ScoreBoard", { state: userData })
-        }
-    })
 
     function getBackgroundColor(status){
         return backgroundColors[status]

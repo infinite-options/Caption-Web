@@ -112,19 +112,19 @@ export default function Vote(){
     }
 
     async function voteButton(timerComplete){
-        let votedCaption = ""
-        let numOfPlayersVoting = -1
-        for(let i = 0; i < toggles.length; i++){
-            if(toggles[i] === true){
-                setVoteSubmitted(true)
-                votedCaption = captions[i]
-            }
-        }
         if(votedCaption === "" && !timerComplete){
             alert("Please vote for a caption.")
             return
         }
-        else if(votedCaption === "" && timerComplete){
+        setVoteSubmitted(true)
+        let votedCaption = ""
+        let numOfPlayersVoting = -1
+        for(let i = 0; i < toggles.length; i++){
+            if(toggles[i] === true){
+                votedCaption = captions[i]
+            }
+        }
+        if(votedCaption === "" && timerComplete){
             numOfPlayersVoting = await postVote(null, userData)
         }
         else if(votedCaption !== ""){

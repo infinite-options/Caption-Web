@@ -16,12 +16,14 @@
     border-radius: 50px;
 }
 .headerScoreBoard {
+    color: white;
     text-align: center;
     display: grid;
     grid-template-columns: repeat(4, auto);
     margin-bottom: 10px;
 }
 .valuesScoreBoard {
+    color: white;
     text-align: center;
     display: grid;
     grid-template-columns: repeat(4, auto);

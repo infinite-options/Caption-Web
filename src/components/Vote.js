@@ -27,6 +27,19 @@ export default function Vote(){
     }
 
     useEffect( () => {
+        async function skipVote(tempCaptions, onlyCaptionSubmitted, myCaption){
+            if(tempCaptions.length === 1 && onlyCaptionSubmitted === myCaption){
+                await postVote(null, userData)
+            }
+            else if(tempCaptions.length === 1 && onlyCaptionSubmitted !== myCaption){
+                await postVote(onlyCaptionSubmitted, userData)
+            }
+            else if(tempCaptions.length === 0){
+                await postVote(null, userData)
+            }
+            navigate("/ScoreBoard", { state: userData })
+        }
+
         async function getCaptions(){
             const submittedCaptions = await getSubmittedCaptions(userData)
             let tempCaptions = []
@@ -49,16 +62,7 @@ export default function Vote(){
             setToggles(tempToggles)
             setIsMyCaption(myCaption)
             if(tempCaptions.length <= 1){
-                if(tempCaptions.length === 1 && onlyCaptionSubmitted === myCaption){
-                    await postVote(null, userData)
-                }
-                else if(tempCaptions.length === 1 && onlyCaptionSubmitted !== myCaption){
-                    await postVote(onlyCaptionSubmitted, userData)
-                }
-                else if(tempCaptions.length === 0){
-                    await postVote(null, userData)
-                }
-                navigate("/ScoreBoard", { state: userData })
+                await skipVote(tempCaptions, onlyCaptionSubmitted, myCaption)
             }
         }
         getCaptions()

@@ -16,7 +16,9 @@ export default function Vote(){
     const [toggles, setToggles] = useState([])
     const [isMyCaption, setIsMyCaption] = useState("")
     const [voteSubmitted, setVoteSubmitted] = useState(false)
+    const [votedCaption, setvotedCaption] = useState(-1)
     const backgroundColors = { default: "white", selected: "#f9dd25", myCaption: "gray" }
+
 
     if(cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL){
         async function sendingError(){
@@ -103,32 +105,33 @@ export default function Vote(){
             return
         let tempToggles = []
         for(let i = 0; i < toggles.length; i++){
-            if(index === i)
+            if (index === i) {
                 tempToggles.push(true)
-            else
+                setvotedCaption(i)
+            } else
                 tempToggles.push(false)
         }
         setToggles(tempToggles)
     }
 
-    async function voteButton(timerComplete){
-        if(votedCaption === "" && !timerComplete){
+    async function voteButton(timerComplete) {
+        
+        let numOfPlayersVoting = -1
+        // for(let i = 0; i < toggles.length; i++){
+        //     if(toggles[i] === true){
+        //         votedCaption = captions[i]
+        //     }
+        // }
+        if(votedCaption === -1 && !timerComplete){
             alert("Please vote for a caption.")
             return
         }
         setVoteSubmitted(true)
-        let votedCaption = ""
-        let numOfPlayersVoting = -1
-        for(let i = 0; i < toggles.length; i++){
-            if(toggles[i] === true){
-                votedCaption = captions[i]
-            }
-        }
-        if(votedCaption === "" && timerComplete){
+        if(votedCaption === -1 && timerComplete){
             numOfPlayersVoting = await postVote(null, userData)
         }
-        else if(votedCaption !== ""){
-            numOfPlayersVoting = await postVote(votedCaption, userData)
+        else if(votedCaption !== -1){
+            numOfPlayersVoting = await postVote(captions[votedCaption], userData)
         }
         if(numOfPlayersVoting === 0){
             channel.publish({data: {message: "Start ScoreBoard"}})

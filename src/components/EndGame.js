@@ -16,9 +16,16 @@ export default function EndGame(){
             scoreboard.sort((a, b) => b.game_score - a.game_score)
             setScoreBoard(scoreboard)
         }
-        scoreBoard()
+        if (cookies.userData.host && cookies.userData === undefined) {
+            scoreBoard()
+        }            
+        else {
+            const scoreboard = cookies.userData.scoreBoard;
+            scoreboard.sort((a, b) => b.game_score - a.game_score)
+            setScoreBoard(scoreboard)
+        }
     }, [userData])
-
+    
     function landingButton(){
         navigate("/", { state: userData })
     }

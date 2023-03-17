@@ -32,11 +32,15 @@ export default function Vote(){
     useEffect( () => {
         if(captions.length === 0 && cookies.userData.captions != undefined){
             setSubmittedCaptions(cookies.userData.captions)
+            console.log("get from cookie")
+            console.log(cookies.userData.captions)
         }
 
         if(userData.host && cookies.userData.captions === undefined){
             async function getCaptions(){
                 const submittedCaptions = await getSubmittedCaptions(userData)
+                console.log("get from service")
+                console.log(submittedCaptions)
                 channel.publish({data: {
                     message: "Set Vote",
                     submittedCaptions: submittedCaptions
@@ -77,6 +81,8 @@ export default function Vote(){
                 tempToggles.push(false)
             }
             setCaptions(tempCaptions)
+            console.log("tempCaptions")
+            console.log(tempCaptions)
             setToggles(tempToggles)
             setIsMyCaption(myCaption)
             const updatedUserData = {
@@ -86,6 +92,8 @@ export default function Vote(){
             setCookie("userData", updatedUserData, {path: '/'})
             if(tempCaptions.length <= 1){
                 await skipVote(tempCaptions, onlyCaptionSubmitted, myCaption)
+                console.log("skipVote")
+            console.log(tempCaptions)
             }
         }
 

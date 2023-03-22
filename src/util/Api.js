@@ -27,6 +27,7 @@ const createNextRoundURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.c
 const createRounds = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/createRounds"
 const nextImage = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getNextImage"
 const errorURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/"
+const CheckGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage"
 
 async function checkGameCode(gameCode){
     const codeStatus = await axios.get(checkGameURL + '/' + gameCode)
@@ -37,11 +38,19 @@ async function checkGameCode(gameCode){
     return true
 }
 
+async function checkGameStarted(gameCode,round){
+    const Game_status = await axios.get(CheckGameURL + '/' + gameCode + ',' + round)
+    if(Game_status.data.result[0].round_image_uid === null ) {
+        return false
+    }
+    return true
+}
 async function checkEmailCode(playerUID, code){
     const payload = {
         user_uid: playerUID,
         code: code
     }
+    
     const status = await axios.post(checkEmailCodeURL, payload)
         .then(response => response.data)
     return status
@@ -57,6 +66,12 @@ async function addUser(userData) {
     const playerInfo = await axios.post(addUserURL, payload)
         .then(response => response.data)
     return playerInfo
+}
+
+async function getCnnImageURLS() {
+    const CnnImageURLS = await axios.get("https://myx6g22dd2rtcpviw3d5wuz7eu0zudaq.lambda-url.us-west-2.on.aws/")
+        .then(response => response.data)
+    return CnnImageURLS
 }
 
 async function createGame(playerUID, numOfRounds, roundTime, scoreType){
@@ -222,4 +237,4 @@ export { ably, checkGameCode, checkEmailCode, addUser, createGame,
     joinGame, getDecks, selectDeck, assignDeck, setDatabaseImages,
     getApiImages, postRoundImage, getDatabaseImage, getPlayers, submitCaption,
     getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers, getScoreBoard,
-    createNextRound, postCreateRounds, getNextImage, sendError }
+    createNextRound, postCreateRounds, getNextImage, sendError,getCnnImageURLS ,checkGameStarted}

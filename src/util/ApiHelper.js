@@ -56,7 +56,8 @@ async function getApiImagesHelper(userData){
         return harvardImages
     }
     else if (userData.deckUID === "500-000010") {
-        let cnnImages = await getCurrentCnnURL()
+        let cnnURL = await axios.get(userData.CNN_URL).then(response => response.config.url)
+        let cnnImages = await getCnnImgURLs("https://www.cnn.com/2023/02/09/world/gallery/photos-this-week-february-2-february-9/index.html")
         cnnImages = randomize(cnnImages, userData.numOfRounds)
         return cnnImages
     }
@@ -64,6 +65,7 @@ async function getApiImagesHelper(userData){
 
 function randomize(inputArray, numOfRounds){
     let tempArray = []
+    
     for(let i = 0; i < numOfRounds; i++){
         const randomIndex = Math.floor(Math.random() * inputArray.length)
         const imageURL = inputArray.splice(randomIndex, 1)
@@ -79,11 +81,12 @@ async function getCnnImgURLs(URL){
     const $ = cheerio.load(htmlString)
     const scriptString = $("script")
     const scriptObj = JSON.parse($(scriptString[2]).text())
-    const imgItems = scriptObj.hasPart.mainEntity.itemListElement
+    const imgItems = scriptObj.itemListElement
     let imgURLs = []
     for (let i = 0; i < imgItems.length; i++){
         imgURLs.push(imgItems[i].item.url)
     }
+   
     return imgURLs
 }
 

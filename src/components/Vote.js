@@ -1,8 +1,8 @@
 import React from "react"
 import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useNavigate, useLocation , Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getSubmittedCaptions, postVote, sendError } from "../util/Api"
+import { ably, getSubmittedCaptions, postVote, sendError ,getScoreBoard } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import "../styles/Vote.css"
 import * as ReactBootStrap from "react-bootstrap";
@@ -18,7 +18,7 @@ export default function Vote(){
     const [voteSubmitted, setVoteSubmitted] = useState(false)
     const [votedCaption, setvotedCaption] = useState(-1)
     const backgroundColors = { default: "white", selected: "#f9dd25", myCaption: "gray" }
-
+    const [isGameEnded, setGameEnded] = useState(false)
 
     if(cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL){
         async function sendingError(){
@@ -28,15 +28,23 @@ export default function Vote(){
         }
         sendingError()
     }
-
+    async function scoreBoard(){
+        const scoreboard = await getScoreBoard(userData)
+        scoreboard.sort((a, b) => b.game_score - a.game_score)
+        return scoreboard
+    }
     useEffect( () => {
         if(captions.length === 0 && cookies.userData.captions != undefined){
             setSubmittedCaptions(cookies.userData.captions)
+            console.log("get from cookie")
+            console.log(cookies.userData.captions)
         }
 
         if(userData.host && cookies.userData.captions === undefined){
             async function getCaptions(){
                 const submittedCaptions = await getSubmittedCaptions(userData)
+                console.log("get from service")
+                console.log(submittedCaptions)
                 channel.publish({data: {
                     message: "Set Vote",
                     submittedCaptions: submittedCaptions
@@ -78,6 +86,8 @@ export default function Vote(){
             }
             setCaptions(tempCaptions)
             setToggles(tempToggles)
+            console.log("tempCaptions")
+            console.log(tempCaptions)
             setIsMyCaption(myCaption)
             const updatedUserData = {
                 ...userData,
@@ -86,6 +96,8 @@ export default function Vote(){
             setCookie("userData", updatedUserData, {path: '/'})
             if(tempCaptions.length <= 1){
                 await skipVote(tempCaptions, onlyCaptionSubmitted, myCaption)
+                console.log("skipVote")
+                console.log(tempCaptions)
             }
         }
 
@@ -100,6 +112,38 @@ export default function Vote(){
         })
     }, [userData])
 
+    useEffect( () => {      
+        channel.subscribe( event => {
+            if (event.data.message === "EndGame vote") {
+                if (!userData.host && !isGameEnded) {
+                    setGameEnded(true)
+                    alert("Host has Ended the game")
+                }
+                const updatedUserData = {
+                    ...userData,
+                    scoreBoard: event.data.scoreBoard
+                }
+                setUserData(updatedUserData)
+                setCookie("userData", updatedUserData, { path: '/' })
+                navigate("/EndGame", { state: updatedUserData })
+            }
+        })
+    }, [isGameEnded])
+    async function closeButton() {
+        let scoreboard = userData.scoreBoardEnd
+        if (scoreboard === undefined) {
+            scoreboard = await scoreBoard()
+            for(let i = 0; i < scoreboard.length; i++){
+                scoreboard[i].game_score = 0
+            }
+        }
+        channel.publish({
+            data: {
+                message: "EndGame vote",
+                scoreBoard : scoreboard
+            }
+        })
+    }
     function updateToggles(index){
         if(captions[index] === isMyCaption)
             return
@@ -144,6 +188,11 @@ export default function Vote(){
 
     return(
         <div className="vote">
+            {userData.host &&
+                < Link onClick={() => { window.confirm( 'Are you sure you want to end this game?', ) && closeButton() }} className ="closeBtn">
+                    <i className="fa" >&#xf00d;</i>
+                </Link>
+            }
             <h1 className="titleCaption">
                 {userData.deckTitle}
             </h1>

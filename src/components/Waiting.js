@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getApiImages, getPlayers, postCreateRounds } from "../util/Api"
+import { ably, getApiImages, getPlayers, postCreateRounds,checkGameStarted } from "../util/Api"
 import "../styles/Waiting.css"
 
 export default function Waiting(){
@@ -56,10 +56,11 @@ export default function Waiting(){
         }
 
         channel.subscribe(async event => {
-            if(event.data.message === "New Player Joined Lobby"){
+            if (event.data.message === "New Player Joined Lobby") {
+                await checkGameStarted(userData.gameCode,1)
                 initializeLobby()
             }
-            else if(event.data.message === "Start Game" ){
+            else if (event.data.message === "Start Game") {
                 const updatedUserData = {
                     ...userData,
                     numOfPlayers: event.data.numOfPlayers,

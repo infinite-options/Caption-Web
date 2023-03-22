@@ -11,6 +11,13 @@
     padding-top: 25px;
     text-align: center;
 }
+.closeBtn{
+    /* margin-top: 44px; */
+    position: absolute;
+    margin-left: 353Px;
+    color: red;
+    font-size: 24px;
+}
 .imgCaption {
     display: block;
     margin-left: auto;

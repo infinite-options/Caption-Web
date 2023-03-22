@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useNavigate, useLocation,Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, submitCaption, sendError } from "../util/Api"
+import { ably, submitCaption, sendError , getScoreBoard } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import * as ReactBootStrap from 'react-bootstrap'
 import "../styles/Caption.css"
 
-export default function Caption(){
+export default function Caption() {
     const navigate = useNavigate(), location = useLocation()
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
@@ -14,19 +14,37 @@ export default function Caption(){
     const [caption, setCaption] = useState("")
     const [captionSubmitted, setCaptionSubmitted] = useState(false)
 
-    if(cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL){
-        async function sendingError(){
+    if (cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL) {
+        async function sendingError() {
             let code1 = "Caption Page"
             let code2 = "userData.imageURL does not match cookies.userData.imageURL"
             await sendError(code1, code2)
         }
         sendingError()
     }
-
-    function handleChange(event){
+    async function scoreBoard(){
+        const scoreboard = await getScoreBoard(userData)
+        scoreboard.sort((a, b) => b.game_score - a.game_score)
+        return scoreboard
+    }
+    function handleChange(event) {
         setCaption(event.target.value)
     }
-
+    async function closeButton() {
+        let scoreboard = userData.scoreBoardEnd
+        if (scoreboard === undefined) {
+            scoreboard = await scoreBoard()
+            for(let i = 0; i < scoreboard.length; i++){
+                scoreboard[i].game_score = 0
+            }
+        }
+        channel.publish({
+            data: {
+                message: "EndGame caption",
+                scoreBoard : scoreboard
+            }
+        })
+    }
     async function submitButton(timerComplete) {
         let numOfPlayersSubmitting = -1
         if (caption === "" && !timerComplete) {
@@ -34,25 +52,42 @@ export default function Caption(){
             return
         }
         setCaptionSubmitted(true)
-        if(caption !== "" && !timerComplete){
+        if (caption !== "" && !timerComplete) {
             numOfPlayersSubmitting = await submitCaption(caption, userData)
         }
         else if (timerComplete) {
             numOfPlayersSubmitting = await submitCaption(caption, userData)
         }
-        if(numOfPlayersSubmitting === 0){
-            channel.publish({data: {message: "Start Vote"}})
+        if (numOfPlayersSubmitting === 0) {
+            channel.publish({ data: { message: "Start Vote" } })
         }
     }
+    useEffect(() => {
+        channel.subscribe(event => {
+            if (event.data.message === "Start Vote") {
+                navigate("/Vote", { state: userData })
+            } else if (event.data.message === "EndGame caption") {
+                if (!userData.host) {
+                    alert("Host has Ended the game")
+                }                
+                const updatedUserData = {
+                    ...userData,
+                    scoreBoard: event.data.scoreBoard
+                }
+                setUserData(updatedUserData)
+                setCookie("userData", updatedUserData, { path: '/' })
+                navigate("/EndGame", { state: updatedUserData })
+            }
+        })
+    },[userData])
 
-    channel.subscribe( event => {
-        if(event.data.message === "Start Vote"){
-            navigate("/Vote", { state: userData })
-        }
-    })
-
-    return(
+    return (
         <div className="caption">
+            {userData.host &&
+                < Link onClick={() => { window.confirm( 'Are you sure you want to end this game?', ) && closeButton() }} className ="closeBtn">
+                    <i className="fa" >&#xf00d;</i>
+                </Link>
+            }
             <h1 className="titleCaption">
                 {userData.deckTitle}
             </h1>

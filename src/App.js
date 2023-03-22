@@ -10,6 +10,7 @@ import Caption from "./components/Caption"
 import Vote from "./components/Vote"
 import ScoreBoard from "./components/ScoreBoard"
 import EndGame from "./components/EndGame"
+import CnnDeck from "./components/CnnDeck"
 import { GoogleOAuthProvider } from "@react-oauth/google"
 import { CookiesProvider } from 'react-cookie'
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom"
@@ -34,6 +35,7 @@ export default function App() {
                         <Route path="/Vote" element={<Vote />} />
                         <Route path="/ScoreBoard" element={<ScoreBoard />} />
                         <Route path="/EndGame" element={<EndGame />} />
+                        <Route path="/CnnDeck" element={<CnnDeck />} />
                     </Routes>
                 </Router>
             </CookiesProvider>

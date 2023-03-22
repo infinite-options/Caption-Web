@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react"
-import { useNavigate, useLocation } from "react-router-dom"
+import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import { ably, getScoreBoard, getNextImage } from "../util/Api"
 import "../styles/ScoreBoard.css"
@@ -10,7 +10,7 @@ export default function ScoreBoard(){
     const [cookies, setCookie] = useCookies(["userData"])
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}/${userData.roundNumber}`)
     const [scoreBoard, setScoreBoard] = useState([])
-
+    const [isGameEnded, setGameEnded] = useState(false)
     if(scoreBoard.length === 0 && cookies.userData.scoreBoard != undefined){
         setScoreBoard(cookies.userData.scoreBoard)
     }
@@ -30,6 +30,13 @@ export default function ScoreBoard(){
         }
     }, [userData])
 
+    function closeButton() {
+        channel.publish({
+            data: {
+                message: "EndGame scoreboard"
+            }
+        })
+    }
     async function nextRoundButton() {
         const nextRound = userData.roundNumber + 1
         const imageURL = await getNextImage(userData.gameCode, nextRound)
@@ -51,6 +58,11 @@ export default function ScoreBoard(){
                     ...userData,
                     scoreBoard: event.data.scoreBoard
                 }
+                const updatedEndUserData = {
+                    ...userData,
+                    scoreBoardEnd: event.data.scoreBoard
+                }
+                setUserData(updatedEndUserData)
                 setCookie("userData", updatedUserData, {path: '/'})
                 setScoreBoard(event.data.scoreBoard)
             }
@@ -69,9 +81,27 @@ export default function ScoreBoard(){
             }
         })
     })
+    
+    useEffect(() => {
+        channel.subscribe(async event => {
+            
+            if (event.data.message === "EndGame scoreboard") {
+                if (!userData.host && !isGameEnded)  {
+                    setGameEnded(true)
+                    alert("Host has Ended the game")
+                }
+                navigate("/EndGame", { state: userData })
+            }
+        })
+    }, [isGameEnded])
 
     return(
         <div className="scoreboard">
+            {userData.host &&
+                < Link onClick={() => { window.confirm( 'Are you sure you want to end this game?', ) && closeButton() }} className ="closeBtn">
+                    <i className="fa" >&#xf00d;</i>
+                </Link>
+            }
             <div className="textScoreBoard">
                 <br/>
                 <h1>

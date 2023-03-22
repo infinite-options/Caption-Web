@@ -18,8 +18,7 @@ export default function SelectDeck(){
         }
         getDecksInfo()
     }, [userData.playerUID])
-
-    async function handleClick(deckTitle, deckUID) {
+    async function handleClick(deckTitle, deckUID,thumbnail_url) {
         await selectDeck(deckUID, userData.gameCode, userData.roundNumber)
         let isApi
         if(deckTitle === "Google Photos"){
@@ -39,19 +38,28 @@ export default function SelectDeck(){
             isApi: isApi,
             deckSelected: true,
             deckTitle: deckTitle,
-            deckUID: deckUID
+            deckUID: deckUID,
+            deckThumbnail_url: thumbnail_url
         }
         setUserData(updatedUserData)
-        setCookie("userData", updatedUserData, {path: '/'})
-        navigate("/Waiting", {state: updatedUserData})
+        setCookie("userData", updatedUserData, { path: '/' })
+        if (deckTitle === "CNN Gallery") {
+            navigate("/CnnDeck", {state: updatedUserData})
+        } else {
+            navigate("/Waiting", {state: updatedUserData})    
+        }
+        
     }
 
     return(
         <div className="selectDeck">
+            <div>
             <Link to="/GameRules" className="gameRulesSelectDeck">
                 <i className="fa fa-info-circle"></i>
                 Game Rules
             </Link>
+            </div>
+
             <h4 className="oneSelectDeck">Select a deck</h4>
             <br/>
             <br/>
@@ -59,7 +67,7 @@ export default function SelectDeck(){
                 {decksInfo.map((deck, index) => {
                     if(deck.user_uid !== "PRIVATE"){
                         return(
-                            <div key={index} onClick={event => handleClick(deck.deck_title, deck.deck_uid)} className="deck">
+                            <div key={index} onClick={event => handleClick(deck.deck_title, deck.deck_uid,deck.deck_thumbnail_url)} className="deck">
                                 <div className="deck-background">
                                     <img src={deck.deck_thumbnail_url} alt={deck.deck_title} className="deck-image"/>
                                     <div className="deckText">

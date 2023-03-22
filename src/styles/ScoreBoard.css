@@ -15,6 +15,12 @@
     width: 255px;
     border-radius: 50px;
 }
+.closeBtn{
+    position: absolute;
+    margin-left: 353Px;
+    color: red;
+    font-size: 24px;
+}
 .headerScoreBoard {
     color: white;
     text-align: center;

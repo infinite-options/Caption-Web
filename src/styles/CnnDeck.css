@@ -1,0 +1,51 @@
+.CNNDeck {
+    height: 812px;
+}
+.CNNWeekdeck {
+    font-weight: bold;
+    color: black;
+    margin: 10px;
+}
+.gameRulesSelectDeck {
+    display: inline-block;
+    position: absolute;
+    margin-top: 52px;
+    margin-left: 30px;
+    margin-bottom: 20px;
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    color: blue;
+    text-decoration: none;
+}
+.CNNdeck-container {
+    max-width: 375px;
+    height: 812px;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: space-around;
+    padding: 0;
+    list-style: none;
+}
+.CNNdeck-background {
+    cursor: pointer;
+    height: 160px;
+    width: 160px;
+    background-color: yellow;
+}
+.CNNdeck-image {
+    object-fit: cover;
+    height: 100px;
+    width: 100px;
+    position: absolute;
+    top: 50%;
+    margin-left: 0.5%;
+    transform: translateY(-364%);
+    border-radius: 40px;
+}
+.CNNdeckText {
+    font-family: Josefin Sans, sans-serif;
+    font-weight: bold;
+    font-size: 12px;
+    margin-top: 15px;
+    text-align: center;
+}

@@ -15,6 +15,12 @@
     width: 325px;
     border-radius: 50px;
 }
+.closeBtn{
+    position: absolute;
+    margin-left: 353Px;
+    color: red;
+    font-size: 24px;
+}
 .submitVote {
     display:block;
     margin-top: 20px;

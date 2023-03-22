@@ -33,7 +33,10 @@ export default function Vote(){
         scoreboard.sort((a, b) => b.game_score - a.game_score)
         return scoreboard
     }
-    useEffect( () => {
+    useEffect(() => {
+        console.log("Start")
+        console.log(captions)
+        console.log(cookies.userData)
         if(captions.length === 0 && cookies.userData.captions != undefined){
             setSubmittedCaptions(cookies.userData.captions)
             console.log("get from cookie")
@@ -102,7 +105,9 @@ export default function Vote(){
         }
 
         channel.subscribe( event => {
-            if(event.data.message === "Set Vote"){
+            if (event.data.message === "Set Vote") {
+                console.log("get from ably")
+                console.log(event.data.submittedCaptions)
                 setSubmittedCaptions(event.data.submittedCaptions)
             }
             else if(event.data.message === "Start ScoreBoard"){

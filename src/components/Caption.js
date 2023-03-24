@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation,Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, submitCaption, sendError , getScoreBoard } from "../util/Api"
+import { ably, submitCaption, sendError , getScoreBoard,getSubmittedCaptions } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import * as ReactBootStrap from 'react-bootstrap'
 import "../styles/Caption.css"
@@ -18,6 +18,7 @@ export default function Caption() {
         async function sendingError() {
             let code1 = "Caption Page"
             let code2 = "userData.imageURL does not match cookies.userData.imageURL"
+            console.log("caption:err")
             await sendError(code1, code2)
         }
         sendingError()
@@ -59,12 +60,31 @@ export default function Caption() {
             numOfPlayersSubmitting = await submitCaption(caption, userData)
         }
         if (numOfPlayersSubmitting === 0) {
-            channel.publish({ data: { message: "Start Vote" } })
+            // const submittedCaptions = await getCaptions()
+
+            channel.publish({
+                data: {
+                    message: "Start Vote"
+                    // ,submittedCaptions: submittedCaptions,
+                }
+            })
         }
+    }
+    async function getCaptions(){
+        const submittedCaptions = await getSubmittedCaptions(userData)
+        console.log("get from service:Caption")
+        console.log(submittedCaptions)
+        return submittedCaptions;
     }
     useEffect(() => {
         channel.subscribe(event => {
             if (event.data.message === "Start Vote") {
+                // const updatedUserData = {
+                //     ...userData,
+                //     captions: event.data.submittedCaptions
+                // }
+                // setCookie("userData", updatedUserData, { path: '/' })
+                // console.log(cookies)
                 navigate("/Vote", { state: userData })
             } else if (event.data.message === "EndGame caption") {
                 if (!userData.host) {

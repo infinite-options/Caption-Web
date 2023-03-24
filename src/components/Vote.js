@@ -1,5 +1,5 @@
 import React from "react"
-import { useState, useEffect } from "react"
+import { useState, useEffect ,useRef} from "react"
 import { useNavigate, useLocation , Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import { ably, getSubmittedCaptions, postVote, sendError ,getScoreBoard } from "../util/Api"
@@ -18,12 +18,14 @@ export default function Vote(){
     const [voteSubmitted, setVoteSubmitted] = useState(false)
     const [votedCaption, setvotedCaption] = useState(-1)
     const backgroundColors = { default: "white", selected: "#f9dd25", myCaption: "gray" }
-    const [isGameEnded, setGameEnded] = useState(false)
+    const isGameEnded = useRef(false)
+    const isCaptionSubmitted = useRef(false)
 
     if(cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL){
         async function sendingError(){
             let code1 = "Vote Page"
             let code2 = "userData.imageURL does not match cookies.userData.imageURL"
+            console.log("vote:err")
             await sendError(code1, code2)
         }
         sendingError()
@@ -33,12 +35,61 @@ export default function Vote(){
         scoreboard.sort((a, b) => b.game_score - a.game_score)
         return scoreboard
     }
+    async function setSubmittedCaptions(submittedCaptions){
+        // setisCaptionSubmitted(true)
+        let tempCaptions = []
+        let tempToggles = []
+        let myCaption = ""
+        let onlyCaptionSubmitted = ""
+        for(let i = 0; i < submittedCaptions.length; i++){
+            if(submittedCaptions[i].caption === "")
+                continue
+            if(submittedCaptions[i].round_user_uid === userData.playerUID)
+                myCaption = submittedCaptions[i].caption
+            if(submittedCaptions[i].caption !== "")
+                onlyCaptionSubmitted = submittedCaptions[i].caption
+            tempCaptions.push(submittedCaptions[i].caption)
+        }
+        for(let i = 0; i < tempCaptions.length; i++){
+            tempToggles.push(false)
+        }
+        setCaptions(tempCaptions)
+        setToggles(tempToggles)
+        // console.log("tempCaptions")
+        // console.log(tempCaptions)
+        setIsMyCaption(myCaption)
+        const updatedUserData = {
+            ...userData,
+            captions: submittedCaptions
+        }
+        setCookie("userData", updatedUserData, {path: '/'})
+        if(tempCaptions.length <= 1){
+            await skipVote(tempCaptions, onlyCaptionSubmitted, myCaption)
+            // console.log("skipVote")
+            // console.log(tempCaptions)
+        }
+    }
+    async function skipVote(tempCaptions, onlyCaptionSubmitted, myCaption){
+        if(tempCaptions.length === 1 && onlyCaptionSubmitted === myCaption){
+            await postVote(null, userData)
+        }
+        else if(tempCaptions.length === 1 && onlyCaptionSubmitted !== myCaption){
+            await postVote(onlyCaptionSubmitted, userData)
+        }
+        else if(tempCaptions.length === 0){
+            await postVote(null, userData)
+        }
+        setCookie("userData", userData, {path: '/'})
+        navigate("/ScoreBoard", { state: userData })
+    }
+
     useEffect(() => {
         console.log("Start")
         console.log(captions)
         console.log(cookies.userData)
         if(captions.length === 0 && cookies.userData.captions != undefined){
             setSubmittedCaptions(cookies.userData.captions)
+            isCaptionSubmitted.current = true
             console.log("get from cookie")
             console.log(cookies.userData.captions)
         }
@@ -56,58 +107,13 @@ export default function Vote(){
             getCaptions()
         }
 
-        async function skipVote(tempCaptions, onlyCaptionSubmitted, myCaption){
-            if(tempCaptions.length === 1 && onlyCaptionSubmitted === myCaption){
-                await postVote(null, userData)
-            }
-            else if(tempCaptions.length === 1 && onlyCaptionSubmitted !== myCaption){
-                await postVote(onlyCaptionSubmitted, userData)
-            }
-            else if(tempCaptions.length === 0){
-                await postVote(null, userData)
-            }
-            setCookie("userData", userData, {path: '/'})
-            navigate("/ScoreBoard", { state: userData })
-        }
-
-        async function setSubmittedCaptions(submittedCaptions){
-            let tempCaptions = []
-            let tempToggles = []
-            let myCaption = ""
-            let onlyCaptionSubmitted = ""
-            for(let i = 0; i < submittedCaptions.length; i++){
-                if(submittedCaptions[i].caption === "")
-                    continue
-                if(submittedCaptions[i].round_user_uid === userData.playerUID)
-                    myCaption = submittedCaptions[i].caption
-                if(submittedCaptions[i].caption !== "")
-                    onlyCaptionSubmitted = submittedCaptions[i].caption
-                tempCaptions.push(submittedCaptions[i].caption)
-            }
-            for(let i = 0; i < tempCaptions.length; i++){
-                tempToggles.push(false)
-            }
-            setCaptions(tempCaptions)
-            setToggles(tempToggles)
-            console.log("tempCaptions")
-            console.log(tempCaptions)
-            setIsMyCaption(myCaption)
-            const updatedUserData = {
-                ...userData,
-                captions: submittedCaptions
-            }
-            setCookie("userData", updatedUserData, {path: '/'})
-            if(tempCaptions.length <= 1){
-                await skipVote(tempCaptions, onlyCaptionSubmitted, myCaption)
-                console.log("skipVote")
-                console.log(tempCaptions)
-            }
-        }
+        
 
         channel.subscribe( event => {
             if (event.data.message === "Set Vote") {
                 console.log("get from ably")
                 console.log(event.data.submittedCaptions)
+                isCaptionSubmitted.current = true
                 setSubmittedCaptions(event.data.submittedCaptions)
             }
             else if(event.data.message === "Start ScoreBoard"){
@@ -120,8 +126,8 @@ export default function Vote(){
     useEffect( () => {      
         channel.subscribe( event => {
             if (event.data.message === "EndGame vote") {
-                if (!userData.host && !isGameEnded) {
-                    setGameEnded(true)
+                if (!userData.host && !isGameEnded.current) {
+                    isGameEnded.current = true
                     alert("Host has Ended the game")
                 }
                 const updatedUserData = {
@@ -133,7 +139,24 @@ export default function Vote(){
                 navigate("/EndGame", { state: updatedUserData })
             }
         })
-    }, [isGameEnded])
+    }, [])
+    async function getCaptionsForUser() {
+        const submittedCaptions = await getSubmittedCaptions(userData)
+        console.log("get from service:user")
+        console.log(submittedCaptions)
+        setSubmittedCaptions(submittedCaptions)
+    }
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!isCaptionSubmitted.current) {
+                getCaptionsForUser()
+                console.log(isCaptionSubmitted)
+                isCaptionSubmitted.current = true
+            }
+        }, 5000);
+      
+        return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    }, [])
     async function closeButton() {
         let scoreboard = userData.scoreBoardEnd
         if (scoreboard === undefined) {

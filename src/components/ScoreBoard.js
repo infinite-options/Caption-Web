@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect,useRef } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
 import { ably, getScoreBoard, getNextImage } from "../util/Api"
@@ -10,7 +10,7 @@ export default function ScoreBoard(){
     const [cookies, setCookie] = useCookies(["userData"])
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}/${userData.roundNumber}`)
     const [scoreBoard, setScoreBoard] = useState([])
-    const [isGameEnded, setGameEnded] = useState(false)
+    const isGameEnded = useRef(false)
     const [isScoreBoard, setisScoreBoard] = useState(false)
     if(scoreBoard.length === 0 && cookies.userData.scoreBoard != undefined){
         setScoreBoard(cookies.userData.scoreBoard)
@@ -86,16 +86,21 @@ export default function ScoreBoard(){
     
     useEffect(() => {
         channel.subscribe(async event => {
-            
             if (event.data.message === "EndGame scoreboard") {
-                if (!userData.host && !isGameEnded)  {
-                    setGameEnded(true)
+                const updatedUserData = {
+                    ...userData,
+                    scoreBoard: scoreBoard
+                }
+                setCookie("userData", updatedUserData, {path: '/'})
+                if (!userData.host && !isGameEnded.current)  {
+                    console.log("sb")
+                    isGameEnded.current = true
                     alert("Host has Ended the game")
                 }
-                navigate("/EndGame", { state: userData })
+                navigate("/EndGame", { state: updatedUserData })
             }
         })
-    }, [isGameEnded])
+    }, [scoreBoard])
 
     return(
         <div className="scoreboard">

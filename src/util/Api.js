@@ -2,7 +2,8 @@ import axios from "axios"
 import Ably from "ably/callbacks"
 import { getApiImagesHelper } from "./ApiHelper"
 
-const ably_api_key = "KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF"
+//KdQRaQ.Xl1OGw:yvmvuVmPZkzLf3ZF 
+const ably_api_key = "uVw8ZQ.JeIy0w:oGVPDlf8XqW8GGYFkjpbMaxjGb7PFr0Go8xp7NMWB28"
 const ably = new Ably.Realtime(ably_api_key)
 
 const checkGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/checkGame"

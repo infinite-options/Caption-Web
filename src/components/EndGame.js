@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react"
 import { useNavigate, useLocation } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { getScoreBoard } from "../util/Api"
+import { getScoreBoard,getGameScore } from "../util/Api"
 import "../styles/EndGame.css"
 
 export default function EndGame(){
@@ -9,17 +9,15 @@ export default function EndGame(){
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
     const [scoreBoard, setScoreBoard] = useState([])
-
     useEffect(() => {
         async function scoreBoard(){
-            const scoreboard = await getScoreBoard(userData)
+            const scoreboard = await getGameScore(userData.gameCode,userData.numOfRounds)
             scoreboard.sort((a, b) => b.game_score - a.game_score)
             setScoreBoard(scoreboard)
         }
-        if (cookies.userData.host && cookies.userData === undefined) {
+        if (cookies.userData === undefined || cookies.userData.scoreBoard === undefined || cookies.userData.scoreBoard.lenght === 0) {
             scoreBoard()
-        }            
-        else {
+        }else {
             const scoreboard = cookies.userData.scoreBoard;
             scoreboard.sort((a, b) => b.game_score - a.game_score)
             setScoreBoard(scoreboard)

@@ -1,7 +1,7 @@
 import { useState, useEffect,useRef } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getScoreBoard, getNextImage } from "../util/Api"
+import { ably, getScoreBoard, getNextImage,getGameScore } from "../util/Api"
 import "../styles/ScoreBoard.css"
 
 export default function ScoreBoard(){
@@ -12,6 +12,7 @@ export default function ScoreBoard(){
     const [scoreBoard, setScoreBoard] = useState([])
     const isGameEnded = useRef(false)
     const [isScoreBoard, setisScoreBoard] = useState(false)
+    const isScoreBoardDisplayed = useRef(false)
     if(scoreBoard.length === 0 && cookies.userData.scoreBoard != undefined){
         setScoreBoard(cookies.userData.scoreBoard)
     }
@@ -21,6 +22,7 @@ export default function ScoreBoard(){
             async function setScoreBoard() {
                 const scoreBoard = await getScoreBoard(userData)
                 scoreBoard.sort((a, b) => b.votes - a.votes)
+                // console.log(scoreBoard)
                 setisScoreBoard(true)
                 channel.publish({
                     data: {
@@ -31,7 +33,25 @@ export default function ScoreBoard(){
             setScoreBoard()
         }
     }, [userData,isScoreBoard])
-
+    
+    useEffect(() => {
+        const interval = setInterval(() => {
+            // console.log("score interval")
+            if (!isScoreBoardDisplayed.current && scoreBoard.length == 0) {
+                async function getScoreBoard() {
+                    const scoreboard = await getGameScore(userData.gameCode,userData.roundNumber)
+                    scoreboard.sort((a, b) => b.game_score - a.game_score)
+                    setScoreBoard(scoreboard)
+                    return scoreBoard
+                }
+                // console.log("score from service")
+                getScoreBoard()
+                isScoreBoardDisplayed.current = true
+            }
+        }, 5000);
+      
+        return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    }, [scoreBoard])
     function closeButton() {
         channel.publish({
             data: {
@@ -93,7 +113,6 @@ export default function ScoreBoard(){
                 }
                 setCookie("userData", updatedUserData, {path: '/'})
                 if (!userData.host && !isGameEnded.current)  {
-                    console.log("sb")
                     isGameEnded.current = true
                     alert("Host has Ended the game")
                 }

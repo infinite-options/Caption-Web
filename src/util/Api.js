@@ -29,6 +29,8 @@ const createRounds = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev
 const nextImage = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getNextImage"
 const errorURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/sendError/"
 const CheckGameURL = "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getRoundImage"
+const getCNNDeckURLS = "https://myx6g22dd2rtcpviw3d5wuz7eu0zudaq.lambda-url.us-west-2.on.aws/"
+const getgameScoreURL =  "https://bmarz6chil.execute-api.us-west-1.amazonaws.com/dev/api/v2/getScores/"
 
 async function checkGameCode(gameCode){
     const codeStatus = await axios.get(checkGameURL + '/' + gameCode)
@@ -46,6 +48,11 @@ async function checkGameStarted(gameCode,round){
     }
     return true
 }
+async function getGameImageForRound(gameCode,round){
+    const Game_status = await axios.get(CheckGameURL + '/' + gameCode + ',' + round)
+    return Game_status.data.result[0].round_image_uid
+}
+
 async function checkEmailCode(playerUID, code){
     const payload = {
         user_uid: playerUID,
@@ -70,8 +77,13 @@ async function addUser(userData) {
 }
 
 async function getCnnImageURLS() {
-    const CnnImageURLS = await axios.get("https://myx6g22dd2rtcpviw3d5wuz7eu0zudaq.lambda-url.us-west-2.on.aws/")
-        .then(response => response.data)
+    const CnnImageURLS = await axios.get(getCNNDeckURLS)
+        .then(response => {
+            if (response.status != 200) {
+                return []
+            }            
+            return response.data
+        })
     return CnnImageURLS
 }
 
@@ -233,9 +245,14 @@ async function sendError(code1, code2){
     await axios.get(errorURL + code1 + "*" + code2).then(res => {console.log(res)})
     return
 }
-
+async function getGameScore(gameCode,roundNo){
+    const scoreboard = await axios.get(getgameScoreURL + '/' + gameCode + ',' + roundNo).then(response => {
+        return response.data.scoreboard
+    })
+    return scoreboard
+}
 export { ably, checkGameCode, checkEmailCode, addUser, createGame,
     joinGame, getDecks, selectDeck, assignDeck, setDatabaseImages,
     getApiImages, postRoundImage, getDatabaseImage, getPlayers, submitCaption,
     getSubmittedCaptions, postVote, updateScores, leftOverVotingPlayers, getScoreBoard,
-    createNextRound, postCreateRounds, getNextImage, sendError,getCnnImageURLS ,checkGameStarted}
+    createNextRound, postCreateRounds, getNextImage, sendError,getCnnImageURLS ,checkGameStarted,getGameScore,getGameImageForRound}

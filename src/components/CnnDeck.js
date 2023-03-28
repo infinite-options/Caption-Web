@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect,useRef } from "react"
 import { useNavigate, useLocation, Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, getDecks, getCnnImageURLS } from "../util/Api.js"
+import { ably, getDecks, getCnnImageURLS,sendError } from "../util/Api.js"
 import "../styles/CnnDeck.css"
 
 export default function CnnDeck(){
@@ -9,17 +9,57 @@ export default function CnnDeck(){
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
     const [CNNImageURL, setCNNImageURL] = useState([])
-    const [loadingImg, setloadingImg] = useState(true)
-    const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
-
-    useEffect( () => {
+    const [loadingImg, setloadingImg] = useState(0)
+    // const channel = ably.channels.get(`BizBuz/${userData.gameCode}`)
+    const isMessageDisplayed = useRef(false)
+    //loadingImg code : 0  not called service,
+                    // 1:pending for API respoence, 
+                    // 2: takeing more than 30 seconds to for responce
+                    // 3: taking more than 60 seconds to for responce or status in invalid
+                    // 4: success 
+    
+    useEffect(() => {
         async function getCnnURLS(){
-            const CNNImageURL = await getCnnImageURLS()
-            setloadingImg(false)
-            setCNNImageURL(CNNImageURL)
+            const CNNImageURLResponse = await getCnnImageURLS()
+            if (CNNImageURLResponse.length == 0) {
+                setloadingImg(3)
+                isMessageDisplayed.current = true
+                let code1 = "CNN Deck is not loading"
+                let code2 = "loading for the user" + userData.alias
+                // console.log("vote:err")
+                alert("Loading of CNN deck is taking time please go back and select onter deck");
+                sendError(code1, code2)
+            } else {
+                setloadingImg(4)
+                console.log(CNNImageURLResponse)
+                setCNNImageURL(CNNImageURLResponse)
+            }
         }
-        getCnnURLS()
-    }, [])
+        if (loadingImg == 0) {
+            setloadingImg(1)
+            getCnnURLS()
+        }
+            
+        
+        const interval = setInterval(() => {
+            if (!isMessageDisplayed.current) {
+                if (loadingImg == 1) {
+                    alert("Loading of CNN deck is taking time please wait for some more time");
+                    setloadingImg(2)
+                } else {
+                    setloadingImg(3)
+                    isMessageDisplayed.current = true
+                    let code1 = "CNN Deck is not loading"
+                    let code2 = "loading for the user" + userData.alias
+                    // console.log("vote:err")
+                    alert("Loading of CNN deck is taking time please go back and select onter deck");
+                    sendError(code1, code2)
+                }
+            }
+        }, 30000);
+      
+        return () => clearInterval(interval); 
+    }, [loadingImg])
 
     async function handleClick(Link_Url) {
         const updatedUserData = {
@@ -37,8 +77,11 @@ export default function CnnDeck(){
             <h4 className="oneSelectDeck">Select a CNN Image URL</h4>
             <br/>
             <br />
-            {loadingImg &&
-                <img src="/Loading_icon.gif" alt="loading CNN images"  width="250" />
+            {loadingImg !=4 &&
+                 <div>
+                 <img src="/Loading_icon.gif" alt="loading CNN images"  width="250" />
+                 <br/> <h6> CNN Deck may take more time for loading </h6>
+                 </div>
                 // <img  href="" />
 
             }

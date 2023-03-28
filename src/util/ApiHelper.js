@@ -57,7 +57,7 @@ async function getApiImagesHelper(userData){
     }
     else if (userData.deckUID === "500-000010") {
         let cnnURL = await axios.get(userData.CNN_URL).then(response => response.config.url)
-        let cnnImages = await getCnnImgURLs("https://www.cnn.com/2023/02/09/world/gallery/photos-this-week-february-2-february-9/index.html")
+        let cnnImages = await getCnnImgURLs(cnnURL)
         cnnImages = randomize(cnnImages, userData.numOfRounds)
         return cnnImages
     }

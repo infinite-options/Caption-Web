@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react"
+import { useState, useEffect,useRef } from "react"
 import { useNavigate, useLocation,Link } from "react-router-dom"
 import { useCookies } from 'react-cookie'
-import { ably, submitCaption, sendError , getScoreBoard,getSubmittedCaptions } from "../util/Api"
+import { ably, submitCaption, sendError , getScoreBoard,getSubmittedCaptions,getGameImageForRound } from "../util/Api"
 import { CountdownCircleTimer } from "react-countdown-circle-timer"
 import * as ReactBootStrap from 'react-bootstrap'
 import "../styles/Caption.css"
@@ -13,6 +13,7 @@ export default function Caption() {
     const channel = ably.channels.get(`BizBuz/${userData.gameCode}/${userData.roundNumber}`)
     const [caption, setCaption] = useState("")
     const [captionSubmitted, setCaptionSubmitted] = useState(false)
+    const isCaptionDisplayed = useRef(false)
 
     if (cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL) {
         async function sendingError() {
@@ -23,6 +24,23 @@ export default function Caption() {
         }
         sendingError()
     }
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (!isCaptionDisplayed.current && cookies.userData.imageURL !== userData.imageURL) {
+                // getCaptionsForUser()
+                const image_URL = getGameImageForRound(userData.gameCode, userData.roundNumber)
+                const updatedUserData = {
+                    ...userData,
+                    imageURL: image_URL
+                }
+                setUserData(updatedUserData)
+                setCookie("userData", updatedUserData, {path: '/'})
+                isCaptionDisplayed.current = true
+            }
+        }, 5000);
+      
+        return () => clearInterval(interval); // This represents the unmount function, in which you need to clear your interval to prevent memory leaks.
+    }, [])
     async function scoreBoard(){
         const scoreboard = await getScoreBoard(userData)
         scoreboard.sort((a, b) => b.game_score - a.game_score)

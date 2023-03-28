@@ -15,7 +15,7 @@ export default function EndGame(){
             scoreboard.sort((a, b) => b.game_score - a.game_score)
             setScoreBoard(scoreboard)
         }
-        if (cookies.userData === undefined || cookies.userData.scoreBoard === undefined || cookies.userData.scoreBoard.lenght == 0) {
+        if (cookies.userData === undefined || cookies.userData.scoreBoard === undefined || cookies.userData.scoreBoard.length == 0) {
             scoreBoard()
         } else {
             console.log(cookies.userData)

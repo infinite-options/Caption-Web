@@ -27,7 +27,7 @@ export default function CnnDeck(){
                 let code1 = "CNN Deck is not loading"
                 let code2 = "loading for the user" + userData.alias
                 // console.log("vote:err")
-                alert("Loading of CNN deck is taking time please go back and select onter deck");
+                alert("The CNN deck may not be available right now.  Please select another deck.");
                 sendError(code1, code2)
             } else {
                 setloadingImg(4)
@@ -44,7 +44,7 @@ export default function CnnDeck(){
         const interval = setInterval(() => {
             if (!isMessageDisplayed.current) {
                 if (loadingImg == 1) {
-                    alert("Loading of CNN deck is taking time please wait for some more time");
+                    alert("Loading of the CNN deck is taking longer than expected.  Please be patient.");
                     setloadingImg(2)
                 } else {
                     setloadingImg(3)
@@ -52,7 +52,7 @@ export default function CnnDeck(){
                     let code1 = "CNN Deck is not loading"
                     let code2 = "loading for the user" + userData.alias
                     // console.log("vote:err")
-                    alert("Loading of CNN deck is taking time please go back and select onter deck");
+                    alert("The CNN deck may not be available right now.  Please select another deck.");
                     sendError(code1, code2)
                 }
             }
@@ -80,7 +80,7 @@ export default function CnnDeck(){
             {loadingImg !=4 &&
                  <div>
                  <img src="/Loading_icon.gif" alt="loading CNN images"  width="250" />
-                 <br/> <h6> CNN Deck may take more time for loading </h6>
+                 <br/> <h6> Please be patient.  It takes some time to load the CNN deck. </h6>
                  </div>
                 // <img  href="" />
 

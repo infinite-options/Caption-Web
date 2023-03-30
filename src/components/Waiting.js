@@ -12,6 +12,7 @@ export default function Waiting(){
     const [buttonText, setButtonText] = useState("Share with other players")
     const [lobby, setLobby] = useState([])
     const [initialize, setInitialize] = useState(false)
+    const [loadingImg, setloadingImg] = useState(false)
 
     function copyGameCodeButton(){
         navigator.clipboard.writeText(userData.gameCode)
@@ -45,8 +46,10 @@ export default function Waiting(){
     }
 
     useEffect(() => {
-        async function initializeLobby(){
+        async function initializeLobby() {
+            setloadingImg(true)
             const newLobby = await getPlayers(userData.gameCode)
+            setloadingImg(false)
             setLobby(newLobby)
         }
 
@@ -98,6 +101,14 @@ export default function Waiting(){
                     )
                 })}
             </ul>
+            {loadingImg &&
+                 <div>
+                 <img src="/Loading_icon.gif" alt="loading CNN images"  width="250"  className="loadingimg"/>
+                 {/* <br/> <h6> CNN Deck may take more time for loading </h6> */}
+                 </div>
+                // <img  href="" />
+
+            }
             <button className="gameCodeWaiting">Game Code: {userData.gameCode}</button>
             <br/>
             <br/>

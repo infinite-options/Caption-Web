@@ -9,9 +9,13 @@ export default function EndGame(){
     const [userData, setUserData] = useState(location.state)
     const [cookies, setCookie] = useCookies(["userData"])
     const [scoreBoard, setScoreBoard] = useState([])
+    const [loadingImg, setloadingImg] = useState(false)
+
     useEffect(() => {
-        async function scoreBoard(){
+        async function scoreBoard() {
+            setloadingImg(true)
             const scoreboard = await getGameScore(userData.gameCode,userData.numOfRounds)
+            setloadingImg(false)
             scoreboard.sort((a, b) => b.game_score - a.game_score)
             setScoreBoard(scoreboard)
         }
@@ -37,6 +41,14 @@ export default function EndGame(){
                 <br/>
                 <h3>Final Scores</h3>
             </div>
+            {loadingImg &&
+                 <div>
+                 <img src="/Loading_icon.gif" alt="loading CNN images"  width="250"  className="loadingimg"/>
+                 {/* <br/> <h6> CNN Deck may take more time for loading </h6> */}
+                 </div>
+                // <img  href="" />
+
+            }
             <div className="columnsEndGame">
                 <div>Alias</div>
                 <div>Total</div>

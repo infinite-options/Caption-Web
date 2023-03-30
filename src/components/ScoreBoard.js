@@ -13,7 +13,10 @@ export default function ScoreBoard(){
     const isGameEnded = useRef(false)
     const [isScoreBoard, setisScoreBoard] = useState(false)
     const isScoreBoardDisplayed = useRef(false)
-    if(scoreBoard.length === 0 && cookies.userData.scoreBoard != undefined){
+    const [loadingImg, setloadingImg] = useState(true)
+
+    if (scoreBoard.length === 0 && cookies.userData.scoreBoard != undefined) {
+        setloadingImg(false)
         setScoreBoard(cookies.userData.scoreBoard)
     }
 
@@ -21,6 +24,7 @@ export default function ScoreBoard(){
         if(!isScoreBoard && userData.host && cookies.userData.scoreBoard === undefined){
             async function setScoreBoard() {
                 const scoreBoard = await getScoreBoard(userData)
+                setloadingImg(false)
                 scoreBoard.sort((a, b) => b.votes - a.votes)
                 // console.log(scoreBoard)
                 setisScoreBoard(true)
@@ -39,7 +43,8 @@ export default function ScoreBoard(){
             // console.log("score interval")
             if (!isScoreBoardDisplayed.current && scoreBoard.length == 0) {
                 async function getScoreBoard() {
-                    const scoreboard = await getGameScore(userData.gameCode,userData.roundNumber)
+                    const scoreboard = await getGameScore(userData.gameCode, userData.roundNumber)
+                    setloadingImg(false)
                     scoreboard.sort((a, b) => b.game_score - a.game_score)
                     setScoreBoard(scoreboard)
                     return scoreBoard
@@ -142,7 +147,15 @@ export default function ScoreBoard(){
             </div>
             <br/>
             <img className="imgScoreBoard" src={userData.imageURL}/>
-            <br/>
+            <br />
+            {loadingImg &&
+                 <div>
+                 <img src="/Loading_icon.gif" alt="loading CNN images"  width="250"  className="loadingimg"/>
+                 {/* <br/> <h6> CNN Deck may take more time for loading </h6> */}
+                 </div>
+                // <img  href="" />
+
+            }
             <div className="headerScoreBoard">
                 <div>Alias</div>
                 <div>Votes</div>

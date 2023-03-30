@@ -20,6 +20,7 @@ export default function Vote(){
     const backgroundColors = { default: "white", selected: "#f9dd25", myCaption: "gray" }
     const isGameEnded = useRef(false)
     const isCaptionSubmitted = useRef(false)
+    const [loadingImg, setloadingImg] = useState(true)
 
     if(cookies.userData != undefined && cookies.userData.imageURL !== userData.imageURL){
         async function sendingError(){
@@ -87,11 +88,13 @@ export default function Vote(){
         console.log("Start")
         console.log(captions)
         console.log(cookies.userData)
-        if(captions.length === 0 && cookies.userData.captions != undefined){
+        if (captions.length === 0 && cookies.userData.captions != undefined) {
+            setloadingImg(false)
             setSubmittedCaptions(cookies.userData.captions)
             isCaptionSubmitted.current = true
             console.log("get from cookie")
             console.log(cookies.userData.captions)
+            
         }
 
         if(userData.host && cookies.userData.captions === undefined){
@@ -114,7 +117,9 @@ export default function Vote(){
                 console.log("get from ably")
                 console.log(event.data.submittedCaptions)
                 isCaptionSubmitted.current = true
+                setloadingImg(false)
                 setSubmittedCaptions(event.data.submittedCaptions)
+                
             }
             else if(event.data.message === "Start ScoreBoard"){
                 setCookie("userData", userData, {path: '/'})
@@ -144,7 +149,8 @@ export default function Vote(){
         const submittedCaptions = await getSubmittedCaptions(userData)
         console.log("get from service:user")
         console.log(submittedCaptions)
-        setSubmittedCaptions(submittedCaptions)
+        setloadingImg(false)
+        setSubmittedCaptions(submittedCaptions)        
     }
     useEffect(() => {
         const interval = setInterval(() => {
@@ -231,7 +237,15 @@ export default function Vote(){
             <h4 className="favoriteVote">Vote your favorite caption</h4>
             <br/>
             <img className="imgVote" src={userData.imageURL}/>
-            <br/>
+            <br />
+            {loadingImg &&
+                 <div>
+                 <img src="/Loading_icon.gif" alt="loading CNN images"  width="250"  className="loadingimg"/>
+                 {/* <br/> <h6> CNN Deck may take more time for loading </h6> */}
+                 </div>
+                // <img  href="" />
+
+            }
             <div className="captionsContainerVote">
                 {captions.map((caption, index) => {
                     let status = ""
